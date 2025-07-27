@@ -1,23 +1,27 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import StudyTracker from './Components/StudyTracker.jsx';
-import Auth from './Components/Auth.jsx';
+import StudyTracker from './StudyTracker'; // Assuming StudyTracker.jsx is in the same src/ folder
+import Auth from './components/Auth'; // Assuming Auth.jsx is in src/components/
 
+// A helper component to access context values
 function AppContent() {
-  const [theme, setTheme] = useState('light');
-  const { currentUser } = useAuth();
+  const { currentUser, loading } = useAuth();
 
-  return (
-    <div className={theme === 'dark' ? 'dark' : ''}>
-      {currentUser ? (
-        <StudyTracker theme={theme} setTheme={setTheme} />
-      ) : (
-        <Auth theme={theme} setTheme={setTheme} /> 
-      )}
-    </div>
-  );
+  // Show a full-screen loader while Firebase checks the auth state
+  if (loading) {
+     return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-indigo-900 flex items-center justify-center">
+        <div className="text-white text-2xl font-bold">Initializing...</div>
+      </div>
+    );
+  }
+
+  // Once loading is complete, decide which component to show
+  return currentUser ? <StudyTracker /> : <Auth />;
 }
 
+
+// The main App component that provides the context
 function App() {
   return (
     <AuthProvider>
