@@ -1,7 +1,7 @@
 import React from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
 import StudyTracker from './StudyTracker'; // Assuming StudyTracker.jsx is in the same src/ folder
-import Auth from './components/Auth.jsx'; // Assuming Auth.jsx is in src/components/
+import Auth from './Components/Auth.jsx'; // Assuming Auth.jsx is in src/components/
 
 // A helper component to access context values
 function AppContent() {
