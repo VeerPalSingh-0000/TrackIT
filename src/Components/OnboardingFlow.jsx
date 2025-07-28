@@ -80,9 +80,7 @@ const OnboardingFlow = ({ onFinish, onCancel }) => {
   }
 
   return (
-    // The AnimatedModal already provides the main flex container and height constraints
     <AnimatedModal onClose={onCancel}>
-        {/* Header: No longer needs to be inside a separate div */}
         <div className="p-4 sm:p-6 border-b border-slate-700 flex-shrink-0">
           <h2 className="text-xl sm:text-2xl font-bold text-white text-center">Create New Project</h2>
           <div className="w-full bg-slate-700 rounded-full h-2.5 mt-4">
@@ -95,7 +93,6 @@ const OnboardingFlow = ({ onFinish, onCancel }) => {
           </div>
         </div>
 
-        {/* Content: This area will now correctly become scrollable */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-8">
           <AnimatePresence mode="wait">
             {step === 1 && (
@@ -120,95 +117,104 @@ const OnboardingFlow = ({ onFinish, onCancel }) => {
             )}
             
             {step === 2 && (
-               <motion.div key="step2" variants={stepVariants} initial="hidden" animate="visible" exit="exit">
-                 <h3 className="text-lg sm:text-xl font-semibold text-center text-indigo-300 mb-6">Add Topics & Sub-Topics (Optional)</h3>
-                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                   {/* Input Column */}
-                   <div className="bg-slate-900/50 p-4 sm:p-6 rounded-2xl space-y-4">
-                      <h3 className="font-bold text-lg sm:text-xl text-white">Add New Topic</h3>
-                      <input
-                        type="text"
-                        placeholder="Topic Name (e.g., Hooks)"
-                        value={currentTopic.name}
-                        onChange={(e) => setCurrentTopic({ ...currentTopic, name: e.target.value })}
-                        className="w-full p-3 rounded-lg bg-slate-800 border border-slate-600 text-white focus:border-purple-500 outline-none"
-                      />
+              <motion.div key="step2" variants={stepVariants} initial="hidden" animate="visible" exit="exit">
+                <h3 className="text-lg sm:text-xl font-semibold text-center text-indigo-300 mb-6">Add Topics & Sub-Topics (Optional)</h3>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Input Column */}
+                  <div className="bg-slate-900/50 p-4 sm:p-6 rounded-2xl space-y-4">
+                    <h3 className="font-bold text-lg sm:text-xl text-white">Add New Topic</h3>
+                    <input
+                      type="text"
+                      placeholder="Topic Name (e.g., Hooks)"
+                      value={currentTopic.name}
+                      onChange={(e) => setCurrentTopic({ ...currentTopic, name: e.target.value })}
+                      className="w-full p-3 rounded-lg bg-slate-800 border border-slate-600 text-white focus:border-purple-500 outline-none"
+                    />
 
-                      <div className="bg-slate-800/50 p-4 rounded-lg">
-                        <h4 className="text-sm font-bold text-gray-300 mb-3">Add Sub-Topics</h4>
-                        <div className="flex gap-2 mb-3">
-                          <input
-                            type="text"
-                            placeholder="Sub-Topic Name (e.g., useState)"
-                            value={currentSubTopicName}
-                            onChange={(e) => setCurrentSubTopicName(e.target.value)}
-                            onKeyPress={(e) => handleKeyPress(e, addSubTopic)}
-                            className="flex-1 p-2 rounded bg-slate-900 border border-slate-700 text-white focus:border-emerald-500 outline-none"
-                          />
-                          <button onClick={addSubTopic} disabled={!currentSubTopicName.trim()} className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"><FaPlus /></button>
-                        </div>
-                        <AnimatePresence>
-                        {currentTopic.subTopics.length > 0 && (
-                          <motion.div layout className="space-y-2 max-h-32 overflow-y-auto p-1">
-                            {currentTopic.subTopics.map((st) => (
-                              <motion.div layout key={st.id} variants={listItemVariants} initial="hidden" animate="visible" exit="exit" className="flex items-center justify-between bg-slate-900/50 p-2 rounded">
-                                <span className="text-sm text-gray-300"> • {st.name}</span>
-                                <button onClick={() => removeSubTopic(st.id)} className="text-rose-400 hover:text-rose-300 p-1"><FaTrash className="text-xs" /></button>
-                              </motion.div>
-                            ))}
-                          </motion.div>
-                        )}
-                        </AnimatePresence>
+                    <div className="bg-slate-800/50 p-4 rounded-lg">
+                      <h4 className="text-sm font-bold text-gray-300 mb-3">Add Sub-Topics</h4>
+                      {/* ✨ RESPONSIVE CONTAINER: Stacks vertically on mobile, horizontally on larger screens */}
+                      <div className="flex flex-col sm:flex-row gap-2 mb-3">
+                        <input
+                          type="text"
+                          placeholder="Sub-Topic Name (e.g., useState)"
+                          value={currentSubTopicName}
+                          onChange={(e) => setCurrentSubTopicName(e.target.value)}
+                          onKeyPress={(e) => handleKeyPress(e, addSubTopic)}
+                          className="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-white focus:border-emerald-500 outline-none text-sm sm:text-base"
+                        />
+                        <button onClick={addSubTopic} disabled={!currentSubTopicName.trim()} className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                          <FaPlus />
+                          <span className="sm:hidden">Add Sub-Topic</span>
+                        </button>
                       </div>
-                      <AnimatedButton onClick={addTopic} disabled={!currentTopic.name.trim()} className="w-full bg-purple-600 hover:bg-purple-500 text-white" icon={<FaPlus />}>Add Topic</AnimatedButton>
-                   </div>
-                   
-                   <div className="bg-slate-900/50 p-4 sm:p-6 rounded-2xl flex flex-col min-h-[300px]">
-                     <h3 className="font-bold text-lg sm:text-xl text-white mb-4 flex-shrink-0">Project Structure</h3>
-                     <div className="space-y-3 flex-grow overflow-y-auto p-1">
-                        {projectSetup.topics.length === 0 && (
-                            <div className="flex flex-col items-center justify-center h-full text-slate-500">
-                                <FaFolderOpen className="text-4xl mb-4"/>
-                                <p>Your topics will appear here.</p>
+                      <AnimatePresence>
+                      {currentTopic.subTopics.length > 0 && (
+                        <motion.div layout className="space-y-2 max-h-32 overflow-y-auto p-1">
+                          {currentTopic.subTopics.map((st) => (
+                            <motion.div layout key={st.id} variants={listItemVariants} initial="hidden" animate="visible" exit="exit" className="flex items-center justify-between bg-slate-900/50 p-2 rounded">
+                              <span className="text-sm text-gray-300"> • {st.name}</span>
+                              <button onClick={() => removeSubTopic(st.id)} className="text-rose-400 hover:text-rose-300 p-1"><FaTrash className="text-xs" /></button>
+                            </motion.div>
+                          ))}
+                        </motion.div>
+                      )}
+                      </AnimatePresence>
+                    </div>
+                    <AnimatedButton onClick={addTopic} disabled={!currentTopic.name.trim()} className="w-full bg-purple-600 hover:bg-purple-500 text-white" icon={<FaPlus />}>Add Topic</AnimatedButton>
+                  </div>
+                  
+                  <div className="bg-slate-900/50 p-4 sm:p-6 rounded-2xl flex flex-col min-h-[300px]">
+                    <h3 className="font-bold text-lg sm:text-xl text-white mb-4 flex-shrink-0">Project Structure</h3>
+                    <div className="space-y-3 flex-grow overflow-y-auto p-1">
+                      {projectSetup.topics.length === 0 && (
+                        <div className="flex flex-col items-center justify-center h-full text-slate-500">
+                          <FaFolderOpen className="text-3xl sm:text-4xl mb-4"/>
+                          <p>Your topics will appear here.</p>
+                        </div>
+                      )}
+                      <AnimatePresence>
+                      {projectSetup.topics.map((t) => (
+                        <motion.div layout key={t.id} variants={listItemVariants} initial="hidden" animate="visible" exit="exit" className="bg-slate-800 p-3 rounded-lg">
+                          <div className="flex items-center justify-between mb-2">
+                            <p className="font-semibold text-purple-300 flex items-center gap-2"><FaBookmark />{t.name}</p>
+                            <button onClick={() => removeTopic(t.id)} className="text-rose-400 hover:text-rose-300 p-1"><FaTrash className="text-xs" /></button>
+                          </div>
+                          {t.subTopics.length > 0 && (
+                            <div className="pl-4 space-y-1 border-l-2 border-slate-700 ml-2">
+                                {t.subTopics.map((st) => (
+                                    <p key={st.id} className="text-xs text-gray-400 flex items-center gap-2 pt-1"><FaCheck className="text-emerald-400" />{st.name}</p>
+                                ))}
                             </div>
-                        )}
-                        <AnimatePresence>
-                        {projectSetup.topics.map((t) => (
-                          <motion.div layout key={t.id} variants={listItemVariants} initial="hidden" animate="visible" exit="exit" className="bg-slate-800 p-3 rounded-lg">
-                            <div className="flex items-center justify-between mb-2">
-                                <p className="font-semibold text-purple-300 flex items-center gap-2"><FaBookmark />{t.name}</p>
-                                <button onClick={() => removeTopic(t.id)} className="text-rose-400 hover:text-rose-300 p-1"><FaTrash className="text-xs" /></button>
-                            </div>
-                            {t.subTopics.length > 0 && (
-                                <div className="pl-4 space-y-1 border-l-2 border-slate-700 ml-2">
-                                    {t.subTopics.map((st) => (
-                                        <p key={st.id} className="text-xs text-gray-400 flex items-center gap-2 pt-1"><FaCheck className="text-emerald-400" />{st.name}</p>
-                                    ))}
-                                </div>
-                            )}
-                          </motion.div>
-                        ))}
-                        </AnimatePresence>
-                     </div>
-                   </div>
-                 </div>
-               </motion.div>
+                          )}
+                        </motion.div>
+                      ))}
+                      </AnimatePresence>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
             )}
           </AnimatePresence>
         </div>
 
-        {/* Footer: No longer needs to be inside a separate div */}
         <div className="p-4 sm:p-6 border-t border-slate-700 flex justify-between items-center flex-shrink-0">
             {step === 1 ? (
                 <AnimatedButton onClick={onCancel} className="bg-slate-600 hover:bg-slate-500 text-white">Cancel</AnimatedButton>
             ) : (
-                <AnimatedButton onClick={() => setStep(1)} className="bg-slate-600 hover:bg-slate-500 text-white" icon={<FaArrowLeft />}>Back</AnimatedButton>
+                <AnimatedButton onClick={() => setStep(1)} className="bg-slate-600 hover:bg-slate-500 text-white p-3 sm:px-4 sm:py-2" icon={<FaArrowLeft />}>
+                    <span className="hidden sm:inline ml-2">Back</span>
+                </AnimatedButton>
             )}
 
             {step === 1 ? (
-                <AnimatedButton onClick={() => setStep(2)} disabled={!projectSetup.name.trim()} className="bg-indigo-600 hover:bg-indigo-500 text-white" icon={<FaArrowRight />}>Next</AnimatedButton>
+                <AnimatedButton onClick={() => setStep(2)} disabled={!projectSetup.name.trim()} className="bg-indigo-600 hover:bg-indigo-500 text-white p-3 sm:px-4 sm:py-2" icon={<FaArrowRight />}>
+                    <span className="hidden sm:inline ml-2">Next</span>
+                </AnimatedButton>
             ) : (
-                <AnimatedButton onClick={handleFinish} disabled={!projectSetup.name.trim()} className="bg-emerald-600 hover:bg-emerald-500 text-white" icon={<FaCheck />}>Finish & Create</AnimatedButton>
+                <AnimatedButton onClick={handleFinish} disabled={!projectSetup.name.trim()} className="bg-emerald-600 hover:bg-emerald-500 text-white p-3 sm:px-4 sm:py-2" icon={<FaCheck />}>
+                    <span className="hidden sm:inline ml-2">Finish & Create</span>
+                </AnimatedButton>
             )}
         </div>
     </AnimatedModal>
