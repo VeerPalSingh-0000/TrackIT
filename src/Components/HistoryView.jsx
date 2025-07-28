@@ -28,7 +28,7 @@ const HistoryView = ({ projects, studyHistory, formatTime, onClose, timers, topi
 
   return (
     <AnimatedModal onClose={onClose}>
-      <div className="flex flex-col w-[95vw] h-[90vh] max-w-4xl bg-slate-900 rounded-xl shadow-2xl overflow-hidden">
+      <div className="flex flex-col w-[90vw] h-[80vh] max-w-4xl bg-slate-900 rounded-xl shadow-2xl overflow-hidden">
         
         {/* ✨ RESPONSIVE HEADER: Stacks vertically on mobile, horizontally on larger screens */}
         <div className="p-4 sm:p-6 border-b border-slate-700 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 flex-shrink-0">
