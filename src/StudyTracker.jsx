@@ -75,6 +75,9 @@ const StudyTracker = () => {
   const stopwatch = useStudyTimer();
   const pomodoro = usePomodoroTimer(); // Using your new hook
   const playedCuesRef = useRef(new Set());
+  
+  // --- FIX: Ref to prevent re-entry into session end logic ---
+  const sessionCompletedRef = useRef(false);
 
   // --- Functions ---
   const formatTime = (milliseconds) => {
@@ -138,27 +141,45 @@ const StudyTracker = () => {
     }
 
     // 2. Handle the end of a session (work or break)
+    // This is the "timer just finished" state.
     if (!pomodoro.isActive && pomodoro.timeLeft === 0) {
+      
+      // --- FIX: Guard against re-entry ---
+      // If we have already processed this specific completion event, exit early.
+      if (sessionCompletedRef.current) {
+        return;
+      }
+      // Mark this session completion as handled to prevent the logic from running again.
+      sessionCompletedRef.current = true;
+
       const endedMode = pomodoro.mode;
 
       if (endedMode === 'work') {
         toast.success("Work session complete! Time for a break.");
         audioService.play('end');
-        saveSession(POMODORO_DURATIONS.work * 1000); // Save full work session
+        saveSession(POMODORO_DURATIONS.work * 1000);
         const newCycle = pomodoroCycle + 1;
         setPomodoroCycle(newCycle);
         
         const nextBreak = newCycle % 4 === 0 ? 'longBreak' : 'shortBreak';
         pomodoro.resetTimer(nextBreak);
-        // Auto-start the break
-        setTimeout(() => pomodoro.startTimer(), 100);
+
+        // Auto-start the break and reset the completion flag for the next round.
+        setTimeout(() => {
+          pomodoro.startTimer();
+          sessionCompletedRef.current = false; // Reset the lock
+        }, 500); // Increased timeout for stability
       } 
       else { // Break session ended
         toast("Break's over! Let's get back to work.", { icon: '💪' });
-        audioService.play('start'); // Reuse 'start' sound
+        audioService.play('start');
         pomodoro.resetTimer('work');
-        // Auto-start the next work session
-        setTimeout(() => pomodoro.startTimer(), 100);
+
+        // Auto-start the next work session and reset the flag.
+        setTimeout(() => {
+          pomodoro.startTimer();
+          sessionCompletedRef.current = false; // Reset the lock
+        }, 500); // Increased timeout for stability
       }
     }
   }, [pomodoro.timeLeft, pomodoro.isActive, pomodoro.mode, pomodoro, saveSession, pomodoroCycle, setPomodoroCycle]);

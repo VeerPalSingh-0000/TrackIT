@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 
 /**
  * A robust and accurate hook for a "count-up" stopwatch timer.
- * This version is corrected to be fully reliable by removing stale closures.
+ * This version is corrected to be fully reliable.
  */
 export const useStudyTimer = () => {
   // State is used to trigger re-renders for the UI (e.g., Play/Pause button).
@@ -18,7 +18,6 @@ export const useStudyTimer = () => {
 
   // The main "tick" function that runs on each interval.
   const tick = useCallback(() => {
-    // This calculation is always correct because it uses refs.
     const elapsed = Date.now() - startTimeRef.current + timeWhenPausedRef.current;
     setSessionDisplayTime(elapsed);
   }, []);
@@ -46,16 +45,9 @@ export const useStudyTimer = () => {
     setIsSessionRunning(false);
 
     clearInterval(intervalRef.current);
-
-    // --- THE KEY FIX ---
-    // Instead of using the potentially stale `sessionDisplayTime` state,
-    // we calculate the exact elapsed time at the moment of pausing.
     const elapsed = Date.now() - startTimeRef.current + timeWhenPausedRef.current;
-    
-    // We then store this perfectly accurate value in our ref for when we resume.
     timeWhenPausedRef.current = elapsed;
-
-  }, []); // This function no longer depends on any state, removing the stale closure.
+  }, []);
 
   // Function to completely reset the timer.
   const resetTimer = useCallback(() => {
@@ -70,11 +62,15 @@ export const useStudyTimer = () => {
 
   // Function to stop the timer and get the final duration.
   const endSessionAndGetDuration = useCallback(() => {
-    // We use the ref here too for maximum accuracy.
-    const finalDuration = timeWhenPausedRef.current;
+    // --- THE KEY FIX IS HERE ---
+    // We must calculate the final duration based on the timer's state at this exact moment.
+    const finalDuration = isRunningRef.current
+      ? Date.now() - startTimeRef.current + timeWhenPausedRef.current
+      : sessionDisplayTime; // If paused, the display time is already correct.
+    
     resetTimer();
     return finalDuration;
-  }, [resetTimer]);
+  }, [resetTimer, sessionDisplayTime]); // Dependency added for when paused.
 
   // Cleanup effect: ensures the interval is cleared when the component unmounts.
   useEffect(() => {
