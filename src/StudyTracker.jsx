@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useAuth } from "./contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import toast, { Toaster } from "react-hot-toast";
-import * as Tone from 'tone';
+import audioService from './services/audioService';
 
 // Firebase and Custom Hooks
 import {
@@ -11,18 +11,25 @@ import {
   subscribeToUserProjects,
 } from "./firebase/services";
 import { useLocalStorage } from "./hooks/useLocalStorage";
-import { useStudyTimer } from "./hooks/useStudyTimer";
-import { usePomodoroTimer } from "./hooks/usePomodoroTimer";
+import { useStudyTimer } from "./hooks/useStudyTimer"; // Kept for stopwatch mode
+import { usePomodoroTimer } from "./hooks/usePomodoroTimer"; // Your new, improved hook
 
 // Components
 import OnboardingFlow from "./Components/OnboardingFlow";
 import SelectionModal from "./Components/SelectionModal";
 import HistoryView from "./Components/HistoryView";
-import TimerDisplay from "./Components/TimerDisplay";
+import TimerDisplay from "./Components/TimerDisplay"; // Your new display component
 import AnimatedButton from "./Components/ui/AnimatedButton";
 import { FaPlus, FaHistory, FaSignOutAlt, FaTasks, FaPlay, FaPause, FaRedo } from 'react-icons/fa';
 
-// Timer Mode Toggle Component
+// --- Constants ---
+const POMODORO_DURATIONS = {
+  work: 25 * 60,
+  shortBreak: 5 * 60,
+  longBreak: 15 * 60,
+};
+
+// --- Components ---
 const TimerModeToggle = ({ mode, setMode }) => (
   <div className="flex p-1 rounded-full bg-slate-800/80 border border-slate-700 mb-10">
     <button
@@ -64,18 +71,12 @@ const StudyTracker = () => {
   const [timerMode, setTimerMode] = useLocalStorage('timerMode', 'stopwatch');
   const [pomodoroCycle, setPomodoroCycle] = useLocalStorage(`pomodoroCycle_${currentUser.uid}`, 0);
 
-  // Sound Synthesizers
-  const synthRef = useRef(null);
-  useEffect(() => {
-    synthRef.current = new Tone.Synth().toDestination();
-  }, []);
-
-  // Stopwatch Hook
+  // --- Hooks ---
   const stopwatch = useStudyTimer();
-  
-  // Pomodoro Hook (No callback passed in config)
-  const pomodoro = usePomodoroTimer({});
+  const pomodoro = usePomodoroTimer(); // Using your new hook
+  const playedCuesRef = useRef(new Set());
 
+  // --- Functions ---
   const formatTime = (milliseconds) => {
     const totalSeconds = Math.floor(milliseconds / 1000);
     const hours = Math.floor(totalSeconds / 3600);
@@ -87,8 +88,8 @@ const StudyTracker = () => {
     return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  const saveSession = useCallback((duration) => {
-    if (!selectedProject || duration < 1000) {
+  const saveSession = useCallback((durationInMs) => {
+    if (!selectedProject || durationInMs < 1000) {
       if (stopwatch.sessionStartTime) toast.error("Session too short to save.");
       return;
     }
@@ -97,7 +98,7 @@ const StudyTracker = () => {
     const updateTimers = (setter) => {
       setter(prev => ({
         ...prev,
-        [id]: { totalTime: (prev[id]?.totalTime || 0) + duration }
+        [id]: { totalTime: (prev[id]?.totalTime || 0) + durationInMs }
       }));
     };
     if (type === "project") updateTimers(setTimers);
@@ -111,48 +112,58 @@ const StudyTracker = () => {
         topicName: selectedTopic?.name || null,
         subTopicId: selectedSubTopic?.id || null,
         subTopicName: selectedSubTopic?.name || null,
-        duration: duration,
-        startTime: stopwatch.sessionStartTime || (Date.now() - duration),
+        duration: durationInMs,
+        startTime: stopwatch.sessionStartTime || (Date.now() - durationInMs),
         endTime: Date.now(),
         date: new Date().toISOString().split("T")[0],
         type: type,
     };
     setStudyHistory(prev => [sessionRecord, ...prev]);
-    toast.success(`Saved ${formatTime(duration)} session!`);
+    toast.success(`Saved ${formatTime(durationInMs)} session!`);
   }, [selectedProject, selectedTopic, selectedSubTopic, setTimers, setTopicTimers, setSubTopicTimers, setStudyHistory, stopwatch.sessionStartTime, formatTime]);
-  
-  // *** NEW: useEffect to handle Pomodoro session completions ***
+
+  // --- Effects ---
+
+  // Main effect for handling pomodoro logic and audio cues
   useEffect(() => {
-    // Only run when an active timer has just hit zero
-    if (pomodoro.isActive && pomodoro.timeLeft === 0) {
-        const endedMode = pomodoro.mode;
-
-        // --- Work session ended ---
-        if (endedMode === 'work') {
-            toast.success("Work session complete! Time for a break.");
-            synthRef.current?.triggerAttackRelease("C5", "8n");
-            saveSession(25 * 60 * 1000);
-            const newCycle = pomodoroCycle + 1;
-            setPomodoroCycle(newCycle);
-            // Auto-start the correct break
-            if (newCycle % 4 === 0) {
-                pomodoro.resetTimer('longBreak');
-            } else {
-                pomodoro.resetTimer('shortBreak');
-            }
-            pomodoro.startTimer();
-        
-        // --- Break session ended ---
-        } else {
-            toast("Break's over! Let's get back to work.", { icon: '💪' });
-            synthRef.current?.triggerAttackRelease("G5", "8n");
-            // Auto-start the next work session
-            pomodoro.resetTimer('work');
-            pomodoro.startTimer();
+    // 1. Handle audio cues during an active work session
+    if (pomodoro.isActive && pomodoro.mode === 'work') {
+      const checkAndPlay = (time, sound) => {
+        if (pomodoro.timeLeft === time && !playedCuesRef.current.has(sound)) {
+          audioService.play(sound);
+          playedCuesRef.current.add(sound);
         }
+      };
+      checkAndPlay(3, 'countdown');
     }
-  }, [pomodoro.timeLeft, pomodoro.isActive]); // Dependencies dictate when this effect re-runs
 
+    // 2. Handle the end of a session (work or break)
+    if (!pomodoro.isActive && pomodoro.timeLeft === 0) {
+      const endedMode = pomodoro.mode;
+
+      if (endedMode === 'work') {
+        toast.success("Work session complete! Time for a break.");
+        audioService.play('end');
+        saveSession(POMODORO_DURATIONS.work * 1000); // Save full work session
+        const newCycle = pomodoroCycle + 1;
+        setPomodoroCycle(newCycle);
+        
+        const nextBreak = newCycle % 4 === 0 ? 'longBreak' : 'shortBreak';
+        pomodoro.resetTimer(nextBreak);
+        // Auto-start the break
+        setTimeout(() => pomodoro.startTimer(), 100);
+      } 
+      else { // Break session ended
+        toast("Break's over! Let's get back to work.", { icon: '💪' });
+        audioService.play('start'); // Reuse 'start' sound
+        pomodoro.resetTimer('work');
+        // Auto-start the next work session
+        setTimeout(() => pomodoro.startTimer(), 100);
+      }
+    }
+  }, [pomodoro.timeLeft, pomodoro.isActive, pomodoro.mode, pomodoro, saveSession, pomodoroCycle, setPomodoroCycle]);
+
+  // Effect for fetching projects from Firebase
   useEffect(() => {
     if (currentUser) {
       const unsubscribe = subscribeToUserProjects(
@@ -172,24 +183,34 @@ const StudyTracker = () => {
     }
   }, [currentUser, selectedProject]);
 
+  // --- Event Handlers ---
+
   const handleStartPause = async () => {
     if (!selectedProject) {
       toast.error("Please select a project first!");
       setShowSelectionModal(true);
       return;
     }
-    if (Tone.context.state !== 'running') {
-      await Tone.start();
-    }
+    await audioService.init();
 
     if (timerMode === 'stopwatch') {
       stopwatch.isSessionRunning ? stopwatch.pauseTimer() : stopwatch.startTimer();
-    } else { 
-      pomodoro.isActive ? pomodoro.pauseTimer() : pomodoro.startTimer();
+    } else { // Pomodoro mode
+      if (pomodoro.isActive) {
+        pomodoro.pauseTimer();
+      } else {
+        pomodoro.startTimer();
+        if (pomodoro.mode === 'work') {
+          playedCuesRef.current.clear();
+          audioService.play('start');
+        }
+      }
     }
   };
   
   const handleStopOrReset = () => {
+    playedCuesRef.current.clear();
+
     if (timerMode === 'stopwatch') {
       const duration = stopwatch.endSessionAndGetDuration();
       saveSession(duration);
@@ -198,13 +219,12 @@ const StudyTracker = () => {
       const isWorkSession = pomodoro.mode === 'work' && pomodoro.isActive;
       if (isWorkSession) {
         if (window.confirm("Stop this session, save progress, and reset the cycle?")) {
-          const workDuration = 25 * 60;
-          const elapsedTime = workDuration - pomodoro.timeLeft;
-          saveSession(elapsedTime * 1000);
+          const elapsedTimeSec = POMODORO_DURATIONS.work - pomodoro.timeLeft;
+          saveSession(elapsedTimeSec * 1000);
           pomodoro.resetTimer('work');
           setPomodoroCycle(0);
         }
-      } else { // During a break or before starting
+      } else {
         if (window.confirm("Reset the Pomodoro cycle?")) {
           pomodoro.resetTimer('work');
           setPomodoroCycle(0);
@@ -226,7 +246,8 @@ const StudyTracker = () => {
     setSelectedTopic(topic);
     setSelectedSubTopic(subTopic);
     stopwatch.resetTimer();
-    pomodoro.resetTimer();
+    pomodoro.resetTimer('work');
+    playedCuesRef.current.clear();
     setShowSelectionModal(false);
   };
   
@@ -246,10 +267,13 @@ const StudyTracker = () => {
         setSelectedTopic(null);
         setSelectedSubTopic(null);
         stopwatch.resetTimer();
-        pomodoro.resetTimer();
+        pomodoro.resetTimer('work');
+        playedCuesRef.current.clear();
     }
     toast.success("Project deleted successfully.");
   };
+
+  // --- Render Logic ---
 
   if (dataLoading) {
     return <div className="min-h-screen bg-gradient-to-br from-slate-900 to-indigo-900 flex items-center justify-center text-white text-xl">Loading your projects...</div>;
@@ -257,7 +281,7 @@ const StudyTracker = () => {
 
   const isRunning = timerMode === 'stopwatch' ? stopwatch.isSessionRunning : pomodoro.isActive;
   const displayTime = timerMode === 'stopwatch' ? stopwatch.sessionDisplayTime : pomodoro.timeLeft * 1000;
-  const hasStarted = timerMode === 'stopwatch' ? stopwatch.sessionStartTime !== null : pomodoro.timeLeft < (pomodoro.mode === 'work' ? 25*60 : pomodoro.mode === 'shortBreak' ? 5*60 : 15*60);
+  const hasStarted = timerMode === 'stopwatch' ? stopwatch.sessionStartTime !== null : pomodoro.timeLeft < POMODORO_DURATIONS[pomodoro.mode];
 
   const getPomodoroStatusText = () => {
     if (pomodoro.mode === 'work') return `Focus Session ${pomodoroCycle + 1} / 4`;
@@ -266,30 +290,25 @@ const StudyTracker = () => {
     return "";
   }
 
-  const renderTimerControls = () => {
-    return (
-      <div className="flex items-center gap-3">
-        <motion.button onClick={handleStartPause} className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full text-white font-bold text-2xl flex items-center justify-center transition-all shadow-2xl ${isRunning ? "bg-amber-500" : "bg-green-500"}`} whileHover={{scale: 1.1}} whileTap={{scale:0.9}}>
-            {isRunning ? <FaPause /> : <FaPlay />}
-        </motion.button>
-        {hasStarted && (
-          <AnimatedButton 
-              onClick={handleStopOrReset} 
-              className="bg-slate-600 hover:bg-slate-500 text-white !px-4 sm:!px-6" 
-              icon={<FaRedo />} 
-          />
-        )}
-      </div>
-    );
-  }
+  const renderTimerControls = () => (
+    <div className="flex items-center gap-3">
+      <motion.button onClick={handleStartPause} className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full text-white font-bold text-2xl flex items-center justify-center transition-all shadow-2xl ${isRunning ? "bg-amber-500" : "bg-green-500"}`} whileHover={{scale: 1.1}} whileTap={{scale:0.9}}>
+          {isRunning ? <FaPause /> : <FaPlay />}
+      </motion.button>
+      {hasStarted && (
+        <AnimatedButton 
+            onClick={handleStopOrReset} 
+            className="bg-slate-600 hover:bg-slate-500 text-white !px-4 sm:!px-6" 
+            icon={<FaRedo />} 
+        />
+      )}
+    </div>
+  );
 
   return (
     <>
       <Toaster position="bottom-center" toastOptions={{
-        style: {
-          background: '#1E293B',
-          color: '#F1F5F9',
-        },
+        style: { background: '#1E293B', color: '#F1F5F9' },
       }} />
       <div className="min-h-screen bg-gradient-to-br from-slate-900 to-indigo-900 text-slate-100 font-sans flex flex-col">
         <header className="p-4 flex justify-between items-center border-b border-slate-700/50 sticky top-0 bg-slate-900/50 backdrop-blur-lg z-10">
@@ -307,9 +326,7 @@ const StudyTracker = () => {
         </header>
 
         <main className="flex-grow flex flex-col items-center justify-center p-4 sm:p-8 text-center">
-            
             <TimerModeToggle mode={timerMode} setMode={setTimerMode} />
-
             <TimerDisplay time={displayTime} isRunning={isRunning} formatTime={formatTime} />
             
             {timerMode === 'pomodoro' && (

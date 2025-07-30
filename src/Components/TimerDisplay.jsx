@@ -1,10 +1,8 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion'; // <-- FIX: AnimatePresence is now imported
+import { motion, AnimatePresence } from 'framer-motion';
 
 const TimerDisplay = ({ time, isRunning, formatTime }) => {
-  const seconds = Math.floor(time / 1000);
-  // A more fluid progress animation that loops every 60 seconds
-  const progress = (seconds % 60) / 59; 
+  // This 'progress' variable is not used in the final JSX, so it can be removed for cleanup.
 
   return (
     <motion.div
@@ -21,12 +19,18 @@ const TimerDisplay = ({ time, isRunning, formatTime }) => {
         </defs>
         <circle cx="60" cy="60" r="54" fill="none" strokeWidth="12" className="text-slate-700/50" />
         <motion.circle
-          cx="60" cy="60" r="54" fill="none" stroke="url(#timerGradient)"
+          cx="60"
+          cy="60"
+          r="54"
+          fill="none"
+          stroke="url(#timerGradient)"
           strokeWidth="12"
           strokeLinecap="round"
           pathLength="1"
           strokeDasharray="1"
-          // Animate strokeDashoffset for a continuous "loading bar" effect
+          // --- FIX IS HERE ---
+          // The 'initial' prop defines the starting state for the animation.
+          initial={{ strokeDashoffset: 1 }}
           animate={{ strokeDashoffset: isRunning ? [1, 0, 1] : 1 }}
           transition={{ 
             duration: 60, 
@@ -41,7 +45,6 @@ const TimerDisplay = ({ time, isRunning, formatTime }) => {
           {formatTime(time)}
         </h2>
         
-        {/* This component needs to be imported to be used */}
         <AnimatePresence>
           {isRunning && (
             <motion.p

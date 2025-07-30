@@ -1,48 +1,85 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
+/**
+ * A robust and accurate hook for a "count-up" stopwatch timer.
+ * This version is corrected to be fully reliable by removing stale closures.
+ */
 export const useStudyTimer = () => {
-  const [sessionStartTime, setSessionStartTime] = useState(null);
+  // State is used to trigger re-renders for the UI (e.g., Play/Pause button).
   const [isSessionRunning, setIsSessionRunning] = useState(false);
-  const [timeWhenPaused, setTimeWhenPaused] = useState(0);
   const [sessionDisplayTime, setSessionDisplayTime] = useState(0);
+  const [sessionStartTime, setSessionStartTime] = useState(null);
 
-  useEffect(() => {
-    let interval;
-    if (isSessionRunning) {
-      interval = setInterval(() => {
-        setSessionDisplayTime(Date.now() - sessionStartTime);
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [isSessionRunning, sessionStartTime]);
+  // --- Refs for synchronous, reliable timer logic ---
+  const intervalRef = useRef(null);
+  const startTimeRef = useRef(0);
+  const timeWhenPausedRef = useRef(0);
+  const isRunningRef = useRef(false);
 
-  const startTimer = useCallback(() => {
-    setSessionStartTime(Date.now() - timeWhenPaused);
-    setIsSessionRunning(true);
-  }, [timeWhenPaused]);
-
-  const pauseTimer = useCallback(() => {
-    setIsSessionRunning(false);
-    setTimeWhenPaused(Date.now() - sessionStartTime);
-  }, [sessionStartTime]);
-  
-  const resetTimer = useCallback(() => {
-    setIsSessionRunning(false);
-    setSessionStartTime(null);
-    setTimeWhenPaused(0);
-    setSessionDisplayTime(0);
+  // The main "tick" function that runs on each interval.
+  const tick = useCallback(() => {
+    // This calculation is always correct because it uses refs.
+    const elapsed = Date.now() - startTimeRef.current + timeWhenPausedRef.current;
+    setSessionDisplayTime(elapsed);
   }, []);
 
-  const endSessionAndGetDuration = useCallback(() => {
-    if (!sessionStartTime) return 0;
+  // Function to start or resume the timer.
+  const startTimer = useCallback(() => {
+    if (isRunningRef.current) return;
+
+    isRunningRef.current = true;
+    setIsSessionRunning(true);
     
-    const sessionDuration = isSessionRunning
-      ? Date.now() - sessionStartTime
-      : timeWhenPaused;
-      
+    const now = Date.now();
+    startTimeRef.current = now;
+    setSessionStartTime(now);
+
+    clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(tick, 100);
+  }, [tick]);
+
+  // Function to pause the timer.
+  const pauseTimer = useCallback(() => {
+    if (!isRunningRef.current) return;
+
+    isRunningRef.current = false;
+    setIsSessionRunning(false);
+
+    clearInterval(intervalRef.current);
+
+    // --- THE KEY FIX ---
+    // Instead of using the potentially stale `sessionDisplayTime` state,
+    // we calculate the exact elapsed time at the moment of pausing.
+    const elapsed = Date.now() - startTimeRef.current + timeWhenPausedRef.current;
+    
+    // We then store this perfectly accurate value in our ref for when we resume.
+    timeWhenPausedRef.current = elapsed;
+
+  }, []); // This function no longer depends on any state, removing the stale closure.
+
+  // Function to completely reset the timer.
+  const resetTimer = useCallback(() => {
+    isRunningRef.current = false;
+    setIsSessionRunning(false);
+    clearInterval(intervalRef.current);
+    setSessionDisplayTime(0);
+    setSessionStartTime(null);
+    startTimeRef.current = 0;
+    timeWhenPausedRef.current = 0;
+  }, []);
+
+  // Function to stop the timer and get the final duration.
+  const endSessionAndGetDuration = useCallback(() => {
+    // We use the ref here too for maximum accuracy.
+    const finalDuration = timeWhenPausedRef.current;
     resetTimer();
-    return sessionDuration;
-  }, [isSessionRunning, sessionStartTime, timeWhenPaused, resetTimer]);
+    return finalDuration;
+  }, [resetTimer]);
+
+  // Cleanup effect: ensures the interval is cleared when the component unmounts.
+  useEffect(() => {
+    return () => clearInterval(intervalRef.current);
+  }, []);
 
   return {
     isSessionRunning,
