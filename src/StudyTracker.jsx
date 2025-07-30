@@ -20,7 +20,7 @@ import SelectionModal from "./Components/SelectionModal";
 import HistoryView from "./Components/HistoryView";
 import TimerDisplay from "./Components/TimerDisplay";
 import AnimatedButton from "./Components/ui/AnimatedButton";
-import { FaPlus, FaHistory, FaSignOutAlt, FaTasks, FaPlay, FaPause, FaStop, FaRedo } from 'react-icons/fa';
+import { FaPlus, FaHistory, FaSignOutAlt, FaTasks, FaPlay, FaPause, FaRedo } from 'react-icons/fa';
 
 // Timer Mode Toggle Component
 const TimerModeToggle = ({ mode, setMode }) => (
@@ -63,7 +63,6 @@ const StudyTracker = () => {
   // --- TIMER STATE MANAGEMENT ---
   const [timerMode, setTimerMode] = useLocalStorage('timerMode', 'stopwatch');
   const [pomodoroCycle, setPomodoroCycle] = useLocalStorage(`pomodoroCycle_${currentUser.uid}`, 0);
-  const [isBreakPending, setIsBreakPending] = useState(false); // New state for manual break start
 
   // Sound Synthesizers
   const synthRef = useRef(null);
@@ -73,6 +72,9 @@ const StudyTracker = () => {
 
   // Stopwatch Hook
   const stopwatch = useStudyTimer();
+  
+  // Pomodoro Hook (No callback passed in config)
+  const pomodoro = usePomodoroTimer({});
 
   const formatTime = (milliseconds) => {
     const totalSeconds = Math.floor(milliseconds / 1000);
@@ -118,28 +120,38 @@ const StudyTracker = () => {
     setStudyHistory(prev => [sessionRecord, ...prev]);
     toast.success(`Saved ${formatTime(duration)} session!`);
   }, [selectedProject, selectedTopic, selectedSubTopic, setTimers, setTopicTimers, setSubTopicTimers, setStudyHistory, stopwatch.sessionStartTime, formatTime]);
+  
+  // *** NEW: useEffect to handle Pomodoro session completions ***
+  useEffect(() => {
+    // Only run when an active timer has just hit zero
+    if (pomodoro.isActive && pomodoro.timeLeft === 0) {
+        const endedMode = pomodoro.mode;
 
-  const handlePomodoroSessionEnd = useCallback((endedMode) => {
-    if (endedMode === 'work') {
-      toast.success("Work session complete! Time for a break.");
-      synthRef.current?.triggerAttackRelease("C5", "8n");
-      saveSession(25 * 60 * 1000); 
-      const newCycle = pomodoroCycle + 1;
-      setPomodoroCycle(newCycle);
-      if (newCycle % 4 === 0) {
-        pomodoro.resetTimer('longBreak');
-      } else {
-        pomodoro.resetTimer('shortBreak');
-      }
-      setIsBreakPending(true); // Set break as pending
-    } else { 
-      toast("Break's over! Let's get back to work.", { icon: '💪' });
-      synthRef.current?.triggerAttackRelease("G5", "8n");
-      pomodoro.resetTimer('work');
+        // --- Work session ended ---
+        if (endedMode === 'work') {
+            toast.success("Work session complete! Time for a break.");
+            synthRef.current?.triggerAttackRelease("C5", "8n");
+            saveSession(25 * 60 * 1000);
+            const newCycle = pomodoroCycle + 1;
+            setPomodoroCycle(newCycle);
+            // Auto-start the correct break
+            if (newCycle % 4 === 0) {
+                pomodoro.resetTimer('longBreak');
+            } else {
+                pomodoro.resetTimer('shortBreak');
+            }
+            pomodoro.startTimer();
+        
+        // --- Break session ended ---
+        } else {
+            toast("Break's over! Let's get back to work.", { icon: '💪' });
+            synthRef.current?.triggerAttackRelease("G5", "8n");
+            // Auto-start the next work session
+            pomodoro.resetTimer('work');
+            pomodoro.startTimer();
+        }
     }
-  }, [pomodoroCycle, setPomodoroCycle, saveSession]);
-
-  const pomodoro = usePomodoroTimer({ onSessionEnd: handlePomodoroSessionEnd });
+  }, [pomodoro.timeLeft, pomodoro.isActive]); // Dependencies dictate when this effect re-runs
 
   useEffect(() => {
     if (currentUser) {
@@ -161,7 +173,6 @@ const StudyTracker = () => {
   }, [currentUser, selectedProject]);
 
   const handleStartPause = async () => {
-    if (isBreakPending) return; // Don't allow start/pause if a break is pending user action
     if (!selectedProject) {
       toast.error("Please select a project first!");
       setShowSelectionModal(true);
@@ -178,33 +189,25 @@ const StudyTracker = () => {
     }
   };
   
-  const handleStartBreak = async () => {
-    if (Tone.context.state !== 'running') {
-      await Tone.start();
-    }
-    pomodoro.startTimer();
-    setIsBreakPending(false);
-  }
-
-  const handleStop = () => {
+  const handleStopOrReset = () => {
     if (timerMode === 'stopwatch') {
       const duration = stopwatch.endSessionAndGetDuration();
       saveSession(duration);
       stopwatch.resetTimer();
-    } else { 
-      if (pomodoro.mode === 'work' && pomodoro.isActive) {
-        if (window.confirm("Stop this session and save your progress?")) {
+    } else { // Pomodoro Mode
+      const isWorkSession = pomodoro.mode === 'work' && pomodoro.isActive;
+      if (isWorkSession) {
+        if (window.confirm("Stop this session, save progress, and reset the cycle?")) {
           const workDuration = 25 * 60;
           const elapsedTime = workDuration - pomodoro.timeLeft;
           saveSession(elapsedTime * 1000);
           pomodoro.resetTimer('work');
           setPomodoroCycle(0);
         }
-      } else { 
+      } else { // During a break or before starting
         if (window.confirm("Reset the Pomodoro cycle?")) {
           pomodoro.resetTimer('work');
           setPomodoroCycle(0);
-          setIsBreakPending(false);
         }
       }
     }
@@ -214,7 +217,7 @@ const StudyTracker = () => {
     const isRunning = timerMode === 'stopwatch' ? stopwatch.isSessionRunning : pomodoro.isActive;
     if (isRunning) {
         if (window.confirm("A session is running. Do you want to end it and switch tasks?")) {
-            handleStop();
+            handleStopOrReset();
         } else {
             return;
         }
@@ -224,7 +227,6 @@ const StudyTracker = () => {
     setSelectedSubTopic(subTopic);
     stopwatch.resetTimer();
     pomodoro.resetTimer();
-    setIsBreakPending(false);
     setShowSelectionModal(false);
   };
   
@@ -265,31 +267,18 @@ const StudyTracker = () => {
   }
 
   const renderTimerControls = () => {
-    if (timerMode === 'pomodoro' && isBreakPending) {
-      return (
-        <motion.button 
-          onClick={handleStartBreak} 
-          className="w-24 h-24 rounded-full text-white font-bold text-lg flex items-center justify-center transition-all shadow-2xl bg-sky-500" 
-          whileHover={{scale: 1.1}} whileTap={{scale:0.9}}
-        >
-          Start Break
-        </motion.button>
-      );
-    }
-    
-    const stopIcon = (timerMode === 'pomodoro' && pomodoro.mode === 'work' && pomodoro.isActive) ? <FaStop /> : <FaRedo />;
-
     return (
       <div className="flex items-center gap-3">
         <motion.button onClick={handleStartPause} className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full text-white font-bold text-2xl flex items-center justify-center transition-all shadow-2xl ${isRunning ? "bg-amber-500" : "bg-green-500"}`} whileHover={{scale: 1.1}} whileTap={{scale:0.9}}>
             {isRunning ? <FaPause /> : <FaPlay />}
         </motion.button>
-        <AnimatedButton 
-            onClick={handleStop} 
-            disabled={!hasStarted && !isBreakPending} 
-            className="bg-slate-600 hover:bg-slate-500 text-white disabled:opacity-50 !px-4 sm:!px-6" 
-            icon={stopIcon} 
-        />
+        {hasStarted && (
+          <AnimatedButton 
+              onClick={handleStopOrReset} 
+              className="bg-slate-600 hover:bg-slate-500 text-white !px-4 sm:!px-6" 
+              icon={<FaRedo />} 
+          />
+        )}
       </div>
     );
   }
