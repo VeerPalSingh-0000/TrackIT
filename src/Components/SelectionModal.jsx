@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import AnimatedModal from './ui/AnimatedModal';
-import ProjectCard from './ProjectCard'; // Assuming ProjectCard is in the same folder
+import ProjectCard from './ProjectCard';
 
 const listVariants = {
   visible: {
@@ -22,6 +22,8 @@ const SelectionModal = ({
   onSelect,
   onClose,
   onDeleteProject,
+  // ✨ 1. Accept the onEditProject prop
+  onEditProject,
   timers,
   topicTimers,
   subTopicTimers,
@@ -48,11 +50,12 @@ const SelectionModal = ({
             >
                 {projects.map(project => (
                     <motion.div key={project.id} variants={itemVariants}>
-                        {/* THE FIX: Pass all the necessary props down to ProjectCard */}
                         <ProjectCard
                             project={project}
                             onSelect={onSelect}
                             onDeleteProject={onDeleteProject}
+                            // ✨ 2. Pass the onEditProject prop down to the card
+                            onEditProject={onEditProject}
                             timers={timers}
                             topicTimers={topicTimers}
                             subTopicTimers={subTopicTimers}

@@ -1,0 +1,26 @@
+<svg width="100" height="100" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- 
+        This is a modern, abstract SVG icon for a "Study Tracker".
+        It combines a pencil (study) and an hourglass (time) in a circular design.
+        The use of a gradient gives it a fresh, app-like feel.
+    -->
+    <defs>
+        <linearGradient id="coolGradient" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#6A82FB" />
+            <stop offset="100%" stop-color="#FC5C7D" />
+        </linearGradient>
+    </defs>
+
+    <!-- Background Circle -->
+    <circle cx="12" cy="12" r="11" fill="url(#coolGradient)"/>
+
+    <!-- Pencil Icon -->
+    <path d="M15.5 4.5L19.5 8.5L9 19L5 19L5 15L15.5 4.5Z" fill="white" stroke="white" stroke-width="0.5" stroke-linejoin="round"/>
+    <path d="M14 6L18 10" stroke="#EFEFEF" stroke-width="0.7" stroke-linecap="round"/>
+
+    <!-- Hourglass Icon overlayed on the pencil -->
+    <path d="M9 9C9 9.82843 9.67157 10.5 10.5 10.5C11.3284 10.5 12 9.82843 12 9V8C12 7.17157 11.3284 6.5 10.5 6.5C9.67157 6.5 9 7.17157 9 8V9Z" fill="rgba(255,255,255,0.8)"/>
+    <path d="M9 15C9 14.1716 9.67157 13.5 10.5 13.5C11.3284 13.5 12 14.1716 12 15V16C12 16.8284 11.3284 17.5 10.5 17.5C9.67157 17.5 9 16.8284 9 16V15Z" fill="rgba(255,255,255,0.8)"/>
+    <path d="M9.5 10.5H11.5" stroke="#FC5C7D" stroke-width="0.8" stroke-linecap="round"/>
+
+</svg>
