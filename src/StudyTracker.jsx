@@ -16,13 +16,13 @@ import { useStudyTimer } from "./hooks/useStudyTimer";
 import { usePomodoroTimer } from "./hooks/usePomodoroTimer";
 
 // Components
+import Navbar from "./Components/Navbar";
 import OnboardingFlow from "./Components/OnboardingFlow";
 import SelectionModal from "./Components/SelectionModal";
 import HistoryView from "./Components/HistoryView";
 import TimerDisplay from "./Components/TimerDisplay";
 import AnimatedButton from "./Components/ui/AnimatedButton";
-import AmbientSounds from "./Components/AmbientSounds"; 
-import { FaPlus, FaHistory, FaSignOutAlt, FaTasks, FaPlay, FaPause, FaRedo } from 'react-icons/fa';
+import { FaTasks, FaPlay, FaPause, FaRedo } from 'react-icons/fa';
 
 // --- Constants ---
 const POMODORO_DURATIONS = {
@@ -296,27 +296,12 @@ const StudyTracker = () => {
     <>
       <Toaster position="bottom-center" toastOptions={{ style: { background: '#1E293B', color: '#F1F5F9' } }} />
       <div className="min-h-screen bg-gradient-to-br from-slate-900 to-indigo-900 text-slate-100 font-sans flex flex-col">
-        <header className="p-4 flex justify-between items-center border-b border-slate-700/50 sticky top-0 bg-slate-900/50 backdrop-blur-lg z-20">
-            <h1 className="text-xl sm:text-2xl font-bold text-white">FocusFlow</h1>
-            
-            <div className="flex items-center gap-2">
-                <AmbientSounds />
-                
-                {/* Desktop Header Buttons */}
-                <div className="hidden sm:flex items-center gap-2">
-                    <AnimatedButton onClick={handleOpenCreateModal} className="bg-emerald-600 hover:bg-emerald-500 text-white" icon={<FaPlus />}>New Project</AnimatedButton>
-                    <AnimatedButton onClick={() => setShowHistory(true)} className="bg-slate-700 hover:bg-slate-600 text-white" icon={<FaHistory />}>History</AnimatedButton>
-                    <AnimatedButton onClick={logout} className="bg-rose-600 hover:bg-rose-500 text-white" icon={<FaSignOutAlt />}>Logout</AnimatedButton>
-                </div>
-
-                {/* ✨ CORRECTED Mobile Header Buttons ✨ */}
-                <div className="sm:hidden flex items-center gap-2">
-                    <AnimatedButton onClick={handleOpenCreateModal} className="bg-emerald-600 hover:bg-emerald-500 text-white !px-4" icon={<FaPlus />} />
-                    <AnimatedButton onClick={() => setShowHistory(true)} className="bg-slate-700 hover:bg-slate-600 text-white !px-4" icon={<FaHistory />} />
-                    <AnimatedButton onClick={logout} className="bg-rose-600 hover:bg-rose-500 text-white !px-4" icon={<FaSignOutAlt />} />
-                </div>
-            </div>
-        </header>
+        
+        <Navbar 
+          onNewProjectClick={handleOpenCreateModal}
+          onHistoryClick={() => setShowHistory(true)}
+          onLogout={logout}
+        />
 
         <main className="flex-grow flex flex-col items-center justify-center p-4 sm:p-8 text-center">
           <TimerModeToggle mode={timerMode} setMode={setTimerMode} />
