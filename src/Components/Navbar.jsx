@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import AnimatedButton from './ui/AnimatedButton';
 import AmbientSounds from './AmbientSounds';
 import { FaPlus, FaHistory, FaSignOutAlt, FaBars, FaTimes } from 'react-icons/fa';
-import TrackerLogo from '../../public/TrackerLogo.png';
+import TrackerLogo from '../../public/clock.png';
 
 /**
  * The main navigation bar for the application.
@@ -22,14 +22,14 @@ const Navbar = ({ onNewProjectClick, onHistoryClick, onLogout }) => {
   };
 
   return (
-    <header className="p-4 flex justify-between items-center border-b border-slate-700/50 sticky top-0 bg-slate-900/50 backdrop-blur-lg z-20">
+    <header className="p-1  flex justify-between items-center border-b border-slate-700/50 sticky top-0 bg-slate-900/50 backdrop-blur-lg z-20">
       
       {/* ✨ Logo and Title Section */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-0">
         {/* ✨ FIX: Increased logo size from h-8 to h-10 */}
         <img src={TrackerLogo} alt="FocusFlow Logo" className="h-20 w-auto" />
         {/* ✨ FIX: Re-added the title for better branding on larger screens */}
-        <span className="hidden sm:block text-2xl font-bold text-white">FocusFlow</span>
+        <span className=" sm:block text-2xl font-bold text-white">FocusFlow</span>
       </div>
       
       <div className="flex items-center gap-2">
