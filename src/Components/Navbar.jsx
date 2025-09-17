@@ -27,7 +27,7 @@ const Navbar = ({ onNewProjectClick, onHistoryClick, onLogout }) => {
       {/* ✨ Logo and Title Section */}
       <div className="flex items-center gap-0">
         {/* ✨ FIX: Increased logo size from h-8 to h-10 */}
-        <img src={TrackerLogo} alt="FocusFlow Logo" className="h-20 w-auto" />
+        <img src={TrackerLogo} alt="FocusFlow Logo" className="h-20 w-auto" loading="eager" />
         {/* ✨ FIX: Re-added the title for better branding on larger screens */}
         <span className=" sm:block text-2xl font-bold text-white">FocusFlow</span>
       </div>
