@@ -10,6 +10,12 @@ import {
   updateProjectInFirebase,
   deleteProjectFromFirebase,
   subscribeToUserProjects,
+  addSessionToFirebase,
+  subscribeToUserSessions,
+  saveTimerDataToFirebase,
+  loadTimerDataFromFirebase,
+  getUserProfile,
+  markOnboardingComplete,
 } from "./firebase/services";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 import { useStudyTimer } from "./hooks/useStudyTimer";
@@ -22,9 +28,13 @@ import SelectionModal from "./Components/SelectionModal";
 import HistoryView from "./Components/HistoryView";
 import TimerDisplay from "./Components/TimerDisplay";
 import AnimatedButton from "./Components/ui/AnimatedButton";
+import About from "./Components/About";
+import Features from "./Components/Features";
+import WelcomeScreen from "./Components/WelcomeScreen";
 
 // Icons
 import { FaTasks, FaPlay, FaPause, FaRedo } from 'react-icons/fa';
+import TrackerLogo from '../public/clock.png';
 
 // --- Constants ---
 const POMODORO_DURATIONS = {
@@ -36,32 +46,43 @@ const POMODORO_DURATIONS = {
 // --- Helper & UI Components ---
 
 /**
- * A visually appealing SVG-based loader.
+ * Premium splash loader with logo.
  */
 const Loader = () => (
-  <div className="flex flex-col items-center justify-center gap-4">
-    <svg className="w-16 h-16 animate-spin text-violet-500" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" fillOpacity="0.2" />
-      <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0492C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentColor" />
-    </svg>
-    <p className="text-slate-400">Loading</p>
+  <div className="flex flex-col items-center justify-center gap-6">
+    <div className="relative">
+      <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-2xl animate-pulse" />
+      <img src={TrackerLogo} alt="FocusFlow" className="relative w-20 h-20 object-contain animate-pulse" />
+    </div>
+    <div className="flex items-center gap-2">
+      <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+      <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+      <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+    </div>
   </div>
 );
 
 /**
- * Toggles between Stopwatch and Pomodoro modes.
+ * Toggles between Stopwatch and Pomodoro modes — refined pill toggle.
  */
 const TimerModeToggle = React.memo(({ mode, setMode }) => (
-  <div className="flex p-1 rounded-full bg-slate-800/80 border border-slate-700 mb-10">
+  <div className="relative flex p-1 rounded-full bg-slate-800/60 backdrop-blur-sm border border-white/[0.06] mb-10">
+    {/* Sliding indicator */}
+    <motion.div 
+      className="absolute top-1 bottom-1 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 shadow-lg shadow-violet-500/20"
+      animate={{ x: mode === 'stopwatch' ? 0 : '100%', width: '50%' }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+      style={{ width: 'calc(50% - 2px)', left: 2 }}
+    />
     <button
       onClick={() => setMode('stopwatch')}
-      className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors duration-300 ${mode === 'stopwatch' ? 'bg-violet-600 text-white' : 'text-slate-400 hover:bg-slate-700'}`}
+      className={`relative z-10 px-5 py-2 text-[13px] font-semibold rounded-full transition-colors duration-200 ${mode === 'stopwatch' ? 'text-white' : 'text-slate-400 hover:text-slate-300'}`}
     >
       Stopwatch
     </button>
     <button
       onClick={() => setMode('pomodoro')}
-      className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors duration-300 ${mode === 'pomodoro' ? 'bg-violet-600 text-white' : 'text-slate-400 hover:bg-slate-700'}`}
+      className={`relative z-10 px-5 py-2 text-[13px] font-semibold rounded-full transition-colors duration-200 ${mode === 'pomodoro' ? 'text-white' : 'text-slate-400 hover:text-slate-300'}`}
     >
       Pomodoro
     </button>
@@ -69,17 +90,19 @@ const TimerModeToggle = React.memo(({ mode, setMode }) => (
 ));
 
 /**
- * Displays the currently selected task hierarchy.
+ * Displays the currently selected task hierarchy — cleaner card.
  */
 const CurrentTask = React.memo(({ project, topic, subTopic }) => {
-    const taskName = project 
-        ? `${project.name} ${topic ? `› ${topic.name}` : ''} ${subTopic ? `› ${subTopic.name}` : ''}`
-        : "No Task Selected";
+    const parts = [];
+    if (project) parts.push(project.name);
+    if (topic) parts.push(topic.name);
+    if (subTopic) parts.push(subTopic.name);
+    const taskName = parts.length > 0 ? parts.join(' › ') : 'No Task Selected';
 
     return (
-        <div className="p-4 rounded-2xl bg-slate-800/50 backdrop-blur-sm border border-slate-700/80 w-full">
-            <h3 className="text-xs font-semibold text-violet-400 uppercase tracking-widest mb-1">Current Task</h3>
-            <p className="text-lg sm:text-xl font-bold text-slate-100 truncate h-7" title={taskName}>
+        <div className="p-4 rounded-2xl bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] w-full">
+            <h3 className="text-[11px] font-semibold text-violet-400/80 uppercase tracking-[0.15em] mb-1.5">Current Task</h3>
+            <p className="text-base sm:text-lg font-semibold text-slate-100 truncate" title={taskName}>
                 {taskName}
             </p>
         </div>
@@ -134,24 +157,61 @@ const StudyTracker = () => {
   const [projects, setProjects] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [isCompletingSession, setIsCompletingSession] = useState(false);
-  const [timers, setTimers] = useLocalStorage(`timers_${currentUser.uid}`, {});
-  const [topicTimers, setTopicTimers] = useLocalStorage(`topicTimers_${currentUser.uid}`, {});
-  const [subTopicTimers, setSubTopicTimers] = useLocalStorage(`subTopicTimers_${currentUser.uid}`, {});
-  const [studyHistory, setStudyHistory] = useLocalStorage(`studyHistory_${currentUser.uid}`, []);
+  const [timers, setTimers] = useState({});
+  const [topicTimers, setTopicTimers] = useState({});
+  const [subTopicTimers, setSubTopicTimers] = useState({});
+  const [studyHistory, setStudyHistory] = useState([]);
   const [timerMode, setTimerMode] = useLocalStorage('timerMode', 'stopwatch');
   const [pomodoroCycle, setPomodoroCycle] = useLocalStorage(`pomodoroCycle_${currentUser.uid}`, 0);
-  const [selectedProject, setSelectedProject] = useState(null);
-  const [selectedTopic, setSelectedTopic] = useState(null);
-  const [selectedSubTopic, setSelectedSubTopic] = useState(null);
+  const [selectedProject, setSelectedProject] = useLocalStorage(`selectedProj_${currentUser.uid}`, null);
+  const [selectedTopic, setSelectedTopic] = useLocalStorage(`selectedTopic_${currentUser.uid}`, null);
+  const [selectedSubTopic, setSelectedSubTopic] = useLocalStorage(`selectedSubTopic_${currentUser.uid}`, null);
   const [showSelectionModal, setShowSelectionModal] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
+  const [showFeatures, setShowFeatures] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
+  const [onboardingChecked, setOnboardingChecked] = useState(false);
   const stopwatch = useStudyTimer();
   const pomodoro = usePomodoroTimer(POMODORO_DURATIONS);
   const playedCuesRef = useRef(new Set());
   
-  useEffect(() => { audioService.init(); }, []);
+  // Initialize audio context only on first user interaction to satisfy browser autoplay policies
+  useEffect(() => {
+    const initAudio = () => {
+      audioService.init();
+      document.removeEventListener('click', initAudio);
+    };
+    document.addEventListener('click', initAudio, { once: true });
+    return () => document.removeEventListener('click', initAudio);
+  }, []);
+
+  // Load timer data and session history from Firestore on mount
+  useEffect(() => {
+    if (!currentUser) return;
+    // Load timer data
+    loadTimerDataFromFirebase(currentUser.uid).then((data) => {
+      if (data) {
+        setTimers(data.timers || {});
+        setTopicTimers(data.topicTimers || {});
+        setSubTopicTimers(data.subTopicTimers || {});
+      }
+    });
+    // Subscribe to session history in real-time
+    const unsubSessions = subscribeToUserSessions(currentUser.uid, (sessions) => {
+      setStudyHistory(sessions);
+    });
+    // Check onboarding status from Firestore
+    getUserProfile(currentUser.uid).then((profile) => {
+      if (!profile || !profile.onboardingCompleted) {
+        // New user or hasn't completed onboarding
+        setOnboardingChecked(true); // flag: we need to check project count
+      }
+    });
+    return () => unsubSessions();
+  }, [currentUser]);
 
   const formatTime = useCallback((milliseconds) => {
     const totalSeconds = Math.floor(milliseconds / 1000);
@@ -171,10 +231,27 @@ const StudyTracker = () => {
     }
     const id = selectedSubTopic?.id || selectedTopic?.id || selectedProject.id;
     const type = selectedSubTopic ? "subtopic" : selectedTopic ? "topic" : "project";
-    const updateTimers = (setter) => { setter(prev => ({ ...prev, [id]: { totalTime: (prev[id]?.totalTime || 0) + durationInMs } })); };
-    if (type === "project") updateTimers(setTimers);
-    else if (type === "topic") updateTimers(setTopicTimers);
-    else if (type === "subtopic") updateTimers(setSubTopicTimers);
+    
+    // Update timer accumulations in state
+    const updateTimerState = (setter, key) => {
+      setter(prev => {
+        const updated = { ...prev, [key]: { totalTime: (prev[key]?.totalTime || 0) + durationInMs } };
+        return updated;
+      });
+    };
+    if (type === "project") updateTimerState(setTimers, id);
+    else if (type === "topic") updateTimerState(setTopicTimers, id);
+    else if (type === "subtopic") updateTimerState(setSubTopicTimers, id);
+
+    // Save timer data to Firestore (debounced save after state update)
+    setTimeout(() => {
+      saveTimerDataToFirebase(currentUser.uid, {
+        timers: type === "project" ? { ...timers, [id]: { totalTime: (timers[id]?.totalTime || 0) + durationInMs } } : timers,
+        topicTimers: type === "topic" ? { ...topicTimers, [id]: { totalTime: (topicTimers[id]?.totalTime || 0) + durationInMs } } : topicTimers,
+        subTopicTimers: type === "subtopic" ? { ...subTopicTimers, [id]: { totalTime: (subTopicTimers[id]?.totalTime || 0) + durationInMs } } : subTopicTimers,
+      });
+    }, 100);
+
     const sessionRecord = {
       id: `session_${Date.now()}`,
       projectId: selectedProject.id, projectName: selectedProject.name,
@@ -186,9 +263,10 @@ const StudyTracker = () => {
       date: new Date().toISOString().split("T")[0],
       type: type,
     };
-    setStudyHistory(prev => [sessionRecord, ...prev]);
+    // Save session to Firestore (permanent, cross-device)
+    addSessionToFirebase(sessionRecord, currentUser.uid);
     toast.success(`Saved ${formatTime(durationInMs)} session!`);
-  }, [selectedProject, selectedTopic, selectedSubTopic, setTimers, setTopicTimers, setSubTopicTimers, setStudyHistory, stopwatch.sessionStartTime, formatTime]);
+  }, [selectedProject, selectedTopic, selectedSubTopic, timers, topicTimers, subTopicTimers, currentUser, stopwatch.sessionStartTime, formatTime]);
 
   useEffect(() => {
     if (isCompletingSession) return;
@@ -217,20 +295,60 @@ const StudyTracker = () => {
     }
   }, [pomodoro.timeLeft, pomodoro.isActive, pomodoro.mode, pomodoro, saveSession, pomodoroCycle, setPomodoroCycle, isCompletingSession]);
 
+  // Keeping refs to the current selections so the Firebase callback doesn't need them in its dependency array
+  // This prevents unnecessary re-subscriptions to Firestore when selections change.
+  const selectedStateRef = useRef({ selectedProject, selectedTopic, selectedSubTopic });
+  useEffect(() => {
+      selectedStateRef.current = { selectedProject, selectedTopic, selectedSubTopic };
+  }, [selectedProject, selectedTopic, selectedSubTopic]);
+
   useEffect(() => {
     if (!currentUser) return;
     const unsubscribe = subscribeToUserProjects(currentUser.uid, (fetchedProjects) => {
       setProjects(fetchedProjects);
       setDataLoading(false);
-      if (fetchedProjects.length > 0 && !selectedProject) {
-        setSelectedProject(fetchedProjects[0]);
+      
+      const { selectedProject: currProj, selectedTopic: currTopic, selectedSubTopic: currSubTopic } = selectedStateRef.current;
+
+      if (fetchedProjects.length > 0) {
+        // Try to keep the currently selected project, or default to the first one
+        let matchedProject = fetchedProjects.find(p => p.id === currProj?.id);
+        
+        if (!matchedProject) {
+            matchedProject = fetchedProjects[0];
+            setSelectedTopic(null);
+            setSelectedSubTopic(null);
+        } else if (currTopic) {
+            // Re-sync topic & subtopic to get latest names/data from Firebase
+            const matchedTopic = matchedProject.topics?.find(t => t.id === currTopic.id);
+            if (!matchedTopic) {
+                setSelectedTopic(null);
+                setSelectedSubTopic(null);
+            } else {
+                setSelectedTopic(matchedTopic);
+                if (currSubTopic) {
+                    const matchedSubTopic = matchedTopic.subTopics?.find(s => s.id === currSubTopic.id);
+                    if (!matchedSubTopic) setSelectedSubTopic(null);
+                    else setSelectedSubTopic(matchedSubTopic);
+                }
+            }
+        }
+        
+        setSelectedProject(matchedProject);
+      } else {
+          setSelectedProject(null);
+          setSelectedTopic(null);
+          setSelectedSubTopic(null);
       }
-      if (fetchedProjects.length === 0 && !localStorage.getItem(`onboarding_completed_${currentUser.uid}`)) {
-        setTimeout(() => setIsProjectModalOpen(true), 500);
+
+      // Show welcome tour if this is a new user (no projects + not onboarded)
+      if (fetchedProjects.length === 0 && onboardingChecked) {
+        setTimeout(() => setShowWelcome(true), 500);
       }
     });
     return () => unsubscribe();
-  }, [currentUser, selectedProject]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser, onboardingChecked]);
 
   const handleOpenCreateModal = () => { setEditingProject(null); setIsProjectModalOpen(true); };
   const handleOpenEditModal = (project) => { setEditingProject(project); setIsProjectModalOpen(true); };
@@ -239,7 +357,7 @@ const StudyTracker = () => {
   const handleCreateOrUpdateProject = async (projectData, projectId) => {
     try {
       if (projectId) { await updateProjectInFirebase(projectId, projectData); toast.success("Project updated!"); } 
-      else { await addProjectToFirebase(projectData, currentUser.uid); localStorage.setItem(`onboarding_completed_${currentUser.uid}`, 'true'); toast.success("Project created!"); }
+      else { await addProjectToFirebase(projectData, currentUser.uid); toast.success("Project created!"); }
     } catch (error) { toast.error(`Error: ${error.message}`); } 
     finally { handleCloseProjectModal(); }
   };
@@ -306,12 +424,24 @@ const StudyTracker = () => {
   return (
     <>
       <Toaster position="bottom-center" toastOptions={{ style: { background: '#1e293b', color: '#e2e8f0', border: '1px solid #334155' } }} />
-      <div className="min-h-screen bg-slate-950 text-slate-200 font-sans flex flex-col">
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-slate-950 via-slate-950 to-gray-900 -z-10"></div>
+      <div className="min-h-screen bg-slate-950 text-slate-200 flex flex-col relative overflow-hidden">
+        {/* Living aura background */}
+        <div className="fixed inset-0 -z-0 pointer-events-none overflow-hidden">
+          <div className="aura-orb-1 absolute -top-1/4 -left-1/4 w-[600px] h-[600px] rounded-full bg-emerald-500/[0.04] blur-[100px]" />
+          <div className="aura-orb-2 absolute -bottom-1/4 -right-1/4 w-[500px] h-[500px] rounded-full bg-indigo-500/[0.05] blur-[100px]" />
+          <div className="aura-orb-3 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-violet-500/[0.03] blur-[80px]" />
+        </div>
         
-        <Navbar onNewProjectClick={handleOpenCreateModal} onHistoryClick={() => setShowHistory(true)} onLogout={logout} />
+        <Navbar 
+          onNewProjectClick={handleOpenCreateModal} 
+          onHistoryClick={() => setShowHistory(true)} 
+          onLogout={logout} 
+          user={currentUser}
+          onAboutClick={() => setShowAbout(true)}
+          onFeaturesClick={() => setShowFeatures(true)}
+        />
 
-        <main className="flex-grow flex flex-col items-center justify-center p-4 sm:p-8 text-center">
+        <main className="flex-grow flex flex-col items-center justify-center p-4 sm:p-8 text-center relative z-10">
           <TimerModeToggle mode={timerMode} setMode={setTimerMode} />
           <TimerDisplay time={displayTime} isRunning={isRunning} formatTime={formatTime} />
           
@@ -342,6 +472,13 @@ const StudyTracker = () => {
           </div>
         </main>
 
+        {/* Footer */}
+        <footer className="relative z-10 py-6 px-4 text-center border-t border-white/[0.04]">
+          <p className="text-[11px] text-slate-600 tracking-wide">
+            Built with focus · FocusFlow © {new Date().getFullYear()}
+          </p>
+        </footer>
+
         <AnimatePresence>
           {showSelectionModal && (
             <SelectionModal
@@ -363,6 +500,14 @@ const StudyTracker = () => {
               projectToEdit={editingProject}
             />
           )}
+          {showAbout && <About onClose={() => setShowAbout(false)} />}
+          {showFeatures && <Features onClose={() => setShowFeatures(false)} />}
+          {showWelcome && <WelcomeScreen onComplete={() => {
+            markOnboardingComplete(currentUser.uid);
+            setShowWelcome(false);
+            setOnboardingChecked(false);
+            setTimeout(() => setIsProjectModalOpen(true), 300);
+          }} />}
         </AnimatePresence>
       </div>
     </>

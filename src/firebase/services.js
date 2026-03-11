@@ -5,6 +5,8 @@ import {
   doc, 
   updateDoc, 
   deleteDoc,
+  setDoc,
+  getDoc,
   query,
   where,
   orderBy,
@@ -135,5 +137,100 @@ export const getTimerFromFirebase = async (projectId) => {
   } catch (error) {
     console.error('Error getting timer:', error);
     throw error;
+  }
+};
+
+// ========== SESSION HISTORY (FIRESTORE) ==========
+
+// Add a session record to Firestore
+export const addSessionToFirebase = async (sessionData, userId) => {
+  try {
+    const sessionsRef = collection(db, 'sessions');
+    const docRef = await addDoc(sessionsRef, {
+      ...sessionData,
+      userId,
+      createdAt: new Date()
+    });
+    return docRef.id;
+  } catch (error) {
+    console.error('Error saving session:', error);
+    throw error;
+  }
+};
+
+// Subscribe to user sessions in real-time
+export const subscribeToUserSessions = (userId, callback) => {
+  const q = query(
+    collection(db, 'sessions'),
+    where('userId', '==', userId),
+    orderBy('createdAt', 'desc')
+  );
+
+  return onSnapshot(q, (snapshot) => {
+    const sessions = [];
+    snapshot.forEach((doc) => {
+      sessions.push({ id: doc.id, ...doc.data() });
+    });
+    callback(sessions);
+  });
+};
+
+// ========== TIMER DATA (FIRESTORE) ==========
+
+// Save all timer data for a user
+export const saveTimerDataToFirebase = async (userId, timerData) => {
+  try {
+    const timerDocRef = doc(db, 'userTimers', userId);
+    await setDoc(timerDocRef, {
+      ...timerData,
+      updatedAt: new Date()
+    }, { merge: true });
+  } catch (error) {
+    console.error('Error saving timer data:', error);
+  }
+};
+
+// Load timer data for a user
+export const loadTimerDataFromFirebase = async (userId) => {
+  try {
+    const timerDocRef = doc(db, 'userTimers', userId);
+    const snap = await getDoc(timerDocRef);
+    if (snap.exists()) {
+      return snap.data();
+    }
+    return null;
+  } catch (error) {
+    console.error('Error loading timer data:', error);
+    return null;
+  }
+};
+
+// ========== USER PROFILE / ONBOARDING ==========
+
+// Get user profile (includes onboarding status)
+export const getUserProfile = async (userId) => {
+  try {
+    const profileRef = doc(db, 'userProfiles', userId);
+    const snap = await getDoc(profileRef);
+    if (snap.exists()) {
+      return snap.data();
+    }
+    return null;
+  } catch (error) {
+    console.error('Error getting user profile:', error);
+    return null;
+  }
+};
+
+// Mark user onboarding as completed
+export const markOnboardingComplete = async (userId) => {
+  try {
+    const profileRef = doc(db, 'userProfiles', userId);
+    await setDoc(profileRef, {
+      onboardingCompleted: true,
+      onboardingCompletedAt: new Date()
+    }, { merge: true });
+  } catch (error) {
+    console.error('Error marking onboarding complete:', error);
   }
 };

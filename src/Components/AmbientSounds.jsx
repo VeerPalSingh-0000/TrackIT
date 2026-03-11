@@ -38,13 +38,13 @@ const SoundControl = ({ name, icon, audioRef }) => {
   };
 
   return (
-    <div className="flex items-center gap-2 bg-slate-800/50 p-2 rounded-lg">
+    <div className="flex items-center gap-2 bg-white/[0.04] border border-white/[0.06] p-2 rounded-xl">
       <div className="flex items-center gap-2 w-20 flex-shrink-0">
         {icon}
-        <span className="font-semibold text-sm text-slate-200 truncate">{name}</span>
+        <span className="font-medium text-[13px] text-slate-200 truncate">{name}</span>
       </div>
-      <button onClick={toggleMute} className="text-slate-300 hover:text-white transition-colors p-2 rounded-full hover:bg-slate-700">
-        {isMuted ? <FaVolumeMute /> : <FaVolumeUp />}
+      <button onClick={toggleMute} className="text-slate-400 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/[0.06]">
+        {isMuted ? <FaVolumeMute className="text-sm" /> : <FaVolumeUp className="text-sm text-emerald-400" />}
       </button>
       <input
         type="range"
@@ -53,7 +53,7 @@ const SoundControl = ({ name, icon, audioRef }) => {
         step="0.01"
         value={volume}
         onChange={(e) => setVolume(parseFloat(e.target.value))}
-        className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+        className="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500"
         disabled={isMuted}
       />
     </div>
@@ -62,7 +62,7 @@ const SoundControl = ({ name, icon, audioRef }) => {
 
 
 // --- Main Ambient Sounds Component ---
-const AmbientSounds = () => {
+const AmbientSounds = ({ customTrigger }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   
@@ -98,33 +98,39 @@ const AmbientSounds = () => {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <motion.button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 bg-slate-700 text-white rounded-lg text-sm font-semibold"
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-      >
-        <FaMusic />
-        <span className="hidden sm:inline">Sounds</span>
-      </motion.button>
+      {customTrigger ? (
+        React.cloneElement(customTrigger, { onClick: () => setIsOpen(!isOpen) })
+      ) : (
+        <motion.button
+          onClick={() => setIsOpen(!isOpen)}
+          className={`flex items-center gap-1.5 h-[34px] px-3.5 rounded-full text-[13px] font-medium transition-all duration-200 border ${
+            isOpen 
+              ? 'bg-white/[0.1] border-white/[0.1] text-white'
+              : 'bg-white/[0.04] hover:bg-white/[0.08] border-white/[0.05] text-slate-300 hover:text-white'
+          }`}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.97 }}
+        >
+          <FaMusic className="text-[10px] text-amber-400" />
+          <span className="hidden sm:inline">Sounds</span>
+        </motion.button>
+      )}
 
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+            initial={{ opacity: 0, y: 8, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
-            // ✨ FINAL FIX: Positions the menu in the middle of the screen on mobile
-            // and reverts to being attached to the button on larger screens.
-            className="fixed top-20 w-64 left-1/2 -translate-x-1/2 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-4 z-20 sm:absolute sm:w-72 sm:top-full sm:left-auto sm:right-0 sm:-translate-x-0"
+            exit={{ opacity: 0, y: 8, scale: 0.95 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed top-20 w-64 left-1/2 -translate-x-1/2 bg-slate-900/95 backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.5)] p-4 z-20 sm:absolute sm:w-72 sm:top-full sm:mt-2 sm:left-auto sm:right-0 sm:-translate-x-0"
           >
-            <h3 className="font-bold text-lg text-white mb-4 text-center">Ambient Sounds</h3>
-            <div className="space-y-3">
-              <SoundControl name="Rain" icon={<span className="text-xl">🌧️</span>} audioRef={audioRefs.rain} />
-              <SoundControl name="Forest" icon={<span className="text-xl">🌲</span>} audioRef={audioRefs.forest} />
-              <SoundControl name="Cafe" icon={<span className="text-xl">☕</span>} audioRef={audioRefs.cafe} />
-              <SoundControl name="Lofi" icon={<span className="text-xl">🎵</span>} audioRef={audioRefs.lofi} />
+            <h3 className="font-semibold text-[15px] text-white mb-3.5">🎧 Ambient Sounds</h3>
+            <div className="space-y-2">
+              <SoundControl name="Rain" icon={<span className="text-lg">🌧️</span>} audioRef={audioRefs.rain} />
+              <SoundControl name="Forest" icon={<span className="text-lg">🌲</span>} audioRef={audioRefs.forest} />
+              <SoundControl name="Cafe" icon={<span className="text-lg">☕</span>} audioRef={audioRefs.cafe} />
+              <SoundControl name="Lofi" icon={<span className="text-lg">🎵</span>} audioRef={audioRefs.lofi} />
             </div>
           </motion.div>
         )}

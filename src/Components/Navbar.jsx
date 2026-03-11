@@ -1,75 +1,332 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import AnimatedButton from './ui/AnimatedButton';
 import AmbientSounds from './AmbientSounds';
-import { FaPlus, FaHistory, FaSignOutAlt, FaBars, FaTimes } from 'react-icons/fa';
+import { FaPlus, FaHistory, FaSignOutAlt, FaInfoCircle, FaStar, FaChevronDown, FaMusic } from 'react-icons/fa';
+import { HiMenuAlt3, HiX } from 'react-icons/hi';
+import { useTheme, themes } from '../contexts/ThemeContext';
 import TrackerLogo from '../../public/clock.png';
 
 /**
- * The main navigation bar for the application.
- * It uses a hamburger menu on mobile for a clean, responsive layout.
- * @param {object} props - The component's props.
- * @param {function} props.onNewProjectClick - Function to call when the "New Project" button is clicked.
- * @param {function} props.onHistoryClick - Function to call when the "History" button is clicked.
- * @param {function} props.onLogout - Function to call when the "Logout" button is clicked.
+ * Premium navigation bar — glassmorphic, floating, Linear/Arc-inspired.
  */
-const Navbar = ({ onNewProjectClick, onHistoryClick, onLogout }) => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+const Navbar = ({ onNewProjectClick, onHistoryClick, onLogout, user, onAboutClick, onFeaturesClick }) => {
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef(null);
+  
+  // Custom theme hook
+  const { currentThemeId, setCurrentThemeId } = useTheme();
 
-  const handleMobileLinkClick = (action) => {
-    action();
-    setIsMobileMenuOpen(false);
-  };
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) setProfileOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  useEffect(() => {
+    const onResize = () => { if (window.innerWidth >= 768) setMobileOpen(false); };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  const userInitial = user?.displayName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U';
+
+  // --- Mobile nav link ---
+  const MobileLink = ({ onClick, children, icon, variant = 'default', closeMenu = true }) => (
+    <button
+      onClick={(e) => { if (onClick) onClick(e); if (closeMenu) setMobileOpen(false); }}
+      className={`w-full flex items-center gap-3.5 px-4 py-3.5 text-[15px] font-medium rounded-2xl transition-all duration-200 active:scale-[0.98] focus:outline-none ${
+        variant === 'danger'
+          ? 'text-rose-400 hover:bg-rose-500/10'
+          : variant === 'primary'
+          ? 'text-emerald-400 hover:bg-emerald-500/10'
+          : 'text-slate-300 hover:bg-white/[0.06] hover:text-white'
+      }`}
+    >
+      {icon && <span className="text-[16px] opacity-70 w-5 flex justify-center">{icon}</span>}
+      {children}
+    </button>
+  );
 
   return (
-    <header className="p-1  flex justify-between items-center border-b border-slate-700/50 sticky top-0 bg-slate-900/50 backdrop-blur-lg z-20">
-      
-      {/* ✨ Logo and Title Section */}
-      <div className="flex items-center gap-0">
-        {/* ✨ FIX: Increased logo size from h-8 to h-10 */}
-        <img src={TrackerLogo} alt="FocusFlow Logo" className="h-20 w-auto" loading="eager" />
-        {/* ✨ FIX: Re-added the title for better branding on larger screens */}
-        <span className=" sm:block text-2xl font-bold text-white">FocusFlow</span>
-      </div>
-      
-      <div className="flex items-center gap-2">
-        <AmbientSounds />
-        
-        {/* Desktop Buttons: Visible on screens 'md' and larger */}
-        <div className="hidden md:flex items-center gap-2">
-          <AnimatedButton onClick={onNewProjectClick} className="bg-emerald-600 hover:bg-emerald-500 text-white" icon={<FaPlus />}>New Project</AnimatedButton>
-          <AnimatedButton onClick={onHistoryClick} className="bg-slate-700 hover:bg-slate-600 text-white" icon={<FaHistory />}>History</AnimatedButton>
-          <AnimatedButton onClick={onLogout} className="bg-rose-600 hover:bg-rose-500 text-white" icon={<FaSignOutAlt />}>Logout</AnimatedButton>
-        </div>
+    <>
+      {/* ─── Floating Navbar Container ─── */}
+      <div className="sticky top-0 z-50 w-full px-3 sm:px-5 pt-3">
+        <motion.header
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className={`mx-auto max-w-5xl rounded-2xl transition-all duration-500 ${
+            scrolled
+              ? 'bg-slate-900/70 backdrop-blur-2xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.03)]'
+              : 'bg-slate-900/50 backdrop-blur-xl border border-white/[0.06] shadow-[0_4px_24px_rgba(0,0,0,0.25)]'
+          }`}
+        >
+          <div className="flex items-center justify-between h-[52px] px-3 sm:px-4">
+            
+            {/* ─── Left: Logo ─── */}
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="flex items-center gap-2.5 group focus:outline-none"
+            >
+              <div className="relative">
+                <div className="absolute inset-0 bg-emerald-400/20 rounded-xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <img
+                  src={TrackerLogo}
+                  alt="FocusFlow"
+                  className="relative h-8 w-8 object-contain transition-transform duration-300 group-hover:scale-110"
+                  loading="eager"
+                />
+              </div>
+              <span className="hidden sm:block text-[16px] font-bold text-white tracking-tight">
+                FocusFlow
+              </span>
+            </button>
 
-        {/* Mobile Menu Button & Dropdown */}
-        <div className="md:hidden">
-          <AnimatedButton 
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="bg-slate-700 hover:bg-slate-600 text-white"
-            aria-label="Toggle menu"
-          >
-            {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
-          </AnimatedButton>
+            {/* Center is empty to let elements justify between left and right */}
+            <div className="flex-1" />
 
-          <AnimatePresence>
-            {isMobileMenuOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                transition={{ duration: 0.15, ease: 'easeOut' }}
-                className="absolute top-full right-4 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl p-2 flex flex-col gap-2"
+            {/* ─── Right: Actions ─── */}
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              {/* History Button - Top Right */}
+              <button
+                onClick={onHistoryClick}
+                className="hidden md:flex items-center justify-center w-9 h-9 text-slate-300 hover:text-white hover:bg-white/[0.08] rounded-full transition-all duration-200 focus:outline-none"
+                title="History"
               >
-                <AnimatedButton onClick={() => handleMobileLinkClick(onNewProjectClick)} className="!w-full !justify-start bg-transparent hover:bg-emerald-500" icon={<FaPlus />}>New Project</AnimatedButton>
-                <AnimatedButton onClick={() => handleMobileLinkClick(onHistoryClick)} className="!w-full !justify-start bg-transparent hover:bg-slate-600" icon={<FaHistory />}>History</AnimatedButton>
-                <AnimatedButton onClick={() => handleMobileLinkClick(onLogout)} className="!w-full !justify-start bg-transparent hover:bg-rose-500" icon={<FaSignOutAlt />}>Logout</AnimatedButton>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+                <FaHistory className="text-[14px]" />
+              </button>
+
+              {/* Ambient Sounds */}
+              <div className="hidden sm:block">
+                <AmbientSounds />
+              </div>
+
+              {/* New Project CTA */}
+              <motion.button
+                onClick={onNewProjectClick}
+                className="hidden md:flex items-center gap-1.5 h-[34px] px-4 text-[13px] font-semibold text-white bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 rounded-full shadow-[0_2px_12px_rgba(16,185,129,0.25)] hover:shadow-[0_4px_20px_rgba(16,185,129,0.35)] transition-all duration-300 focus:outline-none"
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                <FaPlus className="text-[10px]" />
+                New Project
+              </motion.button>
+
+              {/* Profile dropdown */}
+              <div className="hidden md:block relative" ref={profileRef}>
+                <motion.button
+                  onClick={() => setProfileOpen(!profileOpen)}
+                  className={`flex items-center gap-1.5 h-[34px] pl-1 pr-2.5 rounded-full transition-all duration-200 focus:outline-none border ${
+                    profileOpen 
+                      ? 'bg-white/[0.1] border-white/[0.12]' 
+                      : 'hover:bg-white/[0.06] border-transparent hover:border-white/[0.06]'
+                  }`}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-400 via-teal-400 to-indigo-500 flex items-center justify-center text-[11px] font-bold text-white ring-2 ring-slate-900/50">
+                    {userInitial}
+                  </div>
+                  <FaChevronDown className={`text-[9px] text-slate-400 transition-transform duration-200 ${profileOpen ? 'rotate-180' : ''}`} />
+                </motion.button>
+
+                <AnimatePresence>
+                  {profileOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                      transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                      className="absolute right-0 mt-2.5 w-72 bg-slate-900/95 backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.5)] overflow-hidden origin-top-right"
+                    >
+                      {/* User info card */}
+                      <div className="p-4 border-b border-white/[0.06]">
+                        <div className="flex items-center gap-3">
+                          <div className="w-11 h-11 rounded-full bg-gradient-to-br from-emerald-400 via-teal-400 to-indigo-500 flex items-center justify-center text-sm font-bold text-white shadow-lg ring-2 ring-white/10">
+                            {userInitial}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[14px] font-semibold text-white truncate">{user?.displayName || 'FocusFlow User'}</p>
+                            <p className="text-[12px] text-slate-400 truncate">{user?.email || ''}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="p-1.5">
+                        {/* Theme Picker */}
+                        <div className="px-3 py-2 mb-1">
+                          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Color Palette</p>
+                          <div className="flex items-center gap-2">
+                            {themes.map((theme) => (
+                              <button
+                                key={theme.id}
+                                onClick={() => setCurrentThemeId(theme.id)}
+                                title={theme.name}
+                                className={`w-6 h-6 rounded-full border-2 transition-transform duration-200 ${
+                                  currentThemeId === theme.id ? 'border-white scale-110 shadow-lg' : 'border-transparent hover:scale-110 hover:border-white/50'
+                                }`}
+                                style={{ backgroundColor: theme.colors['--color-emerald-500'] }}
+                              />
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="h-px bg-white/[0.06] mx-2 my-1" />
+
+                        {[
+                          { icon: <FaInfoCircle />, label: 'About', onClick: onAboutClick },
+                          { icon: <FaStar />, label: 'Features', onClick: onFeaturesClick },
+                        ].map((item) => (
+                          <button
+                            key={item.label}
+                            onClick={() => { setProfileOpen(false); item.onClick(); }}
+                            className="w-full flex items-center gap-3 px-3 py-2.5 text-[13px] text-slate-300 hover:text-white hover:bg-white/[0.06] rounded-xl transition-all duration-150"
+                          >
+                            <span className="text-[13px] opacity-50 w-4 flex justify-center">{item.icon}</span>
+                            {item.label}
+                          </button>
+                        ))}
+                        
+                        <div className="h-px bg-white/[0.06] mx-2 my-1" />
+                        
+                        <button
+                          onClick={() => { setProfileOpen(false); onLogout(); }}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 text-[13px] text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-xl transition-all duration-150"
+                        >
+                          <FaSignOutAlt className="text-[13px] w-4 flex justify-center" /> Sign out
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Hamburger - Mobile */}
+              <button
+                onClick={() => setMobileOpen(!mobileOpen)}
+                className="md:hidden flex items-center justify-center w-9 h-9 rounded-full text-slate-300 hover:text-white hover:bg-white/[0.08] transition-all duration-200 focus:outline-none"
+                aria-label="Toggle menu"
+              >
+                {mobileOpen ? <HiX className="text-xl" /> : <HiMenuAlt3 className="text-xl" />}
+              </button>
+            </div>
+          </div>
+        </motion.header>
       </div>
-    </header>
+
+      {/* ─── Mobile Menu Overlay ─── */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              onClick={() => setMobileOpen(false)}
+              className="fixed inset-0 z-40 bg-black/70 backdrop-blur-md md:hidden"
+            />
+
+            {/* Panel */}
+            <motion.nav
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 28, stiffness: 280 }}
+              className="fixed top-0 right-0 bottom-0 z-50 w-[300px] bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900 border-l border-white/[0.06] flex flex-col md:hidden"
+            >
+              {/* Mobile header */}
+              <div className="flex items-center justify-between h-[60px] px-5 border-b border-white/[0.06]">
+                <div className="flex items-center gap-2.5">
+                  <img src={TrackerLogo} alt="FocusFlow" className="h-8 w-8 object-contain" />
+                  <span className="text-[16px] font-bold text-white tracking-tight">FocusFlow</span>
+                </div>
+                <button
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center justify-center w-8 h-8 rounded-full text-slate-400 hover:text-white hover:bg-white/[0.08] transition-colors"
+                >
+                  <HiX className="text-lg" />
+                </button>
+              </div>
+
+              {/* User card */}
+              {user && (
+                <div className="mx-4 mt-5 mb-3 p-4 bg-gradient-to-r from-white/[0.04] to-white/[0.02] border border-white/[0.06] rounded-2xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 via-teal-400 to-indigo-500 flex items-center justify-center text-sm font-bold text-white flex-shrink-0 ring-2 ring-white/10">
+                      {userInitial}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[14px] font-semibold text-white truncate">{user.displayName || 'User'}</p>
+                      <p className="text-xs text-slate-500 truncate">{user.email || ''}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Mobile nav links */}
+              <div className="flex-1 overflow-y-auto px-3 py-4">
+                <div className="mb-2 px-4">
+                  <span className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.15em]">Navigate</span>
+                </div>
+                <MobileLink onClick={onHistoryClick} icon={<FaHistory />}>History</MobileLink>
+
+                <div className="h-px bg-white/[0.05] mx-4 my-4" />
+
+                <div className="mb-2 px-4">
+                  <span className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.15em]">Actions</span>
+                </div>
+                <MobileLink onClick={onNewProjectClick} icon={<FaPlus />} variant="primary">New Project</MobileLink>
+
+                {/* Ambient sounds in mobile */}
+                <div className="sm:hidden px-0">
+                  <AmbientSounds customTrigger={
+                    <MobileLink closeMenu={false} icon={<FaMusic />}>Ambient Sounds</MobileLink>
+                  } />
+                </div>
+              </div>
+
+              {/* Profile Actions & Sign out at bottom */}
+              <div className="p-3 border-t border-white/[0.06]">
+                {/* Theme Picker - Mobile */}
+                <div className="px-5 py-3 mb-2 bg-white/[0.02] rounded-xl border border-white/[0.04]">
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Color Palette</p>
+                  <div className="flex items-center gap-3">
+                    {themes.map((theme) => (
+                      <button
+                        key={theme.id}
+                        onClick={() => setCurrentThemeId(theme.id)}
+                        title={theme.name}
+                        className={`w-8 h-8 rounded-full border-2 transition-transform duration-200 ${
+                          currentThemeId === theme.id ? 'border-white scale-110 shadow-lg' : 'border-transparent hover:scale-110 shadow-md'
+                        }`}
+                        style={{ backgroundColor: theme.colors['--color-emerald-500'] }}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <MobileLink onClick={onAboutClick} icon={<FaInfoCircle />}>About</MobileLink>
+                <MobileLink onClick={onFeaturesClick} icon={<FaStar />}>Features</MobileLink>
+                <div className="h-px bg-white/[0.06] mx-4 my-2" />
+                <MobileLink onClick={onLogout} icon={<FaSignOutAlt />} variant="danger">Sign out</MobileLink>
+              </div>
+            </motion.nav>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 

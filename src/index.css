@@ -1,29 +1,132 @@
 @import "tailwindcss";
 
-/* --- */
-@keyframes blob {
-  0% {
-    transform: translate(0px, 0px) scale(1);
-  }
-  33% {
-    transform: translate(30px, -50px) scale(1.1);
-  }
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
-  100% {
-    transform: translate(0px, 0px) scale(1);
-  }
+/* --- shadcn-compatible theme tokens (dark mode aligned with slate-950 app) --- */
+:root {
+  --background: oklch(0.13 0.02 260);
+  --foreground: oklch(0.95 0.01 260);
+  --card: oklch(0.16 0.02 260);
+  --card-foreground: oklch(0.95 0.01 260);
+  --popover: oklch(0.16 0.02 260);
+  --popover-foreground: oklch(0.95 0.01 260);
+  --primary: oklch(0.72 0.18 165);
+  --primary-foreground: oklch(0.13 0.02 260);
+  --secondary: oklch(0.22 0.03 260);
+  --secondary-foreground: oklch(0.95 0.01 260);
+  --muted: oklch(0.22 0.03 260);
+  --muted-foreground: oklch(0.6 0.02 260);
+  --accent: oklch(0.22 0.03 260);
+  --accent-foreground: oklch(0.95 0.01 260);
+  --destructive: oklch(0.6 0.22 25);
+  --destructive-foreground: oklch(0.95 0.01 260);
+  --border: oklch(0.25 0.03 260);
+  --input: oklch(0.25 0.03 260);
+  --ring: oklch(0.72 0.18 165);
+  --chart-1: oklch(0.65 0.2 270);
+  --chart-2: oklch(0.6 0.18 140);
+  --chart-3: oklch(0.7 0.15 50);
+  --chart-4: oklch(0.65 0.15 310);
+  --chart-5: oklch(0.55 0.2 30);
+  --color-primary: oklch(0.72 0.18 165);
+  --color-secondary: oklch(0.22 0.03 260);
+  --color-chart-1: oklch(0.65 0.2 270);
+  --color-chart-3: oklch(0.7 0.15 50);
+  --color-chart-4: oklch(0.65 0.15 310);
+  --color-chart-5: oklch(0.55 0.2 30);
+  --color-accent: oklch(0.22 0.03 260);
+  --color-destructive: oklch(0.6 0.22 25);
+  --radius: 0.5rem;
 }
 
+/* --- Global resets & typography --- */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: #020617;
+  color: #e2e8f0;
+  overflow-x: hidden;
+}
+
+/* Monospace timer font */
+.font-timer {
+  font-family: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.15);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.3);
+}
+
+/* Selection color */
+::selection {
+  background: rgba(52, 211, 153, 0.25);
+  color: #fff;
+}
+
+/* --- Animated background aura --- */
+@keyframes aura-float-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(40px, -30px) scale(1.1); }
+  66% { transform: translate(-30px, 20px) scale(0.95); }
+}
+@keyframes aura-float-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-50px, 30px) scale(1.05); }
+  66% { transform: translate(35px, -25px) scale(0.9); }
+}
+@keyframes aura-float-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(25px, 40px) scale(1.15); }
+}
+
+.aura-orb-1 {
+  animation: aura-float-1 20s ease-in-out infinite;
+}
+.aura-orb-2 {
+  animation: aura-float-2 25s ease-in-out infinite;
+}
+.aura-orb-3 {
+  animation: aura-float-3 18s ease-in-out infinite;
+}
+
+/* Timer glow effect */
+@keyframes timer-glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.7; }
+}
+.timer-glow-active {
+  animation: timer-glow 3s ease-in-out infinite;
+}
+
+/* --- Blob animation (existing) --- */
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
 .animate-blob {
   animation: blob 7s infinite;
 }
-
 .animation-delay-2000 {
   animation-delay: 2s;
 }
-
 .animation-delay-4000 {
   animation-delay: 4s;
 }
