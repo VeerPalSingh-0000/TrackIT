@@ -1,81 +1,102 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useLocalStorage } from './useLocalStorage';
 
 /**
- * A robust and accurate hook for a "count-up" stopwatch timer.
- * This version is corrected to be fully reliable.
+ * A robust study timer hook that persists state to LocalStorage.
+ * This ensures the timer continues accurately even if the browser/app refreshes.
  */
 export const useStudyTimer = () => {
-  // State is used to trigger re-renders for the UI (e.g., Play/Pause button).
+  // --- Persisted State (Survives Refreshes) ---
+  
+  // Tracks if the timer is currently counting up
+  const [persistedIsRunning, setPersistedIsRunning] = useLocalStorage('study_isRunning', false);
+  
+  // Tracks total milliseconds from previous "segments" (before the last pause)
+  const [accumulatedTime, setAccumulatedTime] = useLocalStorage('study_accumulatedTime', 0);
+  
+  // The timestamp (Date.now()) when the current running segment started
+  const [startTimeOfSegment, setStartTimeOfSegment] = useLocalStorage('study_segmentStart', null);
+  
+  // The timestamp when the study session FIRST started (used for history records)
+  const [sessionStartTime, setSessionStartTime] = useLocalStorage('study_sessionStart', null);
+
+  // --- Local UI State ---
   const [isSessionRunning, setIsSessionRunning] = useState(false);
   const [sessionDisplayTime, setSessionDisplayTime] = useState(0);
-  const [sessionStartTime, setSessionStartTime] = useState(null);
-
-  // --- Refs for synchronous, reliable timer logic ---
   const intervalRef = useRef(null);
-  const startTimeRef = useRef(0);
-  const timeWhenPausedRef = useRef(0);
-  const isRunningRef = useRef(false);
 
-  // The main "tick" function that runs on each interval.
+  // The main logic to calculate current elapsed time
   const tick = useCallback(() => {
-    const elapsed = Date.now() - startTimeRef.current + timeWhenPausedRef.current;
-    setSessionDisplayTime(elapsed);
-  }, []);
+    if (persistedIsRunning && startTimeOfSegment) {
+      const currentElapsed = Date.now() - startTimeOfSegment + accumulatedTime;
+      setSessionDisplayTime(currentElapsed);
+    } else {
+      setSessionDisplayTime(accumulatedTime);
+    }
+  }, [persistedIsRunning, startTimeOfSegment, accumulatedTime]);
 
-  // Function to start or resume the timer.
+  // Start or Resume
   const startTimer = useCallback(() => {
-    if (isRunningRef.current) return;
+    if (persistedIsRunning) return;
 
-    isRunningRef.current = true;
-    setIsSessionRunning(true);
-    
     const now = Date.now();
-    startTimeRef.current = now;
-    setSessionStartTime(now);
+    setStartTimeOfSegment(now);
+    if (!sessionStartTime) {
+      setSessionStartTime(now);
+    }
+    setPersistedIsRunning(true);
+    setIsSessionRunning(true);
+  }, [persistedIsRunning, sessionStartTime, setPersistedIsRunning, setStartTimeOfSegment, setSessionStartTime]);
 
-    clearInterval(intervalRef.current);
-    intervalRef.current = setInterval(tick, 100);
-  }, [tick]);
-
-  // Function to pause the timer.
+  // Pause
   const pauseTimer = useCallback(() => {
-    if (!isRunningRef.current) return;
+    if (!persistedIsRunning) return;
 
-    isRunningRef.current = false;
+    const now = Date.now();
+    const segmentDuration = now - startTimeOfSegment;
+    
+    setAccumulatedTime(prev => prev + segmentDuration);
+    setStartTimeOfSegment(null);
+    setPersistedIsRunning(false);
     setIsSessionRunning(false);
-
+    
     clearInterval(intervalRef.current);
-    const elapsed = Date.now() - startTimeRef.current + timeWhenPausedRef.current;
-    timeWhenPausedRef.current = elapsed;
-  }, []);
+  }, [persistedIsRunning, startTimeOfSegment, setAccumulatedTime, setStartTimeOfSegment, setPersistedIsRunning]);
 
-  // Function to completely reset the timer.
+  // Complete Reset
   const resetTimer = useCallback(() => {
-    isRunningRef.current = false;
-    setIsSessionRunning(false);
     clearInterval(intervalRef.current);
-    setSessionDisplayTime(0);
+    setPersistedIsRunning(false);
+    setIsSessionRunning(false);
+    setAccumulatedTime(0);
+    setStartTimeOfSegment(null);
     setSessionStartTime(null);
-    startTimeRef.current = 0;
-    timeWhenPausedRef.current = 0;
-  }, []);
+    setSessionDisplayTime(0);
+  }, [setPersistedIsRunning, setAccumulatedTime, setStartTimeOfSegment, setSessionStartTime]);
 
-  // Function to stop the timer and get the final duration.
+  // Stop and return final duration for saving
   const endSessionAndGetDuration = useCallback(() => {
-    // --- THE KEY FIX IS HERE ---
-    // We must calculate the final duration based on the timer's state at this exact moment.
-    const finalDuration = isRunningRef.current
-      ? Date.now() - startTimeRef.current + timeWhenPausedRef.current
-      : sessionDisplayTime; // If paused, the display time is already correct.
+    const finalDuration = persistedIsRunning && startTimeOfSegment
+      ? Date.now() - startTimeOfSegment + accumulatedTime
+      : accumulatedTime;
     
     resetTimer();
     return finalDuration;
-  }, [resetTimer, sessionDisplayTime]); // Dependency added for when paused.
+  }, [persistedIsRunning, startTimeOfSegment, accumulatedTime, resetTimer]);
 
-  // Cleanup effect: ensures the interval is cleared when the component unmounts.
+  // Background Ticking Logic
   useEffect(() => {
+    if (persistedIsRunning) {
+      setIsSessionRunning(true);
+      tick(); // Sync immediately
+      intervalRef.current = setInterval(tick, 100);
+    } else {
+      setIsSessionRunning(false);
+      clearInterval(intervalRef.current);
+      tick(); // Show the static accumulated time
+    }
     return () => clearInterval(intervalRef.current);
-  }, []);
+  }, [persistedIsRunning, tick]);
 
   return {
     isSessionRunning,
