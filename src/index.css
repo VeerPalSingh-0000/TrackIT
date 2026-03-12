@@ -219,3 +219,28 @@ body {
   filter: none !important;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15) !important;
 }
+/* --- WEB MOBILE PERFORMANCE OPTIMIZATIONS (Lag Fix) --- */
+@media (max-width: 768px) {
+  /* Chhote screens (phones) par background hilaana band! */
+  .aura-orb-1,
+  .aura-orb-2,
+  .aura-orb-3,
+  .animate-blob {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  /* Blurs hata do, kiyunki mobile processor inko jhel nahi pata */
+  [class*="blur-"],
+  [class*="backdrop-blur-"] {
+    backdrop-filter: none !important;
+    filter: none !important;
+  }
+
+  /* Bhari shadows ko simple shadows mein badal do */
+  .drop-shadow-2xl,
+  .shadow-2xl {
+    filter: none !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  }
+}
