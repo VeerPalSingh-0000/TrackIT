@@ -6,8 +6,11 @@ import {
   signInWithEmailAndPassword, 
   signOut,
   GoogleAuthProvider,
-  signInWithPopup
+  signInWithPopup,
+  signInWithCredential
 } from 'firebase/auth';
+import { isNative } from '../services/nativeBridge';
+import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 
 const AuthContext = React.createContext();
 
@@ -27,9 +30,18 @@ export function AuthProvider({ children }) {
     return signInWithEmailAndPassword(auth, email, password);
   }
   
-  function loginWithGoogle() {
-    const provider = new GoogleAuthProvider();
-    return signInWithPopup(auth, provider);
+  async function loginWithGoogle() {
+    if (isNative()) {
+      // Native Android: Trigger the native Google Accounts bottom-sheet without any browser
+      const result = await FirebaseAuthentication.signInWithGoogle();
+      // Pass the native Google token back to the normal web Firebase SDK
+      const credential = GoogleAuthProvider.credential(result.credential.idToken);
+      return signInWithCredential(auth, credential);
+    } else {
+      // Standard Web: Keep using Popup
+      const provider = new GoogleAuthProvider();
+      return signInWithPopup(auth, provider);
+    }
   }
 
   function logout() {

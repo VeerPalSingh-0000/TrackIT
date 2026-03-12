@@ -12,7 +12,7 @@ const AnimatedButton = ({
     <motion.button
       onClick={onClick}
       disabled={disabled}
-      className={`flex items-center justify-center gap-2 font-semibold px-6 py-3 rounded-xl shadow-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 ${className}`}
+      className={`flex items-center justify-center gap-2 font-semibold px-6 py-3 rounded-xl shadow-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-emerald-500)] focus:ring-offset-[var(--color-slate-900)] motion-safe-gpu ${className}`}
       whileHover={{ scale: disabled ? 1 : 1.05, y: disabled ? 0 : -2 }}
       whileTap={{ scale: disabled ? 1 : 0.95 }}
       transition={{ type: 'spring', stiffness: 400, damping: 15 }}

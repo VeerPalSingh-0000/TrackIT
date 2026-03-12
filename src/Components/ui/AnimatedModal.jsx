@@ -23,7 +23,7 @@ const AnimatedModal = ({ children, onClose }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 motion-safe-gpu"
       onClick={onClose}
     >
       <motion.div
@@ -31,7 +31,7 @@ const AnimatedModal = ({ children, onClose }) => {
         initial="hidden"
         animate="visible"
         exit="exit"
-        className="max-w-4xl w-full max-h-[90vh] flex flex-col rounded-2xl shadow-2xl bg-slate-800/80 border border-slate-700"
+        className="max-w-4xl w-full max-h-[90vh] flex flex-col rounded-2xl shadow-2xl bg-[var(--color-slate-900)]/95 backdrop-blur-2xl border border-[var(--color-slate-700)] motion-safe-gpu"
         onClick={(e) => e.stopPropagation()}
       >
         {children}

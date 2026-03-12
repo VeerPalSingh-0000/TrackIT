@@ -52,7 +52,11 @@ const Loader = () => (
   <div className="flex flex-col items-center justify-center gap-6">
     <div className="relative">
       <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-2xl animate-pulse" />
-      <img src={TrackerLogo} alt="FocusFlow" className="relative w-20 h-20 object-contain animate-pulse" />
+      <img
+        src={TrackerLogo}
+        alt="FocusFlow"
+        className="relative w-32 h-32 object-contain animate-pulse"
+      />
     </div>
     <div className="flex items-center gap-2">
       <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: '0ms' }} />
@@ -69,20 +73,20 @@ const TimerModeToggle = React.memo(({ mode, setMode }) => (
   <div className="relative flex p-1 rounded-full bg-slate-800/60 backdrop-blur-sm border border-white/[0.06] mb-10">
     {/* Sliding indicator */}
     <motion.div 
-      className="absolute top-1 bottom-1 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 shadow-lg shadow-violet-500/20"
+      className="absolute top-1 bottom-1 rounded-full bg-gradient-to-r from-[var(--color-emerald-500)] to-[var(--color-emerald-600)] shadow-lg motion-safe-gpu"
       animate={{ x: mode === 'stopwatch' ? 0 : '100%', width: '50%' }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       style={{ width: 'calc(50% - 2px)', left: 2 }}
     />
     <button
       onClick={() => setMode('stopwatch')}
-      className={`relative z-10 px-5 py-2 text-[13px] font-semibold rounded-full transition-colors duration-200 ${mode === 'stopwatch' ? 'text-white' : 'text-slate-400 hover:text-slate-300'}`}
+      className={`relative z-10 px-5 py-2 text-[13px] font-semibold rounded-full transition-colors duration-200 ${mode === 'stopwatch' ? 'text-btn' : 'text-[var(--color-slate-400)] hover:text-[var(--color-slate-300)]'}`}
     >
       Stopwatch
     </button>
     <button
       onClick={() => setMode('pomodoro')}
-      className={`relative z-10 px-5 py-2 text-[13px] font-semibold rounded-full transition-colors duration-200 ${mode === 'pomodoro' ? 'text-white' : 'text-slate-400 hover:text-slate-300'}`}
+      className={`relative z-10 px-5 py-2 text-[13px] font-semibold rounded-full transition-colors duration-200 ${mode === 'pomodoro' ? 'text-btn' : 'text-[var(--color-slate-400)] hover:text-[var(--color-slate-300)]'}`}
     >
       Pomodoro
     </button>
@@ -100,9 +104,9 @@ const CurrentTask = React.memo(({ project, topic, subTopic }) => {
     const taskName = parts.length > 0 ? parts.join(' › ') : 'No Task Selected';
 
     return (
-        <div className="p-4 rounded-2xl bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] w-full">
-            <h3 className="text-[11px] font-semibold text-violet-400/80 uppercase tracking-[0.15em] mb-1.5">Current Task</h3>
-            <p className="text-base sm:text-lg font-semibold text-slate-100 truncate" title={taskName}>
+        <div className="p-4 rounded-2xl bg-[var(--color-slate-900)]/40 backdrop-blur-sm border border-[var(--color-slate-700)]/40 w-full transition-colors">
+            <h3 className="text-[11px] font-semibold text-[var(--color-emerald-400)] uppercase tracking-[0.15em] mb-1.5 opacity-80">Current Task</h3>
+            <p className="text-base sm:text-lg font-semibold text-[var(--color-white)] truncate" title={taskName}>
                 {taskName}
             </p>
         </div>
@@ -112,11 +116,27 @@ const CurrentTask = React.memo(({ project, topic, subTopic }) => {
 /**
  * Renders the main timer control buttons.
  */
-const TimerControls = ({ isRunning, hasStarted, onStartPause, onStopReset }) => (
+const TimerControls = ({ isRunning, hasStarted, onStartPause, onStopReset }) => {
+    // Lazy-load haptics only when needed
+    const handleStartPause = async () => {
+      try {
+        const { hapticMedium } = await import('./services/nativeBridge.js');
+        hapticMedium();
+      } catch(e) { /* web — ignore */ }
+      onStartPause();
+    };
+    const handleStopReset = async () => {
+      try {
+        const { hapticLight } = await import('./services/nativeBridge.js');
+        hapticLight();
+      } catch(e) { /* web — ignore */ }
+      onStopReset();
+    };
+    return (
     <div className="flex items-center gap-4">
         <motion.button
-            onClick={onStartPause}
-            className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full text-white font-bold text-2xl flex items-center justify-center transition-all duration-300 shadow-2xl focus:outline-none focus:ring-4 ${isRunning ? "bg-amber-500 hover:bg-amber-600 focus:ring-amber-400/50" : "bg-emerald-500 hover:bg-emerald-600 focus:ring-emerald-400/50"}`}
+            onClick={handleStartPause}
+            className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full text-btn font-bold text-2xl flex items-center justify-center transition-all duration-300 shadow-2xl focus:outline-none focus:ring-4 ${isRunning ? "bg-amber-500 hover:bg-amber-600 focus:ring-amber-400/50" : "bg-[var(--color-emerald-500)] hover:bg-[var(--color-emerald-600)]"}`}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             aria-label={isRunning ? "Pause Timer" : "Start Timer"}
@@ -138,15 +158,16 @@ const TimerControls = ({ isRunning, hasStarted, onStartPause, onStopReset }) => 
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                     <AnimatedButton
                         onClick={onStopReset}
-                        className="bg-slate-600 hover:bg-slate-500 text-white !px-4 sm:!px-6"
-                        icon={<FaRedo />}
+                        className="bg-[var(--color-slate-700)] hover:bg-[var(--color-slate-600)] text-[var(--color-white)] !px-4 sm:!px-6 border border-[var(--color-slate-600)] shadow-lg"
+                        icon={<FaRedo className="text-sm" />}
                         aria-label="Reset Timer"
                     />
                 </motion.div>
             )}
         </AnimatePresence>
     </div>
-);
+    );
+};
 
 
 // --- Main StudyTracker Component ---
@@ -410,11 +431,12 @@ const StudyTracker = () => {
     setShowSelectionModal(false);
   };
   
-  if (dataLoading) { return ( <div className="min-h-screen bg-slate-950 flex items-center justify-center"><Loader /></div> ); }
+  if (dataLoading) { return ( <div className="min-h-screen bg-[var(--color-slate-950)] text-[var(--color-slate-400)] flex items-center justify-center transition-colors duration-500"><Loader /></div> ); }
 
   const isRunning = timerMode === 'stopwatch' ? stopwatch.isSessionRunning : pomodoro.isActive;
   const displayTime = timerMode === 'stopwatch' ? stopwatch.sessionDisplayTime : pomodoro.timeLeft * 1000;
   const hasStarted = timerMode === 'stopwatch' ? stopwatch.sessionStartTime !== null : pomodoro.timeLeft < POMODORO_DURATIONS[pomodoro.mode];
+  
   const getPomodoroStatusText = () => {
     if (pomodoro.mode === 'work') return `Focus Session ${pomodoroCycle + 1} of 4`;
     if (pomodoro.mode === 'shortBreak') return "Short Break";
@@ -423,13 +445,13 @@ const StudyTracker = () => {
 
   return (
     <>
-      <Toaster position="bottom-center" toastOptions={{ style: { background: '#1e293b', color: '#e2e8f0', border: '1px solid #334155' } }} />
-      <div className="min-h-screen bg-slate-950 text-slate-200 flex flex-col relative overflow-hidden">
+      <Toaster position="bottom-center" toastOptions={{ style: { background: 'var(--color-slate-800)', color: 'var(--color-slate-100)', border: '1px solid var(--color-slate-700)' } }} />
+      <div className="min-h-screen bg-[var(--color-slate-950)] text-[var(--color-slate-300)] flex flex-col relative overflow-hidden transition-colors duration-500">
         {/* Living aura background */}
         <div className="fixed inset-0 -z-0 pointer-events-none overflow-hidden">
-          <div className="aura-orb-1 absolute -top-1/4 -left-1/4 w-[600px] h-[600px] rounded-full bg-emerald-500/[0.04] blur-[100px]" />
-          <div className="aura-orb-2 absolute -bottom-1/4 -right-1/4 w-[500px] h-[500px] rounded-full bg-indigo-500/[0.05] blur-[100px]" />
-          <div className="aura-orb-3 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-violet-500/[0.03] blur-[80px]" />
+          <div className="aura-orb-1 absolute -top-1/4 -left-1/4 w-[600px] h-[600px] rounded-full bg-[var(--color-emerald-500)]/5 blur-[100px]" />
+          <div className="aura-orb-2 absolute -bottom-1/4 -right-1/4 w-[500px] h-[500px] rounded-full bg-[var(--color-slate-400)]/5 blur-[100px]" />
+          <div className="aura-orb-3 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-[var(--color-emerald-300)]/5 blur-[80px]" />
         </div>
         
         <Navbar 
@@ -441,7 +463,7 @@ const StudyTracker = () => {
           onFeaturesClick={() => setShowFeatures(true)}
         />
 
-        <main className="flex-grow flex flex-col items-center justify-center p-4 sm:p-8 text-center relative z-10">
+        <main className="flex-grow flex flex-col items-center justify-center p-6 sm:p-8 text-center relative z-10 native-app:pb-24">
           <TimerModeToggle mode={timerMode} setMode={setTimerMode} />
           <TimerDisplay time={displayTime} isRunning={isRunning} formatTime={formatTime} />
           
@@ -455,9 +477,9 @@ const StudyTracker = () => {
             <CurrentTask project={selectedProject} topic={selectedTopic} subTopic={selectedSubTopic} />
             
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-              <AnimatedButton
+               <AnimatedButton
                   onClick={() => setShowSelectionModal(true)}
-                  className="bg-violet-600 hover:bg-violet-500 text-white w-full sm:w-auto"
+                  className="bg-[var(--color-emerald-600)] hover:bg-[var(--color-emerald-500)] text-btn w-full sm:w-auto shadow-lg shadow-[var(--color-emerald-600)]/20"
                   icon={<FaTasks />}
               >
                   Select Task
@@ -472,13 +494,12 @@ const StudyTracker = () => {
           </div>
         </main>
 
-        {/* Footer */}
-        <footer className="relative z-10 py-6 px-4 text-center border-t border-white/[0.04]">
-          <p className="text-[11px] text-slate-600 tracking-wide">
-            Built with focus · FocusFlow © {new Date().getFullYear()}
+         {/* Footer */}
+        <footer className="relative z-10 py-6 px-4 text-center border-t border-[var(--color-slate-700)]/30 safe-pb mt-auto">
+          <p className="text-[11px] text-[var(--color-slate-500)] font-bold tracking-[0.2em] uppercase transition-colors">
+            FocusFlow · Deep Work Companion © {new Date().getFullYear()}
           </p>
         </footer>
-
         <AnimatePresence>
           {showSelectionModal && (
             <SelectionModal

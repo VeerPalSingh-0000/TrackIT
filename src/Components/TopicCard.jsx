@@ -19,23 +19,23 @@ const TopicCard = ({ project, topic, onSelect, formatTime, topicTimers, subTopic
   }, [topic, topicTimers, subTopicTimers]);
 
   return (
-    <div className="bg-slate-800/60 rounded-lg border border-slate-700 overflow-hidden">
+    <div className="bg-[var(--color-slate-900)]/40 rounded-lg border border-[var(--color-slate-700)] overflow-hidden transition-colors">
       <div className="p-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           {hasSubTopics && (
-            <motion.button onClick={() => setIsExpanded(!isExpanded)} className="p-2 rounded-full hover:bg-slate-700" whileTap={{ scale: 0.9 }}>
-              <FaChevronRight className={`text-slate-400 transition-transform duration-300 text-xs ${isExpanded ? 'rotate-90' : ''}`} />
+            <motion.button onClick={() => setIsExpanded(!isExpanded)} className="p-2 rounded-full hover:bg-[var(--color-slate-700)] transition-colors" whileTap={{ scale: 0.9 }}>
+              <FaChevronRight className={`text-[var(--color-slate-400)] transition-transform duration-300 text-xs ${isExpanded ? 'rotate-90' : ''}`} />
             </motion.button>
           )}
-           {!hasSubTopics && <div className="w-8 h-8"></div> /* Spacer */}
-          <FaBookmark className="text-xl text-purple-400 flex-shrink-0" />
+           {!hasSubTopics && <div className="p-2 w-8 h-8"></div> /* Spacer */}
+          <FaBookmark className="text-xl text-[var(--color-emerald-500)] flex-shrink-0 transition-colors" />
           <div className="flex-1 min-w-0">
-            <h4 className="font-semibold text-white truncate">{topic.name}</h4>
+            <h4 className="font-semibold text-[var(--color-white)] truncate">{topic.name}</h4>
             {/* Display the new aggregated time */}
-            <p className="text-xs text-slate-400">{formatTime(topicTime)}</p>
+            <p className="text-xs text-[var(--color-slate-400)]">{formatTime(topicTime)}</p>
           </div>
         </div>
-        <motion.button onClick={() => onSelect(project, topic)} className="flex items-center gap-2 px-3 py-1.5 bg-purple-600 text-white rounded-md text-xs font-semibold" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}><FaPlay /> Topic</motion.button>
+        <motion.button onClick={() => onSelect(project, topic)} className="flex items-center gap-2 px-3 py-1.5 bg-[var(--color-emerald-600)] hover:bg-[var(--color-emerald-500)] text-btn rounded-md text-xs font-bold transition-all shadow-md shadow-[var(--color-emerald-600)]/20" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}><FaPlay className="text-[10px]" /> Topic</motion.button>
       </div>
 
       <AnimatePresence>
@@ -44,7 +44,7 @@ const TopicCard = ({ project, topic, onSelect, formatTime, topicTimers, subTopic
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="border-t border-slate-700"
+            className="border-t border-[var(--color-slate-700)]"
           >
             <div className="p-3 space-y-2">
               {topic.subTopics.map(subTopic => (

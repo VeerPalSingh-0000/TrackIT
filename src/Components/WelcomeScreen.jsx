@@ -84,7 +84,7 @@ const WelcomeScreen = ({ onComplete }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[var(--color-slate-950)] transition-colors duration-1000">
       {/* Animated gradient blobs */}
       <div className={`absolute inset-0 bg-gradient-to-br ${step.gradient} transition-all duration-1000`} />
       <div className="absolute top-1/4 -left-20 w-72 h-72 bg-emerald-500/5 rounded-full blur-3xl animate-pulse" />
@@ -104,7 +104,7 @@ const WelcomeScreen = ({ onComplete }) => {
                   ? `w-8 h-2.5 ${colors.dot}` 
                   : i < currentStep 
                   ? `w-2.5 h-2.5 ${colors.dot} opacity-50`
-                  : 'w-2.5 h-2.5 bg-slate-600'
+                  : 'w-2.5 h-2.5 bg-[var(--color-slate-700)]'
               }`}
             />
           ))}
@@ -156,7 +156,7 @@ const WelcomeScreen = ({ onComplete }) => {
                 initial={{ y: 15, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.25 }}
-                className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 leading-tight"
+                className="text-2xl sm:text-3xl md:text-4xl font-bold text-[var(--color-white)] mb-4 leading-tight transition-colors"
               >
                 {step.title}
               </motion.h2>
@@ -166,7 +166,7 @@ const WelcomeScreen = ({ onComplete }) => {
                 initial={{ y: 15, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.3 }}
-                className="text-base sm:text-lg text-slate-400 leading-relaxed max-w-md"
+                className="text-base sm:text-lg text-[var(--color-slate-400)] leading-relaxed max-w-md transition-colors font-medium"
               >
                 {step.subtitle}
               </motion.p>
@@ -177,12 +177,12 @@ const WelcomeScreen = ({ onComplete }) => {
         {/* Navigation */}
         <div className="w-full flex items-center justify-between mt-8 sm:mt-12 pb-8 sm:pb-0">
           {/* Back button */}
-          <motion.button
+           <motion.button
             onClick={goBack}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
               isFirst 
                 ? 'opacity-0 pointer-events-none' 
-                : 'text-slate-400 hover:text-white hover:bg-white/[0.06]'
+                : 'text-[var(--color-slate-400)] hover:text-[var(--color-white)] hover:bg-[var(--color-white)]/[0.06]'
             }`}
             whileTap={{ scale: 0.95 }}
           >
@@ -192,7 +192,7 @@ const WelcomeScreen = ({ onComplete }) => {
           {/* Next / Get Started button */}
           <motion.button
             onClick={goNext}
-            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white transition-all duration-300 shadow-lg ${colors.btn} ${
+            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-btn transition-all duration-300 shadow-lg ${colors.btn} ${
               isLast ? 'shadow-emerald-500/20' : ''
             }`}
             whileHover={{ scale: 1.03 }}
@@ -211,10 +211,10 @@ const WelcomeScreen = ({ onComplete }) => {
         </div>
 
         {/* Skip for experienced users */}
-        {!isLast && (
+         {!isLast && (
           <button
             onClick={onComplete}
-            className="text-xs text-slate-600 hover:text-slate-400 transition-colors mt-2 mb-4 sm:mb-0"
+            className="text-xs text-[var(--color-slate-500)] hover:text-[var(--color-emerald-500)] transition-colors mt-2 mb-4 sm:mb-0 font-bold uppercase tracking-widest opacity-80"
           >
             Skip intro
           </button>

@@ -162,8 +162,7 @@ export const addSessionToFirebase = async (sessionData, userId) => {
 export const subscribeToUserSessions = (userId, callback) => {
   const q = query(
     collection(db, 'sessions'),
-    where('userId', '==', userId),
-    orderBy('createdAt', 'desc')
+    where('userId', '==', userId)
   );
 
   return onSnapshot(q, (snapshot) => {
@@ -171,7 +170,15 @@ export const subscribeToUserSessions = (userId, callback) => {
     snapshot.forEach((doc) => {
       sessions.push({ id: doc.id, ...doc.data() });
     });
+    // Sort in memory to avoid requiring a composite index
+    sessions.sort((a, b) => {
+      const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+      const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+      return timeB - timeA;
+    });
     callback(sessions);
+  }, (error) => {
+    console.error("Error subscribing to sessions:", error);
   });
 };
 

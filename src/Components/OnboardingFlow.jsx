@@ -106,11 +106,11 @@ const OnboardingFlow = ({ onFinish, onCancel, projectToEdit = null }) => {
   return (
     <AnimatedModal onClose={onCancel}>
         {/* Header: Title and progress bar */}
-        <div className="p-4 sm:p-6 border-b border-slate-700 flex-shrink-0">
-          <h2 className="text-xl sm:text-2xl font-bold text-white text-center">
+        <div className="p-4 sm:p-6 border-b border-[var(--color-slate-700)] flex-shrink-0">
+          <h2 className="text-xl sm:text-2xl font-bold text-[var(--color-white)] text-center">
             {isEditMode ? 'Edit Project' : 'Create New Project'}
           </h2>
-          <div className="w-full bg-slate-700 rounded-full h-2.5 mt-4">
+          <div className="w-full bg-[var(--color-slate-700)] rounded-full h-2.5 mt-4">
             <motion.div
               className="bg-indigo-500 h-2.5 rounded-full"
               initial={{ width: '0%' }}
@@ -123,44 +123,44 @@ const OnboardingFlow = ({ onFinish, onCancel, projectToEdit = null }) => {
         {/* Main Content Area */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-8">
           <AnimatePresence mode="wait">
-            {step === 1 && (
+             {step === 1 && (
               <motion.div key="step1" variants={stepVariants} initial="hidden" animate="visible" exit="exit">
-                <h3 className="text-lg sm:text-xl font-semibold text-center text-indigo-300 mb-6">Project Details</h3>
+                <h3 className="text-lg sm:text-xl font-semibold text-center text-[var(--color-emerald-500)] mb-6">Project Details</h3>
                 <div className="space-y-6">
                   <input
                     type="text"
                     placeholder="Project Name (e.g., Learn React)"
                     value={projectSetup.name}
                     onChange={(e) => setProjectSetup({ ...projectSetup, name: e.target.value })}
-                    className="w-full p-3 sm:p-4 rounded-xl text-base sm:text-lg bg-slate-700 border-2 border-slate-600 text-white focus:border-indigo-500 outline-none transition"
+                    className="w-full p-3 sm:p-4 rounded-xl text-base sm:text-lg bg-[var(--color-slate-800)]/50 border-2 border-[var(--color-slate-700)] text-[var(--color-white)] focus:border-[var(--color-emerald-500)] outline-none transition placeholder:[var(--color-slate-400)]"
                   />
                   <textarea
                     placeholder="Project Description (Optional)"
                     value={projectSetup.description}
                     onChange={(e) => setProjectSetup({ ...projectSetup, description: e.target.value })}
-                    className="w-full p-3 sm:p-4 rounded-xl text-base sm:text-lg bg-slate-700 border-2 border-slate-600 text-white h-24 resize-none focus:border-purple-500 outline-none transition"
+                    className="w-full p-3 sm:p-4 rounded-xl text-base sm:text-lg bg-[var(--color-slate-800)]/50 border-2 border-[var(--color-slate-700)] text-[var(--color-white)] h-24 resize-none focus:border-[var(--color-emerald-500)] outline-none transition placeholder:[var(--color-slate-400)]"
                   />
                 </div>
               </motion.div>
             )}
             
-            {step === 2 && (
+             {step === 2 && (
               <motion.div key="step2" variants={stepVariants} initial="hidden" animate="visible" exit="exit">
-                <h3 className="text-lg sm:text-xl font-semibold text-center text-indigo-300 mb-6">Edit Topics & Sub-Topics</h3>
+                <h3 className="text-lg sm:text-xl font-semibold text-center text-[var(--color-emerald-500)] mb-6">Edit Topics & Sub-Topics</h3>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Input Column */}
-                  <div className="bg-slate-900/50 p-4 sm:p-6 rounded-2xl space-y-4">
-                    <h3 className="font-bold text-lg sm:text-xl text-white">Add New Topic</h3>
+                  {/* Input Column */ }
+                  <div className="bg-[var(--color-slate-900)]/40 p-4 sm:p-6 rounded-2xl space-y-4 border border-[var(--color-slate-700)]/50">
+                    <h3 className="font-bold text-lg sm:text-xl text-[var(--color-white)]">Add New Topic</h3>
                     <input
                       type="text"
                       placeholder="Topic Name (e.g., Hooks)"
                       value={currentTopic.name}
                       onChange={(e) => setCurrentTopic({ ...currentTopic, name: e.target.value })}
-                      className="w-full p-3 rounded-lg bg-slate-800 border border-slate-600 text-white focus:border-purple-500 outline-none"
+                      className="w-full p-3 rounded-lg bg-[var(--color-slate-800)]/50 border border-[var(--color-slate-700)] text-[var(--color-white)] focus:border-[var(--color-emerald-500)] outline-none"
                     />
 
-                    <div className="bg-slate-800/50 p-4 rounded-lg">
-                      <h4 className="text-sm font-bold text-gray-300 mb-3">Add Sub-Topics</h4>
+                    <div className="bg-[var(--color-slate-800)]/30 p-4 rounded-lg">
+                      <h4 className="text-sm font-bold text-[var(--color-slate-400)] mb-3">Add Sub-Topics</h4>
                       <div className="flex flex-col sm:flex-row gap-2 mb-3">
                         <input
                           type="text"
@@ -168,9 +168,9 @@ const OnboardingFlow = ({ onFinish, onCancel, projectToEdit = null }) => {
                           value={currentSubTopicName}
                           onChange={(e) => setCurrentSubTopicName(e.target.value)}
                           onKeyPress={(e) => handleKeyPress(e, addSubTopic)}
-                          className="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-white focus:border-emerald-500 outline-none text-sm sm:text-base"
+                          className="w-full px-3 py-2 rounded bg-[var(--color-slate-900)]/50 border border-[var(--color-slate-700)] text-[var(--color-white)] focus:border-[var(--color-emerald-500)] outline-none text-sm sm:text-base"
                         />
-                        <button onClick={addSubTopic} disabled={!currentSubTopicName.trim()} className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                        <button onClick={addSubTopic} disabled={!currentSubTopicName.trim()} className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-[var(--color-emerald-600)] text-btn rounded-lg hover:bg-[var(--color-emerald-500)] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-[var(--color-emerald-600)]/20">
                           <FaPlus />
                           <span className="sm:hidden">Add Sub-Topic</span>
                         </button>
@@ -179,8 +179,8 @@ const OnboardingFlow = ({ onFinish, onCancel, projectToEdit = null }) => {
                       {currentTopic.subTopics.length > 0 && (
                         <motion.div layout className="space-y-2 max-h-32 overflow-y-auto p-1">
                           {currentTopic.subTopics.map((st) => (
-                            <motion.div layout key={st.id} variants={listItemVariants} initial="hidden" animate="visible" exit="exit" className="flex items-center justify-between bg-slate-900/50 p-2 rounded">
-                              <span className="text-sm text-gray-300"> • {st.name}</span>
+                            <motion.div layout key={st.id} variants={listItemVariants} initial="hidden" animate="visible" exit="exit" className="flex items-center justify-between bg-[var(--color-slate-900)]/50 p-2 rounded">
+                              <span className="text-sm text-[var(--color-slate-300)] font-medium"> • {st.name}</span>
                               <button onClick={() => removeSubTopic(st.id)} className="text-rose-400 hover:text-rose-300 p-1"><FaTrash className="text-xs" /></button>
                             </motion.div>
                           ))}
@@ -188,30 +188,30 @@ const OnboardingFlow = ({ onFinish, onCancel, projectToEdit = null }) => {
                       )}
                       </AnimatePresence>
                     </div>
-                    <AnimatedButton onClick={addTopic} disabled={!currentTopic.name.trim()} className="w-full bg-purple-600 hover:bg-purple-500 text-white" icon={<FaPlus />}>Add Topic</AnimatedButton>
+                    <AnimatedButton onClick={addTopic} disabled={!currentTopic.name.trim()} className="w-full bg-[var(--color-emerald-600)] hover:bg-[var(--color-emerald-500)] text-btn shadow-lg shadow-[var(--color-emerald-600)]/20" icon={<FaPlus />}>Add Topic</AnimatedButton>
                   </div>
                   
-                  {/* Display Column */}
-                  <div className="bg-slate-900/50 p-4 sm:p-6 rounded-2xl flex flex-col min-h-[300px]">
-                    <h3 className="font-bold text-lg sm:text-xl text-white mb-4 flex-shrink-0">Project Structure</h3>
+                   {/* Display Column */ }
+                  <div className="bg-[var(--color-slate-900)]/40 p-4 sm:p-6 rounded-2xl flex flex-col min-h-[300px] border border-[var(--color-slate-700)]/50">
+                    <h3 className="font-bold text-lg sm:text-xl text-[var(--color-white)] mb-4 flex-shrink-0">Project Structure</h3>
                     <div className="space-y-3 flex-grow overflow-y-auto p-1">
                       {projectSetup.topics.length === 0 && (
-                        <div className="flex flex-col items-center justify-center h-full text-slate-500">
-                          <FaFolderOpen className="text-3xl sm:text-4xl mb-4"/>
-                          <p>Your topics will appear here.</p>
+                        <div className="flex flex-col items-center justify-center h-full text-[var(--color-slate-400)] transition-colors">
+                          <FaFolderOpen className="text-3xl sm:text-4xl mb-4 opacity-50"/>
+                          <p className="font-medium">Your topics will appear here.</p>
                         </div>
                       )}
                       <AnimatePresence>
                       {projectSetup.topics.map((t) => (
-                        <motion.div layout key={t.id} variants={listItemVariants} initial="hidden" animate="visible" exit="exit" className="bg-slate-800 p-3 rounded-lg">
+                        <motion.div layout key={t.id} variants={listItemVariants} initial="hidden" animate="visible" exit="exit" className="bg-[var(--color-slate-800)] p-3 rounded-lg">
                           <div className="flex items-center justify-between mb-2">
-                            <p className="font-semibold text-purple-300 flex items-center gap-2"><FaBookmark />{t.name}</p>
+                            <p className="font-bold text-[var(--color-emerald-500)] flex items-center gap-2 transition-colors"><FaBookmark />{t.name}</p>
                             <button onClick={() => removeTopic(t.id)} className="text-rose-400 hover:text-rose-300 p-1"><FaTrash className="text-xs" /></button>
                           </div>
                           {t.subTopics.length > 0 && (
-                            <div className="pl-4 space-y-1 border-l-2 border-slate-700 ml-2">
+                            <div className="pl-4 space-y-1 border-l-2 border-[var(--color-slate-700)] ml-2 transition-colors">
                                 {t.subTopics.map((st) => (
-                                    <p key={st.id} className="text-xs text-gray-400 flex items-center gap-2 pt-1"><FaCheck className="text-emerald-400" />{st.name}</p>
+                                    <p key={st.id} className="text-xs text-[var(--color-slate-400)] flex items-center gap-2 pt-1 font-medium transition-colors"><FaCheck className="text-[var(--color-emerald-400)] transition-colors" />{st.name}</p>
                                 ))}
                             </div>
                           )}
@@ -226,18 +226,18 @@ const OnboardingFlow = ({ onFinish, onCancel, projectToEdit = null }) => {
           </AnimatePresence>
         </div>
 
-        {/* Footer: Navigation buttons */}
-        <div className="p-4 sm:p-6 border-t border-slate-700 flex justify-between items-center flex-shrink-0">
+         {/* Footer: Navigation buttons */}
+        <div className="p-4 sm:p-6 border-t border-[var(--color-slate-700)] flex justify-between items-center flex-shrink-0 transition-colors">
             {step === 1 ? (
-                <AnimatedButton onClick={onCancel} className="bg-slate-600 hover:bg-slate-500 text-white">Cancel</AnimatedButton>
+                <AnimatedButton onClick={onCancel} className="bg-[var(--color-slate-700)] text-[var(--color-white)] hover:bg-[var(--color-slate-600)]">Cancel</AnimatedButton>
             ) : (
-                <AnimatedButton onClick={() => setStep(1)} className="bg-slate-600 hover:bg-slate-500 text-white p-3 sm:px-4 sm:py-2" icon={<FaArrowLeft />}><span className="hidden sm:inline ml-2">Back</span></AnimatedButton>
+                <AnimatedButton onClick={() => setStep(1)} className="bg-[var(--color-slate-700)] text-[var(--color-white)] hover:bg-[var(--color-slate-600)] p-3 sm:px-4 sm:py-2" icon={<FaArrowLeft />}><span className="hidden sm:inline ml-2">Back</span></AnimatedButton>
             )}
 
             {step === 1 ? (
-                <AnimatedButton onClick={() => setStep(2)} disabled={!projectSetup.name.trim()} className="bg-indigo-600 hover:bg-indigo-500 text-white p-3 sm:px-4 sm:py-2" icon={<FaArrowRight />}><span className="hidden sm:inline ml-2">Next</span></AnimatedButton>
+                <AnimatedButton onClick={() => setStep(2)} disabled={!projectSetup.name.trim()} className="bg-[var(--color-emerald-600)] text-btn hover:bg-[var(--color-emerald-500)] p-3 sm:px-4 sm:py-2" icon={<FaArrowRight />}><span className="hidden sm:inline ml-2">Next</span></AnimatedButton>
             ) : (
-                <AnimatedButton onClick={handleFinish} disabled={!projectSetup.name.trim()} className="bg-emerald-600 hover:bg-emerald-500 text-white p-3 sm:px-4 sm:py-2" icon={<FaCheck />}>
+                <AnimatedButton onClick={handleFinish} disabled={!projectSetup.name.trim()} className="bg-[var(--color-emerald-600)] text-btn hover:bg-[var(--color-emerald-500)] p-3 sm:px-4 sm:py-2" icon={<FaCheck />}>
                     <span className="hidden sm:inline ml-2">{isEditMode ? 'Save Changes' : 'Finish & Create'}</span>
                 </AnimatedButton>
             )}

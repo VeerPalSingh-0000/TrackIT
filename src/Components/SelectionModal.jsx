@@ -32,10 +32,10 @@ const SelectionModal = ({
   return (
     <AnimatedModal onClose={onClose}>
       {/* Header */}
-      <div className="p-6 border-b border-slate-700 flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-white">Select a Task</h2>
-        <button onClick={onClose} className="p-2 rounded-full hover:bg-slate-700 transition-colors">
-            <svg className="w-6 h-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+      <div className="p-6 border-b border-[var(--color-slate-700)] flex justify-between items-center transition-colors">
+        <h2 className="text-2xl font-bold text-[var(--color-white)]">Select a Task</h2>
+        <button onClick={onClose} className="p-2 rounded-full hover:bg-[var(--color-slate-700)]/50 transition-colors">
+            <svg className="w-6 h-6 text-[var(--color-slate-400)]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
       </div>
 
@@ -65,7 +65,7 @@ const SelectionModal = ({
                 ))}
             </motion.div>
         ) : (
-            <div className="text-center py-12 text-slate-500">
+            <div className="text-center py-12 text-[var(--color-slate-400)]">
                 <p className="text-lg">No projects found.</p>
                 <p>Click "New Project" to get started.</p>
             </div>

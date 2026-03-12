@@ -4,22 +4,22 @@ import { motion, AnimatePresence } from 'framer-motion';
 const TimerDisplay = ({ time, isRunning, formatTime }) => {
   return (
     <motion.div
-      className="relative flex flex-col items-center justify-center"
+      className="relative flex flex-col items-center justify-center motion-safe-gpu"
       animate={{ scale: isRunning ? 1.02 : 1 }}
       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
     >
       {/* Glow halo behind the ring — only visible when running */}
       <div className={`absolute inset-0 rounded-full transition-all duration-1000 ${
         isRunning 
-          ? 'bg-emerald-500/8 shadow-[0_0_80px_30px_rgba(52,211,153,0.08)] timer-glow-active' 
+          ? 'bg-[var(--color-emerald-500)]/5 shadow-[0_0_80px_30px_var(--color-emerald-500)]/10 timer-glow-active' 
           : 'bg-transparent shadow-none'
       }`} />
 
       <svg className="w-64 h-64 sm:w-72 sm:h-72 transform -rotate-90 relative z-10" viewBox="0 0 120 120">
         <defs>
           <linearGradient id="timerGradient" gradientTransform="rotate(90)">
-            <stop offset="0%" stopColor={isRunning ? "#34D399" : "#818CF8"} />
-            <stop offset="100%" stopColor={isRunning ? "#10B981" : "#6366F1"} />
+            <stop offset="0%" stopColor={isRunning ? "var(--color-emerald-400)" : "var(--color-slate-400)"} />
+            <stop offset="100%" stopColor={isRunning ? "var(--color-emerald-600)" : "var(--color-slate-500)"} />
           </linearGradient>
           <linearGradient id="timerTrack" gradientTransform="rotate(90)">
             <stop offset="0%" stopColor="rgba(100,116,139,0.15)" />
@@ -65,7 +65,7 @@ const TimerDisplay = ({ time, isRunning, formatTime }) => {
 
       {/* Timer digits */}
       <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-        <h2 className="font-timer text-5xl sm:text-6xl font-bold tracking-tight text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+        <h2 className="font-timer text-5xl sm:text-6xl font-bold tracking-tight text-[var(--color-white)] drop-shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-colors">
           {formatTime(time)}
         </h2>
         
@@ -77,8 +77,8 @@ const TimerDisplay = ({ time, isRunning, formatTime }) => {
               exit={{ opacity: 0, y: -8 }}
               className="flex items-center gap-2 mt-3"
             >
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-emerald-400/80 text-xs font-medium uppercase tracking-widest">
+              <span className="w-2 h-2 rounded-full bg-[var(--color-emerald-400)] animate-pulse" />
+              <span className="text-[var(--color-emerald-500)]/80 text-xs font-bold uppercase tracking-widest transition-colors">
                 Focusing
               </span>
             </motion.div>

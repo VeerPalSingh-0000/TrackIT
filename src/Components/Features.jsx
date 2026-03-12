@@ -49,27 +49,26 @@ const Features = ({ onClose }) => {
   ];
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/80 backdrop-blur-md">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[var(--color-slate-950)]/80 backdrop-blur-md">
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="w-full max-w-3xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl relative mx-4 max-h-[90dvh] flex flex-col overflow-hidden"
+        className="w-full max-w-3xl bg-[var(--color-slate-900)] border border-[var(--color-slate-700)] rounded-3xl shadow-2xl relative mx-4 max-h-[90dvh] flex flex-col overflow-hidden transition-colors"
       >
-        {/* Header - fixed at top */}
-        <div className="flex-shrink-0 p-6 sm:p-8 pb-4 sm:pb-6 relative">
+        <div className="flex-shrink-0 p-6 sm:p-8 pb-4 sm:pb-6 relative border-b border-[var(--color-slate-700)]/30">
           <div className="absolute top-4 right-4 z-10">
-            <button onClick={onClose} className="p-2 text-slate-400 hover:text-white transition-colors bg-slate-800/50 hover:bg-rose-500/20 rounded-full">
+            <button onClick={onClose} className="p-2 text-[var(--color-slate-400)] hover:text-[var(--color-emerald-500)] transition-colors bg-[var(--color-slate-800)]/50 rounded-full">
               <FaTimes />
             </button>
           </div>
           
-          <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-64 h-64 bg-[var(--color-emerald-500)]/10 rounded-full blur-3xl pointer-events-none" />
           
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400 mb-1 sm:mb-2 pr-10">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[var(--color-emerald-500)] to-[var(--color-emerald-400)] mb-1 sm:mb-2 pr-10">
             What Does FocusFlow Do?
           </h2>
-          <p className="text-slate-400 text-sm sm:text-base md:text-lg">
+          <p className="text-[var(--color-slate-400)] text-sm sm:text-base md:text-lg font-medium">
             Everything you need to master your study & work sessions.
           </p>
         </div>
@@ -88,10 +87,10 @@ const Features = ({ onClose }) => {
                 <div className={`${feature.color} text-2xl sm:text-3xl mb-3 group-hover:scale-110 transition-transform inline-block`}>
                   {feature.icon}
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-slate-200 mb-1.5">
+                 <h3 className="text-base sm:text-lg font-bold text-[var(--color-white)] mb-1.5 transition-colors">
                   {feature.title}
                 </h3>
-                <p className="text-slate-400 text-sm leading-relaxed">
+                <p className="text-[var(--color-slate-400)] text-sm leading-relaxed transition-colors">
                   {feature.desc}
                 </p>
               </motion.div>

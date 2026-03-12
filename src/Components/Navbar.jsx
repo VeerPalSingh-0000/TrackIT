@@ -48,8 +48,8 @@ const Navbar = ({ onNewProjectClick, onHistoryClick, onLogout, user, onAboutClic
         variant === 'danger'
           ? 'text-rose-400 hover:bg-rose-500/10'
           : variant === 'primary'
-          ? 'text-emerald-400 hover:bg-emerald-500/10'
-          : 'text-slate-300 hover:bg-white/[0.06] hover:text-white'
+          ? 'text-[var(--color-emerald-500)] hover:bg-[var(--color-emerald-500)]/10'
+          : 'text-[var(--color-slate-300)] hover:bg-[var(--color-slate-700)]/50 hover:text-[var(--color-white)]'
       }`}
     >
       {icon && <span className="text-[16px] opacity-70 w-5 flex justify-center">{icon}</span>}
@@ -60,15 +60,15 @@ const Navbar = ({ onNewProjectClick, onHistoryClick, onLogout, user, onAboutClic
   return (
     <>
       {/* ─── Floating Navbar Container ─── */}
-      <div className="sticky top-0 z-50 w-full px-3 sm:px-5 pt-3">
+      <div className="sticky top-0 z-50 w-full px-3 sm:px-5 pt-3 native-app:pt-0 native-app:safe-mt">
         <motion.header
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className={`mx-auto max-w-5xl rounded-2xl transition-all duration-500 ${
+          className={`mx-auto max-w-5xl rounded-2xl transition-all duration-500 motion-safe-gpu ${
             scrolled
-              ? 'bg-slate-900/70 backdrop-blur-2xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.03)]'
-              : 'bg-slate-900/50 backdrop-blur-xl border border-white/[0.06] shadow-[0_4px_24px_rgba(0,0,0,0.25)]'
+              ? 'bg-[var(--color-slate-900)]/70 backdrop-blur-2xl border border-[var(--color-slate-700)] shadow-[0_8px_32px_rgba(0,0,0,0.4)]'
+              : 'bg-[var(--color-slate-900)]/50 backdrop-blur-xl border border-[var(--color-slate-700)] shadow-[0_4px_24px_rgba(0,0,0,0.25)]'
           }`}
         >
           <div className="flex items-center justify-between h-[52px] px-3 sm:px-4">
@@ -83,11 +83,11 @@ const Navbar = ({ onNewProjectClick, onHistoryClick, onLogout, user, onAboutClic
                 <img
                   src={TrackerLogo}
                   alt="FocusFlow"
-                  className="relative h-8 w-8 object-contain transition-transform duration-300 group-hover:scale-110"
+                  className="relative h-10 w-10 object-contain transition-transform duration-300 group-hover:scale-110"
                   loading="eager"
                 />
               </div>
-              <span className="hidden sm:block text-[16px] font-bold text-white tracking-tight">
+              <span className="hidden sm:block text-[16px] font-bold text-[var(--color-white)] tracking-tight">
                 FocusFlow
               </span>
             </button>
@@ -100,7 +100,7 @@ const Navbar = ({ onNewProjectClick, onHistoryClick, onLogout, user, onAboutClic
               {/* History Button - Top Right */}
               <button
                 onClick={onHistoryClick}
-                className="hidden md:flex items-center justify-center w-9 h-9 text-slate-300 hover:text-white hover:bg-white/[0.08] rounded-full transition-all duration-200 focus:outline-none"
+                className="hidden md:flex items-center justify-center w-9 h-9 text-[var(--color-slate-300)] hover:text-[var(--color-white)] hover:bg-[var(--color-white)]/10 rounded-full transition-all duration-200 focus:outline-none"
                 title="History"
               >
                 <FaHistory className="text-[14px]" />
@@ -114,7 +114,7 @@ const Navbar = ({ onNewProjectClick, onHistoryClick, onLogout, user, onAboutClic
               {/* New Project CTA */}
               <motion.button
                 onClick={onNewProjectClick}
-                className="hidden md:flex items-center gap-1.5 h-[34px] px-4 text-[13px] font-semibold text-white bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 rounded-full shadow-[0_2px_12px_rgba(16,185,129,0.25)] hover:shadow-[0_4px_20px_rgba(16,185,129,0.35)] transition-all duration-300 focus:outline-none"
+                className="hidden md:flex items-center gap-1.5 h-[34px] px-4 text-[13px] font-semibold text-[#ffffff] bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 rounded-full shadow-[0_2px_12px_rgba(16,185,129,0.25)] hover:shadow-[0_4px_20px_rgba(16,185,129,0.35)] transition-all duration-300 focus:outline-none"
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
               >
@@ -133,10 +133,10 @@ const Navbar = ({ onNewProjectClick, onHistoryClick, onLogout, user, onAboutClic
                   }`}
                   whileTap={{ scale: 0.97 }}
                 >
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-400 via-teal-400 to-indigo-500 flex items-center justify-center text-[11px] font-bold text-white ring-2 ring-slate-900/50">
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-400 via-teal-400 to-indigo-500 flex items-center justify-center text-[11px] font-bold text-[#ffffff] ring-2 ring-[var(--color-slate-900)]/50">
                     {userInitial}
                   </div>
-                  <FaChevronDown className={`text-[9px] text-slate-400 transition-transform duration-200 ${profileOpen ? 'rotate-180' : ''}`} />
+                  <FaChevronDown className={`text-[9px] text-[var(--color-slate-400)] transition-transform duration-200 ${profileOpen ? 'rotate-180' : ''}`} />
                 </motion.button>
 
                 <AnimatePresence>
@@ -146,17 +146,17 @@ const Navbar = ({ onNewProjectClick, onHistoryClick, onLogout, user, onAboutClic
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 8, scale: 0.95 }}
                       transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                      className="absolute right-0 mt-2.5 w-72 bg-slate-900/95 backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.5)] overflow-hidden origin-top-right"
+                      className="absolute right-0 mt-2.5 w-72 bg-[var(--color-slate-900)] backdrop-blur-2xl border border-[var(--color-slate-700)] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.5)] overflow-hidden origin-top-right"
                     >
                       {/* User info card */}
-                      <div className="p-4 border-b border-white/[0.06]">
+                      <div className="p-4 border-b border-[var(--color-slate-700)]/50">
                         <div className="flex items-center gap-3">
-                          <div className="w-11 h-11 rounded-full bg-gradient-to-br from-emerald-400 via-teal-400 to-indigo-500 flex items-center justify-center text-sm font-bold text-white shadow-lg ring-2 ring-white/10">
+                          <div className="w-11 h-11 rounded-full bg-gradient-to-br from-emerald-400 via-teal-400 to-indigo-500 flex items-center justify-center text-sm font-bold text-[#ffffff] shadow-lg ring-2 ring-[var(--color-slate-700)]">
                             {userInitial}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-[14px] font-semibold text-white truncate">{user?.displayName || 'FocusFlow User'}</p>
-                            <p className="text-[12px] text-slate-400 truncate">{user?.email || ''}</p>
+                            <p className="text-[14px] font-semibold text-[var(--color-white)] truncate">{user?.displayName || 'FocusFlow User'}</p>
+                            <p className="text-[12px] text-[var(--color-slate-400)] truncate">{user?.email || ''}</p>
                           </div>
                         </div>
                       </div>
@@ -165,17 +165,19 @@ const Navbar = ({ onNewProjectClick, onHistoryClick, onLogout, user, onAboutClic
                       <div className="p-1.5">
                         {/* Theme Picker */}
                         <div className="px-3 py-2 mb-1">
-                          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Color Palette</p>
+                          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Theme</p>
                           <div className="flex items-center gap-2">
                             {themes.map((theme) => (
                               <button
                                 key={theme.id}
                                 onClick={() => setCurrentThemeId(theme.id)}
                                 title={theme.name}
-                                className={`w-6 h-6 rounded-full border-2 transition-transform duration-200 ${
-                                  currentThemeId === theme.id ? 'border-white scale-110 shadow-lg' : 'border-transparent hover:scale-110 hover:border-white/50'
+                                className={`w-8 h-8 rounded-full border-2 transition-transform duration-200 ${
+                                  currentThemeId === theme.id ? 'border-[var(--color-emerald-500)] scale-110 shadow-lg' : 'border-[var(--color-slate-700)] hover:scale-110 hover:border-[var(--color-emerald-500)]/50'
                                 }`}
-                                style={{ backgroundColor: theme.colors['--color-emerald-500'] }}
+                                style={{ 
+                                  background: `linear-gradient(135deg, ${theme.colors['--color-slate-950']} 50%, ${theme.colors['--color-emerald-500']} 50%)`
+                                }}
                               />
                             ))}
                           </div>
@@ -190,7 +192,7 @@ const Navbar = ({ onNewProjectClick, onHistoryClick, onLogout, user, onAboutClic
                           <button
                             key={item.label}
                             onClick={() => { setProfileOpen(false); item.onClick(); }}
-                            className="w-full flex items-center gap-3 px-3 py-2.5 text-[13px] text-slate-300 hover:text-white hover:bg-white/[0.06] rounded-xl transition-all duration-150"
+                            className="w-full flex items-center gap-3 px-3 py-2.5 text-[13px] text-[var(--color-slate-300)] hover:text-[var(--color-white)] hover:bg-[var(--color-slate-700)]/50 rounded-xl transition-all duration-150"
                           >
                             <span className="text-[13px] opacity-50 w-4 flex justify-center">{item.icon}</span>
                             {item.label}
@@ -214,7 +216,7 @@ const Navbar = ({ onNewProjectClick, onHistoryClick, onLogout, user, onAboutClic
               {/* Hamburger - Mobile */}
               <button
                 onClick={() => setMobileOpen(!mobileOpen)}
-                className="md:hidden flex items-center justify-center w-9 h-9 rounded-full text-slate-300 hover:text-white hover:bg-white/[0.08] transition-all duration-200 focus:outline-none"
+                className="md:hidden flex items-center justify-center w-9 h-9 rounded-full text-[var(--color-slate-300)] hover:text-[var(--color-white)] hover:bg-[var(--color-slate-700)]/50 transition-all duration-200 focus:outline-none"
                 aria-label="Toggle menu"
               >
                 {mobileOpen ? <HiX className="text-xl" /> : <HiMenuAlt3 className="text-xl" />}
@@ -244,32 +246,32 @@ const Navbar = ({ onNewProjectClick, onHistoryClick, onLogout, user, onAboutClic
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 28, stiffness: 280 }}
-              className="fixed top-0 right-0 bottom-0 z-50 w-[300px] bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900 border-l border-white/[0.06] flex flex-col md:hidden"
+              className="fixed top-0 right-0 bottom-0 z-50 w-[300px] bg-[var(--color-slate-950)] border-l border-[var(--color-slate-700)] flex flex-col md:hidden motion-safe-gpu"
             >
               {/* Mobile header */}
-              <div className="flex items-center justify-between h-[60px] px-5 border-b border-white/[0.06]">
+              <div className="flex items-center justify-between h-[60px] px-5 border-b border-[var(--color-slate-700)]/50 safe-pt">
                 <div className="flex items-center gap-2.5">
-                  <img src={TrackerLogo} alt="FocusFlow" className="h-8 w-8 object-contain" />
-                  <span className="text-[16px] font-bold text-white tracking-tight">FocusFlow</span>
+                  <img src={TrackerLogo} alt="FocusFlow" className="h-10 w-10 object-contain" />
+                  <span className="text-[16px] font-bold text-[var(--color-white)] tracking-tight">FocusFlow</span>
                 </div>
                 <button
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center justify-center w-8 h-8 rounded-full text-slate-400 hover:text-white hover:bg-white/[0.08] transition-colors"
+                  className="flex items-center justify-center w-8 h-8 rounded-full text-[var(--color-slate-400)] hover:text-[var(--color-white)] hover:bg-[var(--color-slate-700)]/50 transition-colors"
                 >
                   <HiX className="text-lg" />
                 </button>
               </div>
 
               {/* User card */}
-              {user && (
-                <div className="mx-4 mt-5 mb-3 p-4 bg-gradient-to-r from-white/[0.04] to-white/[0.02] border border-white/[0.06] rounded-2xl">
+               {user && (
+                <div className="mx-4 mt-5 mb-3 p-4 bg-[var(--color-slate-900)] border border-[var(--color-slate-700)] rounded-2xl">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 via-teal-400 to-indigo-500 flex items-center justify-center text-sm font-bold text-white flex-shrink-0 ring-2 ring-white/10">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 via-teal-400 to-indigo-500 flex items-center justify-center text-sm font-bold text-[#ffffff] flex-shrink-0 ring-2 ring-[var(--color-slate-700)]">
                       {userInitial}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[14px] font-semibold text-white truncate">{user.displayName || 'User'}</p>
-                      <p className="text-xs text-slate-500 truncate">{user.email || ''}</p>
+                      <p className="text-[14px] font-semibold text-[var(--color-white)] truncate">{user.displayName || 'User'}</p>
+                      <p className="text-xs text-[var(--color-slate-400)] truncate">{user.email || ''}</p>
                     </div>
                   </div>
                 </div>
@@ -297,21 +299,23 @@ const Navbar = ({ onNewProjectClick, onHistoryClick, onLogout, user, onAboutClic
                 </div>
               </div>
 
-              {/* Profile Actions & Sign out at bottom */}
-              <div className="p-3 border-t border-white/[0.06]">
-                {/* Theme Picker - Mobile */}
-                <div className="px-5 py-3 mb-2 bg-white/[0.02] rounded-xl border border-white/[0.04]">
-                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Color Palette</p>
+               {/* Profile Actions & Sign out at bottom */}
+              <div className="p-3 border-t border-[var(--color-slate-700)]/50">
+                 {/* Theme Picker - Mobile */}
+                <div className="px-5 py-4 mb-2 bg-[var(--color-slate-900)]/50 rounded-2xl border border-[var(--color-slate-700)]">
+                  <p className="text-[10px] font-bold text-[var(--color-slate-500)] uppercase tracking-widest mb-3">Theme</p>
                   <div className="flex items-center gap-3">
                     {themes.map((theme) => (
                       <button
                         key={theme.id}
                         onClick={() => setCurrentThemeId(theme.id)}
                         title={theme.name}
-                        className={`w-8 h-8 rounded-full border-2 transition-transform duration-200 ${
-                          currentThemeId === theme.id ? 'border-white scale-110 shadow-lg' : 'border-transparent hover:scale-110 shadow-md'
+                        className={`w-9 h-9 rounded-full border-2 transition-transform duration-200 ${
+                          currentThemeId === theme.id ? 'border-[var(--color-emerald-500)] scale-110 shadow-lg' : 'border-[var(--color-slate-700)] hover:scale-110 shadow-md hover:border-[var(--color-emerald-500)]/50'
                         }`}
-                        style={{ backgroundColor: theme.colors['--color-emerald-500'] }}
+                        style={{ 
+                          background: `linear-gradient(135deg, ${theme.colors['--color-slate-950']} 50%, ${theme.colors['--color-emerald-500']} 50%)`
+                        }}
                       />
                     ))}
                   </div>

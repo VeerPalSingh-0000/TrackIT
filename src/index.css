@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+@layer utilities {
+  .text-white {
+    color: var(--color-white) !important;
+  }
+  .text-btn {
+    color: var(--color-btn-text) !important;
+  }
+}
+
 /* --- shadcn-compatible theme tokens (dark mode aligned with slate-950 app) --- */
 :root {
   --background: oklch(0.13 0.02 260);
@@ -46,9 +55,10 @@ html {
 
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background: #020617;
-  color: #e2e8f0;
+  background: var(--color-slate-950);
+  color: var(--color-slate-300);
   overflow-x: hidden;
+  transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Monospace timer font */
@@ -66,17 +76,17 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.15);
+  background: var(--color-slate-700);
   border-radius: 999px;
+  opacity: 0.2;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.3);
+  background: var(--color-slate-600);
 }
 
-/* Selection color */
 ::selection {
-  background: rgba(52, 211, 153, 0.25);
-  color: #fff;
+  background: color-mix(in srgb, var(--color-emerald-500), transparent 75%);
+  color: var(--color-black);
 }
 
 /* --- Animated background aura --- */
@@ -129,4 +139,83 @@ body {
 }
 .animation-delay-4000 {
   animation-delay: 4s;
+}
+
+/* --- NATIVE APP MOBILE PERFORMANCE OPTIMIZATIONS --- */
+/* Disables GPU crushing blurs & animations on Android Webview */
+.native-app .aura-orb-1,
+.native-app .aura-orb-2,
+.native-app .aura-orb-3,
+.native-app .animate-blob {
+  display: none !important;
+  animation: none !important;
+}
+
+.native-app [class*="blur-"],
+.native-app [class*="backdrop-blur-"] {
+  backdrop-filter: none !important;
+  filter: none !important;
+}
+
+.native-app .bg-slate-900\/70,
+.native-app .bg-slate-900\/50,
+.native-app .bg-slate-950\/80,
+.native-app .bg-slate-900\/95 {
+  /* Increase opacity since blur is gone to retain readability */
+  background-color: rgba(15, 23, 42, 0.98) !important;
+}
+
+/* 120FPS Performance Hints */
+.native-app * {
+  /* Enable hardware acceleration for all components that might move */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000;
+  perspective: 1000;
+}
+
+.native-app .motion-safe-gpu {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+/* Better Mobile Padding & Margin with Safe Area Support */
+:root {
+  --sat: env(safe-area-inset-top);
+  --sab: env(safe-area-inset-bottom);
+  --sar: env(safe-area-inset-right);
+  --sal: env(safe-area-inset-left);
+}
+
+.native-app .safe-pt {
+  padding-top: calc(1rem + var(--sat));
+}
+
+.native-app .safe-pb {
+  padding-bottom: calc(1rem + var(--sab));
+}
+
+.native-app .safe-mt {
+  margin-top: var(--sat);
+}
+
+.native-app .safe-mb {
+  margin-bottom: var(--sab);
+}
+
+/* Optimize Scroll for 120fps */
+.native-app .overflow-y-auto {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: auto !important; /* Smooth scroll can be laggy at 120fps on some devices */
+}
+
+/* Disable expensive filters for native app */
+.native-app svg filter {
+  display: none !important;
+}
+
+.native-app .drop-shadow-2xl,
+.native-app .shadow-2xl {
+  filter: none !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15) !important;
 }

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "573843213419",
+    "project_id": "study-tracker-cd631",
+    "storage_bucket": "study-tracker-cd631.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:573843213419:android:b5fba434d6a7e10da7f52e",
+        "android_client_info": {
+          "package_name": "com.focusflow.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "573843213419-9798p64matpp86cnuvb5buj8u07omf8h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.focusflow.app",
+            "certificate_hash": "921cb8bdb289221047ef8d6b8696db44ba7076c9"
+          }
+        },
+        {
+          "client_id": "573843213419-lva274vejkjeq1v2rck584oskt6rcic5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXNNErdfYFzMbZrhqFf8L8O_7m8W0-Gy0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "573843213419-lva274vejkjeq1v2rck584oskt6rcic5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
