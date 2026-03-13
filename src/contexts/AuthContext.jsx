@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { auth } from '../firebase/config'; // Make sure this path is correct
+import { auth } from '../firebase/config';
 import { 
   onAuthStateChanged, 
   createUserWithEmailAndPassword, 
@@ -7,6 +7,8 @@ import {
   signOut,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,     
+  getRedirectResult,
   signInWithCredential
 } from 'firebase/auth';
 import { isNative } from '../services/nativeBridge';
@@ -20,59 +22,83 @@ export function useAuth() {
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
-  const [loading, setLoading] = useState(true); // IMPORTANT: loading state
-
-  function signup(email, password) {
-    return createUserWithEmailAndPassword(auth, email, password);
-  }
-
-  function login(email, password) {
-    return signInWithEmailAndPassword(auth, email, password);
-  }
   
-  async function loginWithGoogle() {
-    if (isNative()) {
-      // Native Android: Trigger the native Google Accounts bottom-sheet without any browser
-      const result = await FirebaseAuthentication.signInWithGoogle();
-      // Pass the native Google token back to the normal web Firebase SDK
-      const credential = GoogleAuthProvider.credential(result.credential.idToken);
-      return signInWithCredential(auth, credential);
-    } else {
-      // Standard Web: Keep using Popup
-      const provider = new GoogleAuthProvider();
-      return signInWithPopup(auth, provider);
+  // Track if the initial Firebase auth check is complete
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
+  // Track if a manual sign-in or sign-up process is currently running
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // The app is "loading" if we are waiting for initial check OR processing a login
+  const loading = !initialLoadDone || isProcessing;
+
+  async function signup(email, password) {
+    setIsProcessing(true);
+    try {
+      return await createUserWithEmailAndPassword(auth, email, password);
+    } finally {
+      setIsProcessing(false);
     }
   }
 
-  function logout() {
-    return signOut(auth);
+  async function login(email, password) {
+    setIsProcessing(true);
+    try {
+      return await signInWithEmailAndPassword(auth, email, password);
+    } finally {
+      setIsProcessing(false);
+    }
+  }
+  
+  async function loginWithGoogle() {
+    setIsProcessing(true);
+    try {
+      if (isNative()) {
+        const result = await FirebaseAuthentication.signInWithGoogle();
+        const credential = GoogleAuthProvider.credential(result.credential.idToken);
+        return await signInWithCredential(auth, credential);
+      } else {
+        const provider = new GoogleAuthProvider();
+        return await signInWithPopup(auth, provider);
+      }
+    } finally {
+      setIsProcessing(false);
+    }
+  }
+
+  async function logout() {
+    setIsProcessing(true);
+    try {
+      if (isNative()) {
+        await FirebaseAuthentication.signOut().catch(() => {});
+      }
+      return await signOut(auth);
+    } finally {
+      setIsProcessing(false);
+    }
   }
 
   useEffect(() => {
-    // This listener is the key. It runs when the component mounts
-    // and whenever the auth state changes.
     const unsubscribe = onAuthStateChanged(auth, user => {
       setCurrentUser(user);
-      setLoading(false); // Set loading to false once we have a user or know there isn't one
+      setInitialLoadDone(true);
     });
 
-    // Cleanup subscription on unmount
     return unsubscribe;
   }, []);
 
   const value = {
     currentUser,
-    loading, // Expose loading state
+    loading, 
     signup,
     login,
     loginWithGoogle,
     logout
   };
 
-  // We don't render the children until the loading is false
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {/* Remove the !loading condition so App.jsx can render its own Loader */}
+      {children}
     </AuthContext.Provider>
   );
 }
