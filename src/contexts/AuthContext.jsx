@@ -7,8 +7,6 @@ import {
   signOut,
   GoogleAuthProvider,
   signInWithPopup,
-  signInWithRedirect,     
-  getRedirectResult,
   signInWithCredential
 } from 'firebase/auth';
 import { isNative } from '../services/nativeBridge';
@@ -55,12 +53,14 @@ export function AuthProvider({ children }) {
       if (isNative()) {
         const result = await FirebaseAuthentication.signInWithGoogle();
         const credential = GoogleAuthProvider.credential(result.credential.idToken);
-        return await signInWithCredential(auth, credential);
+        await signInWithCredential(auth, credential);
       } else {
         const provider = new GoogleAuthProvider();
-        return await signInWithPopup(auth, provider);
+        await signInWithPopup(auth, provider);
       }
-    } finally {
+    } catch (error) {
+      console.error("Google Auth Caught Error:", error);
+      // ✨ FIX 1: If Firebase crashes due to the COOP header, force the loading screen to stop!
       setIsProcessing(false);
     }
   }
@@ -81,6 +81,10 @@ export function AuthProvider({ children }) {
     const unsubscribe = onAuthStateChanged(auth, user => {
       setCurrentUser(user);
       setInitialLoadDone(true);
+      
+      // ✨ FIX 2: The moment Firebase successfully logs you in, instantly kill the loading state.
+      // This guarantees you bypass the infinite loading screen.
+      setIsProcessing(false); 
     });
 
     return unsubscribe;
@@ -97,7 +101,6 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={value}>
-      {/* Remove the !loading condition so App.jsx can render its own Loader */}
       {children}
     </AuthContext.Provider>
   );

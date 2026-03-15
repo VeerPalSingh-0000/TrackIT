@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
 import { useAuth } from "./contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import toast, { Toaster } from "react-hot-toast";
@@ -21,20 +21,22 @@ import { useLocalStorage } from "./hooks/useLocalStorage";
 import { useStudyTimer } from "./hooks/useStudyTimer";
 import { usePomodoroTimer } from "./hooks/usePomodoroTimer";
 
-// Components
+// Components (Static Imports)
 import Navbar from "./Components/Navbar";
 import OnboardingFlow from "./Components/OnboardingFlow";
-import SelectionModal from "./Components/SelectionModal";
-import HistoryView from "./Components/HistoryView";
 import TimerDisplay from "./Components/TimerDisplay";
 import AnimatedButton from "./Components/ui/AnimatedButton";
-import About from "./Components/About";
-import Features from "./Components/Features";
 import WelcomeScreen from "./Components/WelcomeScreen";
 
 // Icons
 import { FaTasks, FaPlay, FaPause, FaRedo } from 'react-icons/fa';
 import TrackerLogo from '../public/clock.png';
+
+// --- PHASE 1: LAZY LOADED COMPONENTS ---
+const SelectionModal = lazy(() => import("./Components/SelectionModal"));
+const HistoryView = lazy(() => import("./Components/HistoryView"));
+const About = lazy(() => import("./Components/About"));
+const Features = lazy(() => import("./Components/Features"));
 
 const POMODORO_DURATIONS = { work: 25 * 60, shortBreak: 5 * 60, longBreak: 15 * 60 };
 
@@ -80,7 +82,7 @@ const CurrentTask = React.memo(({ project, topic, subTopic }) => {
     );
 });
 
-const TimerControls = ({ isRunning, hasStarted, onStartPause, onStopReset }) => {
+const TimerControls = React.memo(({ isRunning, hasStarted, onStartPause, onStopReset }) => {
     const handleStartPause = async () => {
       try { const { hapticMedium } = await import('./services/nativeBridge.js'); hapticMedium(); } catch(e) {}
       onStartPause();
@@ -101,19 +103,18 @@ const TimerControls = ({ isRunning, hasStarted, onStartPause, onStopReset }) => 
         <AnimatePresence>
             {hasStarted && (
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                    <AnimatedButton onClick={onStopReset} className="bg-[var(--color-slate-700)] hover:bg-[var(--color-slate-600)] text-[var(--color-white)] !px-4 sm:!px-6 border border-[var(--color-slate-600)] shadow-lg" icon={<FaRedo className="text-sm" />} aria-label="Reset Timer" />
+                    <AnimatedButton onClick={handleStopReset} className="bg-[var(--color-slate-700)] hover:bg-[var(--color-slate-600)] text-[var(--color-white)] !px-4 sm:!px-6 border border-[var(--color-slate-600)] shadow-lg" icon={<FaRedo className="text-sm" />} aria-label="Reset Timer" />
                 </motion.div>
             )}
         </AnimatePresence>
     </div>
     );
-};
+});
 
 
 const StudyTracker = () => {
   const { currentUser, logout } = useAuth();
   
-  // Yahan naye State Dale gaye hain Fix ke liye!
   const [isProfileLoaded, setIsProfileLoaded] = useState(false);
   const [isProjectsLoaded, setIsProjectsLoaded] = useState(false);
   
@@ -123,11 +124,13 @@ const StudyTracker = () => {
   const [topicTimers, setTopicTimers] = useState({});
   const [subTopicTimers, setSubTopicTimers] = useState({});
   const [studyHistory, setStudyHistory] = useState([]);
+  
   const [timerMode, setTimerMode] = useLocalStorage('timerMode', 'stopwatch');
   const [pomodoroCycle, setPomodoroCycle] = useLocalStorage(`pomodoroCycle_${currentUser?.uid}`, 0);
   const [selectedProject, setSelectedProject] = useLocalStorage(`selectedProj_${currentUser?.uid}`, null);
   const [selectedTopic, setSelectedTopic] = useLocalStorage(`selectedTopic_${currentUser?.uid}`, null);
   const [selectedSubTopic, setSelectedSubTopic] = useLocalStorage(`selectedSubTopic_${currentUser?.uid}`, null);
+  
   const [showSelectionModal, setShowSelectionModal] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
@@ -135,6 +138,7 @@ const StudyTracker = () => {
   const [showWelcome, setShowWelcome] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
+  
   const stopwatch = useStudyTimer();
   const pomodoro = usePomodoroTimer(POMODORO_DURATIONS);
   const playedCuesRef = useRef(new Set());
@@ -152,11 +156,8 @@ const StudyTracker = () => {
     });
     const unsubSessions = subscribeToUserSessions(currentUser.uid, (sessions) => { setStudyHistory(sessions); });
     
-    // ONBOARDING CHECK HOGA YAHAN
     getUserProfile(currentUser.uid).then((profile) => {
-      if (!profile || !profile.onboardingCompleted) {
-        setShowWelcome(true);
-      }
+      if (!profile || !profile.onboardingCompleted) { setShowWelcome(true); }
       setIsProfileLoaded(true);
     });
     
@@ -238,19 +239,31 @@ const StudyTracker = () => {
     }
   }, [pomodoro.timeLeft, pomodoro.isActive, pomodoro.mode, pomodoro, saveSession, pomodoroCycle, setPomodoroCycle, isCompletingSession]);
 
-  const handleOpenCreateModal = () => { setEditingProject(null); setIsProjectModalOpen(true); };
-  const handleOpenEditModal = (project) => { setEditingProject(project); setIsProjectModalOpen(true); };
-  const handleCloseProjectModal = () => { setIsProjectModalOpen(false); setEditingProject(null); };
+  // --- PHASE 2: MEMOIZED HANDLERS ---
+  const handleOpenCreateModal = useCallback(() => { 
+    setEditingProject(null); 
+    setIsProjectModalOpen(true); 
+  }, []);
 
-  const handleCreateOrUpdateProject = async (projectData, projectId) => {
+  const handleOpenEditModal = useCallback((project) => { 
+    setEditingProject(project); 
+    setIsProjectModalOpen(true); 
+  }, []);
+
+  const handleCloseProjectModal = useCallback(() => { 
+    setIsProjectModalOpen(false); 
+    setEditingProject(null); 
+  }, []);
+
+  const handleCreateOrUpdateProject = useCallback(async (projectData, projectId) => {
     try {
       if (projectId) { await updateProjectInFirebase(projectId, projectData); toast.success("Project updated!"); } 
       else { await addProjectToFirebase(projectData, currentUser.uid); toast.success("Project created!"); }
     } catch (error) { toast.error(`Error: ${error.message}`); } 
     finally { handleCloseProjectModal(); }
-  };
+  }, [currentUser, handleCloseProjectModal]);
 
-  const deleteProject = async (projectId) => {
+  const deleteProject = useCallback(async (projectId) => {
     if (!window.confirm("Are you sure? This will delete the project and all its data permanently.")) return;
     try {
         await deleteProjectFromFirebase(projectId);
@@ -261,15 +274,15 @@ const StudyTracker = () => {
         }
         toast.success("Project deleted.");
     } catch(error) { toast.error(`Failed to delete: ${error.message}`); }
-  };
+  }, [projects, selectedProject, stopwatch, pomodoro, setSelectedProject, setSelectedTopic, setSelectedSubTopic]);
 
-  const handleStartPause = () => {
+  const handleStartPause = useCallback(() => {
     if (!selectedProject) { toast.error("Please select a task first!"); setShowSelectionModal(true); return; }
     if (timerMode === 'stopwatch') { stopwatch.isSessionRunning ? stopwatch.pauseTimer() : stopwatch.startTimer(); } 
     else { if (pomodoro.isActive) { pomodoro.pauseTimer(); } else { pomodoro.startTimer(); if (pomodoro.mode === 'work') { playedCuesRef.current.clear(); audioService.play('start'); } } }
-  };
+  }, [selectedProject, timerMode, stopwatch, pomodoro]);
 
-  const handleStopOrReset = () => {
+  const handleStopOrReset = useCallback(() => {
     playedCuesRef.current.clear();
     if (timerMode === 'stopwatch') {
       const duration = stopwatch.endSessionAndGetDuration(); saveSession(duration); stopwatch.resetTimer();
@@ -281,22 +294,20 @@ const StudyTracker = () => {
         pomodoro.resetTimer('work'); setPomodoroCycle(0);
       }
     }
-  };
+  }, [timerMode, stopwatch, pomodoro, saveSession, setPomodoroCycle]);
   
-  const handleSelection = (project, topic = null, subTopic = null) => {
+  const handleSelection = useCallback((project, topic = null, subTopic = null) => {
     const isRunning = timerMode === 'stopwatch' ? stopwatch.isSessionRunning : pomodoro.isActive;
     if (isRunning) { if (window.confirm("A session is running. End it and switch tasks?")) { handleStopOrReset(); } else { return; } }
     setSelectedProject(project); setSelectedTopic(topic); setSelectedSubTopic(subTopic);
     stopwatch.resetTimer(); pomodoro.resetTimer('work'); playedCuesRef.current.clear(); setShowSelectionModal(false);
-  };
-  
-  // YAHAN NAYA LOADER LOGIC HAI!
+  }, [timerMode, stopwatch, pomodoro, handleStopOrReset, setSelectedProject, setSelectedTopic, setSelectedSubTopic]);
+
   const isLoading = !isProfileLoaded || !isProjectsLoaded;
   if (isLoading) { 
       return ( <div className="min-h-screen bg-[var(--color-slate-950)] text-[var(--color-slate-400)] flex items-center justify-center transition-colors duration-500"><Loader /></div> ); 
   }
 
-  // AGAR NAYA USER HAI, TOH SIRF WELCOME SCREEN DIKHEGI!
   if (showWelcome) {
      return (
        <div className="min-h-screen bg-[var(--color-slate-950)] flex items-center justify-center relative overflow-hidden">
@@ -378,29 +389,37 @@ const StudyTracker = () => {
             FocusFlow · Deep Work Companion © {new Date().getFullYear()}
           </p>
         </footer>
+        
+        {/* --- LAZY LOADED MODALS WRAPPED IN SUSPENSE --- */}
         <AnimatePresence>
-          {showSelectionModal && (
-            <SelectionModal
-              projects={projects} onSelect={handleSelection} onDeleteProject={deleteProject} onEditProject={handleOpenEditModal}
-              timers={timers} topicTimers={topicTimers} subTopicTimers={subTopicTimers}
-              formatTime={formatTime} onClose={() => setShowSelectionModal(false)}
-            />
-          )}
-          {showHistory && (
-            <HistoryView
-              projects={projects} studyHistory={studyHistory} formatTime={formatTime}
-              timers={timers} topicTimers={topicTimers} subTopicTimers={subTopicTimers}
-              onClose={() => setShowHistory(false)}
-            />
-          )}
-          {isProjectModalOpen && (
-            <OnboardingFlow
-              onFinish={handleCreateOrUpdateProject} onCancel={handleCloseProjectModal}
-              projectToEdit={editingProject}
-            />
-          )}
-          {showAbout && <About onClose={() => setShowAbout(false)} />}
-          {showFeatures && <Features onClose={() => setShowFeatures(false)} />}
+          <Suspense fallback={
+            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[var(--color-slate-950)]/80 backdrop-blur-sm">
+               <Loader />
+            </div>
+          }>
+            {showSelectionModal && (
+              <SelectionModal
+                projects={projects} onSelect={handleSelection} onDeleteProject={deleteProject} onEditProject={handleOpenEditModal}
+                timers={timers} topicTimers={topicTimers} subTopicTimers={subTopicTimers}
+                formatTime={formatTime} onClose={() => setShowSelectionModal(false)}
+              />
+            )}
+            {showHistory && (
+              <HistoryView
+                projects={projects} studyHistory={studyHistory} formatTime={formatTime}
+                timers={timers} topicTimers={topicTimers} subTopicTimers={subTopicTimers}
+                onClose={() => setShowHistory(false)}
+              />
+            )}
+            {isProjectModalOpen && (
+              <OnboardingFlow
+                onFinish={handleCreateOrUpdateProject} onCancel={handleCloseProjectModal}
+                projectToEdit={editingProject}
+              />
+            )}
+            {showAbout && <About onClose={() => setShowAbout(false)} />}
+            {showFeatures && <Features onClose={() => setShowFeatures(false)} />}
+          </Suspense>
         </AnimatePresence>
       </div>
     </>

@@ -6,12 +6,15 @@ import { FaCalendarDay } from "react-icons/fa";
 
 const listVariants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+  visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
+  hidden: { opacity: 0, y: 15, scale: 0.98 },
+  visible: { 
+    opacity: 1, y: 0, scale: 1,
+    transition: { type: "spring", damping: 25, stiffness: 300 } 
+  },
 };
 
 const HistoryView = ({ projects, studyHistory, formatTime, onClose, timers, topicTimers, subTopicTimers }) => {
@@ -28,85 +31,117 @@ const HistoryView = ({ projects, studyHistory, formatTime, onClose, timers, topi
 
   return (
     <AnimatedModal onClose={onClose}>
-      <div className="flex flex-col w-[90vw] h-[80vh] max-w-4xl bg-[var(--color-slate-950)] border border-[var(--color-slate-700)] rounded-2xl shadow-2xl overflow-hidden motion-safe-gpu transition-colors">
+      <div className="flex flex-col w-[90vw] h-[85vh] max-w-4xl bg-[var(--color-slate-950)]/80 backdrop-blur-3xl border border-white/[0.08] rounded-3xl shadow-2xl overflow-hidden motion-safe-gpu">
         
-        {/* RESPONSIVE HEADER */}
-        <div className="p-4 sm:p-6 border-b border-[var(--color-slate-700)]/50 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 flex-shrink-0 transition-colors">
+        {/* Sleek Header & Segmented Control */}
+        <div className="p-5 sm:p-6 border-b border-white/[0.05] flex flex-col sm:flex-row sm:justify-between sm:items-center gap-5 flex-shrink-0 bg-white/[0.01]">
           
-          {/* ✨ RESPONSIVE TITLE: Smaller text on mobile */}
-          <h2 className="text-xl sm:text-2xl font-bold text-[var(--color-white)] text-center sm:text-left">
-            Study History
+          <h2 className="text-[20px] sm:text-[22px] font-semibold text-white text-center sm:text-left tracking-tight">
+            Session History
           </h2>
           
-          {/* ✨ RESPONSIVE BUTTONS: Takes full width on mobile for easier tapping */}
-          <div className="bg-[var(--color-slate-800)] p-1 rounded-lg flex items-center w-full sm:w-auto border border-[var(--color-slate-700)]">
-            <button onClick={() => setViewMode('summary')} className={`w-1/3 sm:w-auto px-4 py-1.5 text-sm font-semibold rounded-md transition-all ${viewMode === 'summary' ? 'bg-[var(--color-emerald-500)] text-[var(--color-black)] shadow-lg' : 'text-[var(--color-slate-400)] hover:text-[var(--color-slate-200)] hover:bg-[var(--color-slate-700)]'}`}>Summary</button>
-            <button onClick={() => setViewMode('daily')} className={`w-1/3 sm:w-auto px-4 py-1.5 text-sm font-semibold rounded-md transition-all ${viewMode === 'daily' ? 'bg-[var(--color-emerald-500)] text-[var(--color-black)] shadow-lg' : 'text-[var(--color-slate-400)] hover:text-[var(--color-slate-200)] hover:bg-[var(--color-slate-700)]'}`}>Daily</button>
-            <button onClick={() => setViewMode('sessions')} className={`w-1/3 sm:w-auto px-4 py-1.5 text-sm font-semibold rounded-md transition-all ${viewMode === 'sessions' ? 'bg-[var(--color-emerald-500)] text-[var(--color-black)] shadow-lg' : 'text-[var(--color-slate-400)] hover:text-[var(--color-slate-200)] hover:bg-[var(--color-slate-700)]'}`}>Sessions</button>
+          {/* iOS-Style Segmented Control */}
+          <div className="bg-black/30 p-1 rounded-xl flex items-center w-full sm:w-auto border border-white/[0.05] shadow-inner">
+            {['summary', 'daily', 'sessions'].map((mode) => (
+              <button 
+                key={mode}
+                onClick={() => setViewMode(mode)} 
+                className={`flex-1 sm:flex-none relative px-5 py-2 text-[13px] font-semibold rounded-lg transition-all duration-300 focus:outline-none capitalize select-none ${
+                  viewMode === mode 
+                    ? 'text-white shadow-sm' 
+                    : 'text-[var(--color-slate-400)] hover:text-white hover:bg-white/5'
+                }`}
+              >
+                {viewMode === mode && (
+                  <motion.div
+                    layoutId="activeTabHistory"
+                    className="absolute inset-0 bg-white/10 border border-white/10 rounded-lg"
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                  />
+                )}
+                <span className="relative z-10">{mode}</span>
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Content: Takes up the remaining space and scrolls */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+        {/* Scrolling Content */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar">
           <AnimatePresence mode="wait">
             <motion.div
               key={viewMode}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
-              {/* All the view modes remain here... */}
+              
+              {/* SUMMARY VIEW */}
               {viewMode === 'summary' && (
-                <motion.div variants={listVariants} initial="hidden" animate="visible" className="space-y-4">
+                <motion.div variants={listVariants} initial="hidden" animate="visible" className="space-y-3">
                   {projects.map(p => (
                     <motion.div key={p.id} variants={itemVariants}>
                       <ProjectSummaryCard {...{project: p, formatTime, timers, topicTimers, subTopicTimers}} />
                     </motion.div>
                   ))}
-                  {projects.length === 0 && <p className="text-center text-[var(--color-slate-500)] py-10 font-medium">No projects to summarize.</p>}
+                  {projects.length === 0 && (
+                    <div className="text-center py-12">
+                      <p className="text-[15px] font-medium text-[var(--color-slate-400)]">No projects to summarize.</p>
+                    </div>
+                  )}
                 </motion.div>
               )}
               
+              {/* DAILY VIEW */}
               {viewMode === 'daily' && (
-                <motion.div variants={listVariants} initial="hidden" animate="visible" className="space-y-4">
+                <motion.div variants={listVariants} initial="hidden" animate="visible" className="space-y-3">
                   {sortedDates.map(date => {
                     const dailyTotal = groupedSessions[date].reduce((total, session) => total + session.duration, 0);
                     return (
-                       <motion.div key={date} variants={itemVariants} className="bg-[var(--color-slate-900)] border border-[var(--color-slate-700)] p-4 rounded-xl flex justify-between items-center transition-colors">
-                         <h3 className="flex items-center gap-3 font-semibold text-[var(--color-emerald-500)] transition-colors">
-                           <FaCalendarDay className="hidden sm:inline" />
-                           {new Date(date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}
+                       <motion.div key={date} variants={itemVariants} className="bg-white/[0.02] border border-white/[0.05] p-5 rounded-2xl flex justify-between items-center hover:bg-white/[0.04] transition-colors">
+                         <h3 className="flex items-center gap-3 text-[15px] font-semibold text-white">
+                           <FaCalendarDay className="text-[var(--color-emerald-500)] opacity-80" />
+                           {new Date(date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                          </h3>
-                         <div className="flex items-center gap-2">
-                            <span className="text-xs text-[var(--color-slate-400)] font-bold uppercase tracking-wider">Total</span>
-                            <span className="font-mono text-lg sm:text-xl text-[var(--color-emerald-500)] font-bold">{formatTime(dailyTotal)}</span>
+                         <div className="flex flex-col items-end">
+                            <span className="text-[10px] text-[var(--color-slate-400)] font-bold uppercase tracking-widest mb-0.5">Total Focus</span>
+                            <span className="font-mono text-[18px] text-[var(--color-emerald-400)] font-bold">{formatTime(dailyTotal)}</span>
                          </div>
                        </motion.div>
                     );
                   })}
-                  {sortedDates.length === 0 && <p className="text-center text-[var(--color-slate-500)] py-10 font-medium transition-colors">No daily totals to display.</p>}
+                  {sortedDates.length === 0 && <p className="text-center text-[var(--color-slate-400)] py-12 font-medium">No daily totals recorded.</p>}
                 </motion.div>
               )}
 
+              {/* SESSIONS VIEW */}
               {viewMode === 'sessions' && (
-                <motion.div variants={listVariants} initial="hidden" animate="visible" className="space-y-6">
+                <motion.div variants={listVariants} initial="hidden" animate="visible" className="space-y-8">
                    {sortedDates.map(date => (
                     <motion.div key={date} variants={itemVariants}>
-                      <h3 className="flex items-center gap-2 text-base sm:text-lg font-bold text-[var(--color-emerald-500)] mb-3 transition-colors"><FaCalendarDay /> {new Date(date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</h3>
-                      <div className="space-y-2">
+                      <h3 className="flex items-center gap-2 text-[14px] font-bold text-[var(--color-emerald-500)] mb-3 tracking-wide uppercase">
+                        <FaCalendarDay className="text-[12px]" /> 
+                        {new Date(date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                      </h3>
+                      <div className="space-y-2.5">
                         {groupedSessions[date].map(session => (
-                           <div key={session.id} className="bg-[var(--color-slate-900)] border border-[var(--color-slate-700)] p-4 rounded-xl flex justify-between items-center transition-colors">
-                             <div>
-                               <p className="font-bold text-[var(--color-white)] text-sm sm:text-base">{session.projectName} {session.topicName && `> ${session.topicName}`}</p>
-                               <p className="text-xs text-[var(--color-slate-400)] font-medium">{new Date(session.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                           <div key={session.id} className="bg-white/[0.02] border border-white/[0.05] p-4 sm:p-5 rounded-2xl flex justify-between items-center hover:bg-white/[0.04] transition-colors">
+                             <div className="pr-4">
+                               <p className="font-semibold text-white text-[14px] sm:text-[15px] leading-snug">
+                                 {session.projectName} 
+                                 {session.topicName && <span className="text-[var(--color-slate-400)] font-medium ml-1.5">› {session.topicName}</span>}
+                               </p>
+                               <p className="text-[12px] text-[var(--color-slate-400)] font-medium mt-1">
+                                 {new Date(session.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                               </p>
                              </div>
-                             <p className="font-mono text-base sm:text-lg text-[var(--color-emerald-500)] font-bold">{formatTime(session.duration)}</p>
+                             <p className="font-mono text-[16px] sm:text-[18px] text-[var(--color-emerald-400)] font-bold">{formatTime(session.duration)}</p>
                            </div>
                         ))}
                       </div>
                     </motion.div>
                   ))}
-                  {sortedDates.length === 0 && <p className="text-center text-[var(--color-slate-500)] py-10 font-medium">No sessions recorded yet.</p>}
+                  {sortedDates.length === 0 && <p className="text-center text-[var(--color-slate-400)] py-12 font-medium">No sessions recorded yet.</p>}
                 </motion.div>
               )}
 
@@ -114,9 +149,14 @@ const HistoryView = ({ projects, studyHistory, formatTime, onClose, timers, topi
           </AnimatePresence>
         </div>
 
-        {/* Footer: Stays fixed at the bottom */}
-        <div className="p-4 border-t border-[var(--color-slate-700)]/50 flex-shrink-0 bg-[var(--color-slate-950)]/50 transition-colors">
-          <button onClick={onClose} className="w-full text-center py-3.5 bg-[var(--color-emerald-600)] text-btn rounded-xl font-bold hover:bg-[var(--color-emerald-500)] transition-all shadow-lg shadow-[var(--color-emerald-600)]/20 active:scale-[0.98]">Close History</button>
+        {/* Footer Minimalist Button */}
+        <div className="p-5 border-t border-white/[0.05] flex-shrink-0 bg-black/20">
+          <button 
+            onClick={onClose} 
+            className="w-full text-center py-3.5 bg-[var(--color-emerald-500)]/10 text-[var(--color-emerald-400)] rounded-xl text-[14px] font-semibold hover:bg-[var(--color-emerald-500)]/20 hover:text-[var(--color-emerald-300)] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 active:scale-[0.98]"
+          >
+            Close History
+          </button>
         </div>
         
       </div>

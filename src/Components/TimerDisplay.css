@@ -1,0 +1,284 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap');
+
+.fct-root {
+  --emerald-light: #34d399; /* TrackIT Emerald-400 */
+  --emerald-mid: #10b981;   /* TrackIT Emerald-500 */
+  --emerald-dark: #064e3b;  /* TrackIT Emerald-900 */
+  --accent-blue: #38bdf8;   /* Sky-400 for contrast */
+  --glass-bg: rgba(15, 23, 42, 0.65); /* Slate-900 glass */
+  
+  /* Responsive Scale Variable */
+  --scale: 1;
+
+  font-family: 'Rajdhani', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 1rem 0;
+  user-select: none;
+  width: 100%;
+  min-height: 400px;
+}
+
+/* Media Queries to scale the entire timer smoothly down to small phones */
+@media (max-width: 440px) { .fct-root { --scale: 0.85; min-height: 340px; } }
+@media (max-width: 380px) { .fct-root { --scale: 0.75; min-height: 300px; } }
+@media (max-width: 330px) { .fct-root { --scale: 0.65; min-height: 260px; } }
+
+/* ── NEBULA ── */
+.fct-nebula {
+  position: absolute;
+  inset: -80px;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 50%, rgba(52, 211, 153, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 30% 70%, rgba(56, 189, 248, 0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 70% 30%, rgba(16, 185, 129, 0.05) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── STARS ── */
+.fct-star {
+  position: absolute;
+  border-radius: 50%;
+  background: white;
+  animation: fct-blink var(--dur) ease-in-out infinite var(--delay);
+  opacity: 0;
+  z-index: 0;
+}
+@keyframes fct-blink {
+  0%,100%{ opacity:0 }
+  50%{ opacity:var(--op) }
+}
+
+/* ── SCAN LINE ── */
+.fct-scanline {
+  position: absolute;
+  left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(52, 211, 153, 0.15), transparent);
+  pointer-events: none;
+  animation: fct-scan 8s linear infinite;
+  opacity: 0;
+  transition: opacity 0.6s;
+  z-index: 2;
+}
+.fct-scanline.on { opacity: 1; }
+@keyframes fct-scan { 0%{top:0%} 100%{top:100%} }
+
+/* ── CORNER HUD BRACKETS ── */
+.fct-corner {
+  position: absolute;
+  width: 56px; height: 56px;
+  pointer-events: none;
+  opacity: 0.18;
+  transition: opacity 0.5s;
+  z-index: 1;
+}
+.fct-root.is-running .fct-corner { opacity: 0.5; }
+.fct-corner.tl { top:0px;    left:0px;  transform:rotate(0deg)   }
+.fct-corner.tr { top:0px;    right:0px; transform:rotate(90deg)  }
+.fct-corner.bl { bottom:0px; left:0px;  transform:rotate(270deg) }
+.fct-corner.br { bottom:0px; right:0px; transform:rotate(180deg) }
+
+/* ── SCENE ── */
+.fct-scene {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  /* This is the magic line that makes it fully responsive */
+  transform: scale(var(--scale));
+  transform-origin: center center;
+}
+
+/* ── HALO ── */
+.fct-halo {
+  position: absolute;
+  width: 380px; height: 380px;
+  border-radius: 50%;
+  pointer-events: none;
+  transition: box-shadow 0.9s ease;
+  box-shadow:
+    0 0 0 1px rgba(16, 185, 129, 0.06),
+    0 0 60px 20px rgba(16, 185, 129, 0.04),
+    0 0 120px 40px rgba(6, 78, 59, 0.03);
+  animation: fct-breath 6s ease-in-out infinite;
+}
+.fct-halo.on {
+  box-shadow:
+    0 0 0 1px rgba(52, 211, 153, 0.16),
+    0 0 60px 20px rgba(16, 185, 129, 0.14),
+    0 0 120px 50px rgba(6, 78, 59, 0.09),
+    0 0 200px 80px rgba(2, 44, 34, 0.05);
+}
+@keyframes fct-breath { 0%,100%{transform:scale(1)} 50%{transform:scale(1.03)} }
+
+/* ── RINGS SVG ── */
+.fct-rings {
+  position: absolute;
+  width: 380px; height: 380px;
+  pointer-events: none;
+}
+
+/* ── COMET RING SPIN ── */
+.fct-comet-group {
+  transform-origin: 190px 190px;
+}
+.fct-comet-group.on {
+  animation: fct-spin 5s linear infinite;
+}
+.fct-mid-ring {
+  transform-origin: 190px 190px;
+}
+.fct-mid-ring.on {
+  animation: fct-spin 28s linear infinite reverse;
+}
+@keyframes fct-spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+/* ── TICK MARKS SVG ── */
+.fct-ticks {
+  position: absolute;
+  width: 280px; height: 280px;
+  pointer-events: none;
+}
+
+/* ── DIAL ── */
+.fct-dial {
+  position: relative;
+  width: 280px; height: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+/* ── GLASS PLATE ── */
+.fct-glass {
+  position: absolute;
+  width: 240px; height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 25%,
+    rgba(255,255,255,0.065) 0%,
+    rgba(255,255,255,0.018) 30%,
+    var(--glass-bg) 100%);
+  border: 1px solid rgba(255,255,255,0.09);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.12),
+    inset 0 -1px 0 rgba(0,0,0,0.32),
+    0 0 40px rgba(0,0,0,0.8),
+    0 0 0 1px rgba(0,0,0,0.4);
+  overflow: hidden;
+}
+.fct-glass::before {
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;height:52%;
+  background:linear-gradient(180deg,rgba(255,255,255,0.075) 0%,transparent 100%);
+  border-radius:50% 50% 0 0;
+}
+.fct-glass::after {
+  content:'';
+  position:absolute;
+  bottom:-18px;left:20%;right:20%;height:58px;
+  background:radial-gradient(ellipse,rgba(52, 211, 153, 0.14) 0%,transparent 70%);
+  filter:blur(10px);
+  pointer-events:none;
+}
+
+/* ── DIAL CONTENT ── */
+.fct-dial-inner {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.fct-mode-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.35em;
+  color: rgba(52, 211, 153, 0.55);
+  text-transform: uppercase;
+  transition: color 0.5s;
+}
+.fct-mode-label.on { color: var(--emerald-light); }
+
+.fct-time {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 52px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: #fff;
+  text-shadow:
+    0 0 20px rgba(52, 211, 153, 0),
+    0 0 40px rgba(52, 211, 153, 0);
+  transition: text-shadow 0.6s;
+  tabular-nums: true;
+}
+.fct-time.on {
+  text-shadow:
+    0 0 22px rgba(52, 211, 153, 0.45),
+    0 0 64px rgba(16, 185, 129, 0.22);
+}
+
+.fct-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.22);
+  border-radius: 20px;
+  margin-top: 3px;
+  opacity: 0;
+  transform: translateY(5px);
+  transition: opacity 0.4s, transform 0.4s;
+}
+.fct-badge.on { opacity: 1; transform: translateY(0); }
+
+.fct-pulse-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--emerald-light);
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.85);
+  animation: fct-pulse-dot 1.4s ease-in-out infinite;
+}
+@keyframes fct-pulse-dot {
+  0%,100%{ transform:scale(1); opacity:1 }
+  50%{ transform:scale(1.55); opacity:0.55 }
+}
+
+.fct-badge-text {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  color: var(--emerald-light);
+  text-transform: uppercase;
+}
+
+/* ── PARTICLES ── */
+.fct-particle {
+  position: absolute;
+  width: 2px; height: 2px;
+  border-radius: 50%;
+  background: rgba(52, 211, 153, 0.7);
+  pointer-events: none;
+  animation: fct-pfloat var(--dur) ease-in-out forwards var(--delay);
+}
+@keyframes fct-pfloat {
+  0%  { opacity:0; transform:translate(0,0) scale(0) }
+  20% { opacity:1; transform:translate(var(--x1),var(--y1)) scale(1) }
+  80% { opacity:0.45; transform:translate(var(--x2),var(--y2)) scale(0.5) }
+  100%{ opacity:0; transform:translate(var(--x3),var(--y3)) scale(0) }
+}

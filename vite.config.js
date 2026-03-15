@@ -20,4 +20,18 @@ export default defineConfig({
       "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
     },
   },
+  // --- PHASE 4: VITE BUILD OPTIMIZATION (Manual Chunking) ---
+  // This splits your heavy dependencies into separate cacheable files,
+  // drastically speeding up load times for returning users.
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom'], 
+          'framer-motion': ['framer-motion'],
+          'firebase': ['firebase/app', 'firebase/auth', 'firebase/firestore']
+        }
+      }
+    }
+  }
 })
