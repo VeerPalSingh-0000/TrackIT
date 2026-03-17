@@ -89,7 +89,7 @@ export const useStudyTimer = () => {
     if (persistedIsRunning) {
       setIsSessionRunning(true);
       tick(); // Sync immediately
-      intervalRef.current = setInterval(tick, 100);
+      intervalRef.current = setInterval(tick, 1000);
     } else {
       setIsSessionRunning(false);
       clearInterval(intervalRef.current);

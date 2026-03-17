@@ -1,12 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap');
 
 .fct-root {
-  --emerald-light: #34d399; /* TrackIT Emerald-400 */
-  --emerald-mid: #10b981;   /* TrackIT Emerald-500 */
-  --emerald-dark: #064e3b;  /* TrackIT Emerald-900 */
-  --accent-blue: #38bdf8;   /* Sky-400 for contrast */
-  --glass-bg: rgba(15, 23, 42, 0.65); /* Slate-900 glass */
+  /* ── THEME VARIABLES (Maps to your global theme vars) ── */
+  /* Change these 3 accent colors to change the entire timer's color scheme */
+  --timer-accent-light: var(--color-emerald-400, #34d399);
+  --timer-accent-mid:   var(--color-emerald-500, #10b981);
+  --timer-accent-dark:  var(--color-emerald-900, #064e3b);
   
+  /* Glass and Background variables */
+  --timer-glass-bg:     var(--color-slate-900, #0f172a); 
+  --timer-glass-border: color-mix(in srgb, var(--timer-text-main) 9%, transparent);
+  
+  /* Text and Shadow variables */
+  --timer-text-main:    var(--color-white, #ffffff);
+  --timer-shadow-color: rgba(0, 0, 0, 0.8); /* Adjust for light mode if needed */
+
   /* Responsive Scale Variable */
   --scale: 1;
 
@@ -32,9 +40,9 @@
   position: absolute;
   inset: -80px;
   background:
-    radial-gradient(ellipse 60% 50% at 50% 50%, rgba(52, 211, 153, 0.08) 0%, transparent 70%),
-    radial-gradient(ellipse 40% 60% at 30% 70%, rgba(56, 189, 248, 0.05) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 40% at 70% 30%, rgba(16, 185, 129, 0.05) 0%, transparent 60%);
+    radial-gradient(ellipse 60% 50% at 50% 50%, color-mix(in srgb, var(--timer-accent-light) 8%, transparent) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 30% 70%, color-mix(in srgb, var(--color-sky-400, #38bdf8) 5%, transparent) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 70% 30%, color-mix(in srgb, var(--timer-accent-mid) 5%, transparent) 0%, transparent 60%);
   pointer-events: none;
   z-index: 0;
 }
@@ -43,7 +51,7 @@
 .fct-star {
   position: absolute;
   border-radius: 50%;
-  background: white;
+  background: var(--timer-text-main);
   animation: fct-blink var(--dur) ease-in-out infinite var(--delay);
   opacity: 0;
   z-index: 0;
@@ -58,7 +66,7 @@
   position: absolute;
   left: 0; right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(52, 211, 153, 0.15), transparent);
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--timer-accent-light) 15%, transparent), transparent);
   pointer-events: none;
   animation: fct-scan 8s linear infinite;
   opacity: 0;
@@ -91,7 +99,6 @@
   align-items: center;
   justify-content: center;
   z-index: 1;
-  /* This is the magic line that makes it fully responsive */
   transform: scale(var(--scale));
   transform-origin: center center;
 }
@@ -104,17 +111,17 @@
   pointer-events: none;
   transition: box-shadow 0.9s ease;
   box-shadow:
-    0 0 0 1px rgba(16, 185, 129, 0.06),
-    0 0 60px 20px rgba(16, 185, 129, 0.04),
-    0 0 120px 40px rgba(6, 78, 59, 0.03);
+    0 0 0 1px color-mix(in srgb, var(--timer-accent-mid) 6%, transparent),
+    0 0 60px 20px color-mix(in srgb, var(--timer-accent-mid) 4%, transparent),
+    0 0 120px 40px color-mix(in srgb, var(--timer-accent-dark) 3%, transparent);
   animation: fct-breath 6s ease-in-out infinite;
 }
 .fct-halo.on {
   box-shadow:
-    0 0 0 1px rgba(52, 211, 153, 0.16),
-    0 0 60px 20px rgba(16, 185, 129, 0.14),
-    0 0 120px 50px rgba(6, 78, 59, 0.09),
-    0 0 200px 80px rgba(2, 44, 34, 0.05);
+    0 0 0 1px color-mix(in srgb, var(--timer-accent-light) 16%, transparent),
+    0 0 60px 20px color-mix(in srgb, var(--timer-accent-mid) 14%, transparent),
+    0 0 120px 50px color-mix(in srgb, var(--timer-accent-dark) 9%, transparent),
+    0 0 200px 80px color-mix(in srgb, var(--timer-accent-dark) 5%, transparent);
 }
 @keyframes fct-breath { 0%,100%{transform:scale(1)} 50%{transform:scale(1.03)} }
 
@@ -164,31 +171,31 @@
   width: 240px; height: 240px;
   border-radius: 50%;
   background: radial-gradient(circle at 35% 25%,
-    rgba(255,255,255,0.065) 0%,
-    rgba(255,255,255,0.018) 30%,
-    var(--glass-bg) 100%);
-  border: 1px solid rgba(255,255,255,0.09);
+    color-mix(in srgb, var(--timer-text-main) 6.5%, transparent) 0%,
+    color-mix(in srgb, var(--timer-text-main) 1.8%, transparent) 30%,
+    color-mix(in srgb, var(--timer-glass-bg) 65%, transparent) 100%);
+  border: 1px solid var(--timer-glass-border);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.12),
+    inset 0 1px 0 color-mix(in srgb, var(--timer-text-main) 12%, transparent),
     inset 0 -1px 0 rgba(0,0,0,0.32),
-    0 0 40px rgba(0,0,0,0.8),
-    0 0 0 1px rgba(0,0,0,0.4);
+    0 0 40px var(--timer-shadow-color),
+    0 0 0 1px color-mix(in srgb, var(--timer-shadow-color) 50%, transparent);
   overflow: hidden;
 }
 .fct-glass::before {
   content:'';
   position:absolute;
   top:0;left:0;right:0;height:52%;
-  background:linear-gradient(180deg,rgba(255,255,255,0.075) 0%,transparent 100%);
+  background:linear-gradient(180deg, color-mix(in srgb, var(--timer-text-main) 7.5%, transparent) 0%, transparent 100%);
   border-radius:50% 50% 0 0;
 }
 .fct-glass::after {
   content:'';
   position:absolute;
   bottom:-18px;left:20%;right:20%;height:58px;
-  background:radial-gradient(ellipse,rgba(52, 211, 153, 0.14) 0%,transparent 70%);
+  background:radial-gradient(ellipse, color-mix(in srgb, var(--timer-accent-light) 14%, transparent) 0%, transparent 70%);
   filter:blur(10px);
   pointer-events:none;
 }
@@ -207,11 +214,11 @@
   font-family: 'Share Tech Mono', monospace;
   font-size: 10px;
   letter-spacing: 0.35em;
-  color: rgba(52, 211, 153, 0.55);
+  color: color-mix(in srgb, var(--timer-accent-light) 55%, transparent);
   text-transform: uppercase;
   transition: color 0.5s;
 }
-.fct-mode-label.on { color: var(--emerald-light); }
+.fct-mode-label.on { color: var(--timer-accent-light); }
 
 .fct-time {
   font-family: 'Share Tech Mono', monospace;
@@ -219,17 +226,17 @@
   font-weight: 400;
   letter-spacing: -0.02em;
   line-height: 1;
-  color: #fff;
+  color: var(--timer-text-main);
   text-shadow:
-    0 0 20px rgba(52, 211, 153, 0),
-    0 0 40px rgba(52, 211, 153, 0);
+    0 0 20px transparent,
+    0 0 40px transparent;
   transition: text-shadow 0.6s;
   tabular-nums: true;
 }
 .fct-time.on {
   text-shadow:
-    0 0 22px rgba(52, 211, 153, 0.45),
-    0 0 64px rgba(16, 185, 129, 0.22);
+    0 0 22px color-mix(in srgb, var(--timer-accent-light) 45%, transparent),
+    0 0 64px color-mix(in srgb, var(--timer-accent-mid) 22%, transparent);
 }
 
 .fct-badge {
@@ -237,8 +244,8 @@
   align-items: center;
   gap: 8px;
   padding: 5px 14px;
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.22);
+  background: color-mix(in srgb, var(--timer-accent-mid) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--timer-accent-mid) 22%, transparent);
   border-radius: 20px;
   margin-top: 3px;
   opacity: 0;
@@ -250,8 +257,8 @@
 .fct-pulse-dot {
   width: 6px; height: 6px;
   border-radius: 50%;
-  background: var(--emerald-light);
-  box-shadow: 0 0 8px rgba(52, 211, 153, 0.85);
+  background: var(--timer-accent-light);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--timer-accent-light) 85%, transparent);
   animation: fct-pulse-dot 1.4s ease-in-out infinite;
 }
 @keyframes fct-pulse-dot {
@@ -263,7 +270,7 @@
   font-family: 'Share Tech Mono', monospace;
   font-size: 10px;
   letter-spacing: 0.25em;
-  color: var(--emerald-light);
+  color: var(--timer-accent-light);
   text-transform: uppercase;
 }
 
@@ -272,13 +279,13 @@
   position: absolute;
   width: 2px; height: 2px;
   border-radius: 50%;
-  background: rgba(52, 211, 153, 0.7);
+  background: color-mix(in srgb, var(--timer-accent-light) 70%, transparent);
   pointer-events: none;
   animation: fct-pfloat var(--dur) ease-in-out forwards var(--delay);
 }
 @keyframes fct-pfloat {
-  0%  { opacity:0; transform:translate(0,0) scale(0) }
-  20% { opacity:1; transform:translate(var(--x1),var(--y1)) scale(1) }
-  80% { opacity:0.45; transform:translate(var(--x2),var(--y2)) scale(0.5) }
+  0%   { opacity:0; transform:translate(0,0) scale(0) }
+  20%  { opacity:1; transform:translate(var(--x1),var(--y1)) scale(1) }
+  80%  { opacity:0.45; transform:translate(var(--x2),var(--y2)) scale(0.5) }
   100%{ opacity:0; transform:translate(var(--x3),var(--y3)) scale(0) }
 }

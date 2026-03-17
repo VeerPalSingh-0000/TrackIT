@@ -35,7 +35,7 @@ export const addProjectToFirebase = async (projectData, userId) => {
   }
 };
 
-// ✅ MISSING FUNCTION - Update project in Firebase
+// Update project in Firebase
 export const updateProjectInFirebase = async (projectId, projectData) => {
   try {
     const projectRef = doc(db, 'projects', projectId);
@@ -49,7 +49,7 @@ export const updateProjectInFirebase = async (projectId, projectData) => {
   }
 };
 
-// ✅ MISSING FUNCTION - Delete project from Firebase
+// Delete project from Firebase
 export const deleteProjectFromFirebase = async (projectId) => {
   try {
     await deleteDoc(doc(db, 'projects', projectId));
@@ -76,7 +76,7 @@ export const subscribeToUserProjects = (userId, callback) => {
   });
 };
 
-// ✅ ADDITIONAL HELPER FUNCTIONS
+// ========== ADDITIONAL HELPER FUNCTIONS ==========
 
 // Get all projects for a user (one-time fetch)
 export const getUserProjects = async (userId) => {
@@ -162,7 +162,8 @@ export const addSessionToFirebase = async (sessionData, userId) => {
 export const subscribeToUserSessions = (userId, callback) => {
   const q = query(
     collection(db, 'sessions'),
-    where('userId', '==', userId)
+    where('userId', '==', userId),
+    orderBy('createdAt', 'desc') // <-- Added backend sorting here
   );
 
   return onSnapshot(q, (snapshot) => {
@@ -170,12 +171,8 @@ export const subscribeToUserSessions = (userId, callback) => {
     snapshot.forEach((doc) => {
       sessions.push({ id: doc.id, ...doc.data() });
     });
-    // Sort in memory to avoid requiring a composite index
-    sessions.sort((a, b) => {
-      const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
-      const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
-      return timeB - timeA;
-    });
+    
+    // Removed the client-side array sorting so Firebase handles it efficiently
     callback(sessions);
   }, (error) => {
     console.error("Error subscribing to sessions:", error);
