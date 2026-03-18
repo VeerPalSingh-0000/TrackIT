@@ -96,7 +96,7 @@ const Navbar = ({
     <>
       {/* DESKTOP NAVBAR (Kept your existing styling here) */}
       <div
-        className={`sticky top-0 w-full px-3 sm:px-5 pt-3 max-[700px]:pt-2 native-app:pt-0 native-app:safe-mt transition-all duration-300 z-40 ${
+        className={`home-navbar-wrap sticky top-0 w-full px-3 sm:px-5 pt-[calc(0.95rem+var(--sat))] max-[700px]:pt-[calc(0.7rem+var(--sat))] native-app:pt-0 native-app:safe-mt transition-all duration-300 z-40 ${
           mobileOpen ? "opacity-0 pointer-events-none" : "opacity-100"
         }`}
       >
@@ -110,7 +110,7 @@ const Navbar = ({
               : "bg-[var(--color-slate-900)]/50 backdrop-blur-xl border border-[var(--color-slate-700)] shadow-[0_4px_24px_rgba(0,0,0,0.25)]"
           }`}
         >
-          <div className="flex items-center justify-between h-[52px] max-[700px]:h-[46px] px-3 sm:px-4">
+          <div className="home-navbar-inner flex items-center justify-between h-[56px] max-[700px]:h-[50px] px-3 sm:px-4">
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
               className="flex items-center gap-2.5 group focus:outline-none select-none"
@@ -120,7 +120,7 @@ const Navbar = ({
                 <img
                   src={TrackerLogo}
                   alt="FocusFlow"
-                  className="relative h-10 w-10 object-contain transition-transform duration-300"
+                  className="home-navbar-logo relative h-10 w-10 object-contain transition-transform duration-300"
                   loading="eager"
                 />
               </div>

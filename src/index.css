@@ -54,16 +54,17 @@ html {
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
   background: var(--color-slate-950);
   color: var(--color-slate-300);
   overflow-x: hidden;
-  transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Monospace timer font */
 .font-timer {
-  font-family: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', monospace;
+  font-family: "JetBrains Mono", "SF Mono", "Cascadia Code", monospace;
   font-variant-numeric: tabular-nums;
 }
 
@@ -91,18 +92,37 @@ body {
 
 /* --- Animated background aura --- */
 @keyframes aura-float-1 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(40px, -30px) scale(1.1); }
-  66% { transform: translate(-30px, 20px) scale(0.95); }
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(40px, -30px) scale(1.1);
+  }
+  66% {
+    transform: translate(-30px, 20px) scale(0.95);
+  }
 }
 @keyframes aura-float-2 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(-50px, 30px) scale(1.05); }
-  66% { transform: translate(35px, -25px) scale(0.9); }
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(-50px, 30px) scale(1.05);
+  }
+  66% {
+    transform: translate(35px, -25px) scale(0.9);
+  }
 }
 @keyframes aura-float-3 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(25px, 40px) scale(1.15); }
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(25px, 40px) scale(1.15);
+  }
 }
 
 .aura-orb-1 {
@@ -117,8 +137,13 @@ body {
 
 /* Timer glow effect */
 @keyframes timer-glow {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.7; }
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 .timer-glow-active {
   animation: timer-glow 3s ease-in-out infinite;
@@ -126,10 +151,18 @@ body {
 
 /* --- Blob animation (existing) --- */
 @keyframes blob {
-  0% { transform: translate(0px, 0px) scale(1); }
-  33% { transform: translate(30px, -50px) scale(1.1); }
-  66% { transform: translate(-20px, 20px) scale(0.9); }
-  100% { transform: translate(0px, 0px) scale(1); }
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
 }
 .animate-blob {
   animation: blob 7s infinite;
@@ -217,7 +250,8 @@ body {
 .native-app .drop-shadow-2xl,
 .native-app .shadow-2xl {
   filter: none !important;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3),
+    0 4px 6px -2px rgba(0, 0, 0, 0.15) !important;
 }
 /* --- WEB MOBILE PERFORMANCE OPTIMIZATIONS (Lag Fix) --- */
 @media (max-width: 768px) {
@@ -241,6 +275,80 @@ body {
   .drop-shadow-2xl,
   .shadow-2xl {
     filter: none !important;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  }
+}
+
+/* --- LONG PHONE SPACING TUNE (e.g., tall Android/iPhone screens) --- */
+@media (max-width: 540px) and (min-height: 780px) {
+  .home-main {
+    justify-content: center !important;
+    padding-top: 0.6rem !important;
+    padding-bottom: 1.1rem !important;
+  }
+
+  .home-task-block {
+    margin-top: 1rem !important;
+  }
+}
+
+@media (max-width: 540px) and (max-height: 700px) {
+  .home-main {
+    justify-content: flex-start !important;
+    padding-top: 0.2rem !important;
+    padding-bottom: 0.45rem !important;
+  }
+
+  .home-task-block {
+    margin-top: 0.45rem !important;
+  }
+
+  .home-navbar-wrap {
+    padding-top: calc(0.45rem + var(--sat)) !important;
+  }
+}
+
+/* --- TABLET / IPAD TUNE (better scale and spacing) --- */
+@media (min-width: 768px) and (max-width: 1200px) {
+  .home-navbar-wrap {
+    padding-top: calc(1.05rem + var(--sat)) !important;
+  }
+
+  .home-navbar-inner {
+    height: 64px !important;
+  }
+
+  .home-navbar-logo {
+    width: 2.75rem !important;
+    height: 2.75rem !important;
+  }
+
+  .home-main {
+    justify-content: flex-start !important;
+    padding-top: 2rem !important;
+    padding-bottom: 1.25rem !important;
+  }
+
+  .home-mode-toggle {
+    transform: scale(1.08);
+    transform-origin: center top;
+    margin-bottom: 1.2rem !important;
+  }
+
+  .home-task-block {
+    max-width: 36rem !important;
+    margin-top: 1.1rem !important;
+  }
+
+  .home-actions-row {
+    gap: 1.2rem !important;
+  }
+
+  .home-select-task-btn {
+    min-width: 230px !important;
+    font-size: 1.1rem !important;
+    padding-top: 0.85rem !important;
+    padding-bottom: 0.85rem !important;
   }
 }

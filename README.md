@@ -107,13 +107,26 @@ Then run on emulator/device from Android Studio.
 
 ## Firebase Setup 🔐
 
-Current config is in `src/firebase/config.js`.
+Firebase config is loaded from Vite environment variables.
 
-If you use your own Firebase project, update values in that file and ensure:
+1. Copy `.env.example` to `.env.local`
+2. Fill your Firebase web app values
+
+Required keys:
+
+- `VITE_FIREBASE_API_KEY`
+- `VITE_FIREBASE_AUTH_DOMAIN`
+- `VITE_FIREBASE_PROJECT_ID`
+- `VITE_FIREBASE_STORAGE_BUCKET`
+- `VITE_FIREBASE_MESSAGING_SENDER_ID`
+- `VITE_FIREBASE_APP_ID`
+- `VITE_FIREBASE_MEASUREMENT_ID` (optional)
+
+If you use your own Firebase project, ensure:
 
 - Firestore is enabled
 - Authentication is enabled (Google provider)
-- Web app credentials are valid
+- Firestore security rules are deployed (`firestore.rules`)
 
 For Android Google Sign-In/Firebase support, keep `android/app/google-services.json` aligned with your Firebase project.
 

@@ -36,25 +36,25 @@
   padding: 1rem 0;
   user-select: none;
   width: 100%;
-  min-height: 400px;
+  min-height: 360px;
 }
 
 /* Media Queries to scale the entire timer smoothly down to small phones */
 @media (max-width: 440px) {
   .fct-root {
-    --scale: 0.85;
+    --scale: 0.9;
     min-height: 340px;
   }
 }
 @media (max-width: 380px) {
   .fct-root {
-    --scale: 0.75;
+    --scale: 0.84;
     min-height: 300px;
   }
 }
 @media (max-width: 330px) {
   .fct-root {
-    --scale: 0.65;
+    --scale: 0.74;
     min-height: 260px;
   }
 }
@@ -62,8 +62,8 @@
 /* Scale down by screen height to avoid vertical overflow on short devices */
 @media (max-height: 820px) {
   .fct-root {
-    --scale: 0.88;
-    min-height: 330px;
+    --scale: 0.86;
+    min-height: 315px;
     padding: 0.5rem 0;
   }
 }
@@ -71,21 +71,36 @@
   .fct-root {
     --scale: 0.78;
     min-height: 290px;
-    padding: 0.4rem 0;
+    padding: 0.35rem 0;
   }
 }
 @media (max-height: 700px) {
   .fct-root {
-    --scale: 0.62;
-    min-height: 210px;
+    --scale: 0.7;
+    min-height: 250px;
     padding: 0.2rem 0;
   }
 }
 @media (max-height: 640px) {
   .fct-root {
-    --scale: 0.56;
-    min-height: 190px;
+    --scale: 0.62;
+    min-height: 220px;
     padding: 0.15rem 0;
+  }
+}
+
+@media (max-width: 540px) and (min-height: 780px) {
+  .fct-root {
+    --scale: 0.92;
+    min-height: 350px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1200px) {
+  .fct-root {
+    --scale: 1.18;
+    min-height: 510px;
+    padding: 1.1rem 0;
   }
 }
 

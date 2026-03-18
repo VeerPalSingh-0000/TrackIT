@@ -390,7 +390,7 @@ const StudyTracker = () => {
           },
         }}
       />
-      <div className="h-[100dvh] max-h-[100dvh] bg-[var(--color-slate-950)] text-[var(--color-slate-300)] flex flex-col relative overflow-hidden transition-colors duration-500">
+      <div className="home-shell h-[100dvh] max-h-[100dvh] bg-[var(--color-slate-950)] text-[var(--color-slate-300)] flex flex-col relative overflow-hidden transition-colors duration-500">
         <Navbar
           onNewProjectClick={() => {
             setEditingProject(null);
@@ -403,7 +403,7 @@ const StudyTracker = () => {
           onFeaturesClick={() => setActiveModal("features")}
         />
 
-        <main className="flex-1 min-h-0 flex flex-col items-center justify-center max-[700px]:justify-start px-4 py-4 max-[700px]:py-2 sm:p-6 text-center relative z-10 native-app:pb-24 overflow-hidden">
+        <main className="home-main flex-1 min-h-0 flex flex-col items-center justify-center px-4 py-3 sm:p-6 text-center relative z-10 native-app:pb-24 overflow-hidden">
           <TimerModeToggle mode={timerMode} setMode={setTimerMode} />
           <TimerDisplay
             time={displayTime}
@@ -419,17 +419,17 @@ const StudyTracker = () => {
             <div className="h-7 mt-4" />
           )}
 
-          <div className="mt-8 max-[700px]:mt-3 space-y-6 max-[700px]:space-y-3 w-full max-w-md">
+          <div className="home-task-block mt-6 sm:mt-8 space-y-4 sm:space-y-6 w-full max-w-md">
             <CurrentTask
               project={selectedProject}
               topic={selectedTopic}
               subTopic={selectedSubTopic}
             />
 
-            <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+            <div className="home-actions-row flex flex-col sm:flex-row justify-center items-center gap-4">
               <AnimatedButton
                 onClick={() => setActiveModal("selection")}
-                className="bg-[var(--color-emerald-600)] hover:bg-[var(--color-emerald-500)] text-btn w-full sm:w-auto max-[700px]:!py-2 max-[700px]:text-sm shadow-lg shadow-[var(--color-emerald-600)]/20"
+                className="home-select-task-btn bg-[var(--color-emerald-600)] hover:bg-[var(--color-emerald-500)] text-btn w-full sm:w-auto !py-2.5 shadow-lg shadow-[var(--color-emerald-600)]/20"
                 icon={<FaTasks />}
               >
                 Select Task
