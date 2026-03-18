@@ -10,7 +10,7 @@ It combines:
 - Firebase-backed history and progress persistence
 - Android-native polish via Capacitor (haptics, status bar, splash screen, keyboard handling)
 
-## Highlights
+## Highlights ✨
 
 - Task-based session tracking: project, topic, and sub-topic level
 - Session history with saved durations
@@ -19,15 +19,13 @@ It combines:
 - Smooth animated UI built with Framer Motion
 - Android app support through Capacitor
 
-## Demo
+## Demo 🎬
 
 ### GIF Walkthrough
 
-Add a short product walkthrough GIF here:
-
 ![FocusFlow Demo](docs/media/focusflow-demo.gif)
 
-### Screenshots
+### Screenshots 📸
 
 | Home                                       | Task Selection                                   |
 | ------------------------------------------ | ------------------------------------------------ |
@@ -37,15 +35,7 @@ Add a short product walkthrough GIF here:
 | ---------------------------------------------- | -------------------------------------------------- |
 | ![Pomodoro Mode](docs/media/pomodoro-mode.png) | ![Session History](docs/media/session-history.png) |
 
-If these files do not exist yet, create this folder and add your media:
-
-- `docs/media/focusflow-demo.gif`
-- `docs/media/home-screen.png`
-- `docs/media/task-selection.png`
-- `docs/media/pomodoro-mode.png`
-- `docs/media/session-history.png`
-
-## Tech Stack
+## Tech Stack 🛠️
 
 - React 19 + Vite 7
 - Firebase (Auth + Firestore + Hosting)
@@ -53,7 +43,7 @@ If these files do not exist yet, create this folder and add your media:
 - Tailwind CSS 4
 - Framer Motion + React Icons + Tone.js
 
-## Project Structure
+## Project Structure 📁
 
 Key folders:
 
@@ -63,7 +53,7 @@ Key folders:
 - `src/firebase` -> Firebase config and integration
 - `android` -> native Android project (Capacitor)
 
-## Getting Started
+## Getting Started 🚀
 
 ### 1. Prerequisites
 
@@ -98,7 +88,7 @@ npm run build
 npm run preview
 ```
 
-## Android App (Capacitor)
+## Android App (Capacitor) 📱
 
 After any web changes you want in Android:
 
@@ -115,7 +105,7 @@ npx cap open android
 
 Then run on emulator/device from Android Studio.
 
-## Firebase Setup
+## Firebase Setup 🔐
 
 Current config is in `src/firebase/config.js`.
 
@@ -127,14 +117,14 @@ If you use your own Firebase project, update values in that file and ensure:
 
 For Android Google Sign-In/Firebase support, keep `android/app/google-services.json` aligned with your Firebase project.
 
-## Scripts
+## Scripts ⚙️
 
 - `npm run dev` -> run development server
 - `npm run build` -> create production build in `dist`
 - `npm run preview` -> preview production build locally
 - `npm run lint` -> run ESLint
 
-## Deployment (Firebase Hosting)
+## Deployment (Firebase Hosting) 🌐
 
 This repo is already configured with SPA rewrites in `firebase.json`.
 
@@ -145,7 +135,7 @@ npm run build
 firebase deploy
 ```
 
-## Troubleshooting
+## Troubleshooting 🧰
 
 - Android changes not reflecting:
   - run `npm run build` then `npx cap sync android`
@@ -154,14 +144,14 @@ firebase deploy
 - Firebase auth issues:
   - verify auth provider setup and matching app SHA/package config
 
-## Roadmap Ideas
+## Roadmap Ideas 🗺️
 
 - Export study analytics
 - Better onboarding and reminders
 - Offline-first session queueing
 - More timer customization presets
 
-## License
+## License 📄
 
 No license file is currently present.
 Add a `LICENSE` file if you plan to open-source under a specific license.
