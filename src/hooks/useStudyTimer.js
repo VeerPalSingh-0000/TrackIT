@@ -1,5 +1,7 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useLocalStorage } from './useLocalStorage';
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useLocalStorage } from "./useLocalStorage";
+
+const UI_TICK_MS = 250;
 
 /**
  * A robust study timer hook that persists state to LocalStorage.
@@ -7,18 +9,30 @@ import { useLocalStorage } from './useLocalStorage';
  */
 export const useStudyTimer = () => {
   // --- Persisted State (Survives Refreshes) ---
-  
+
   // Tracks if the timer is currently counting up
-  const [persistedIsRunning, setPersistedIsRunning] = useLocalStorage('study_isRunning', false);
-  
+  const [persistedIsRunning, setPersistedIsRunning] = useLocalStorage(
+    "study_isRunning",
+    false,
+  );
+
   // Tracks total milliseconds from previous "segments" (before the last pause)
-  const [accumulatedTime, setAccumulatedTime] = useLocalStorage('study_accumulatedTime', 0);
-  
+  const [accumulatedTime, setAccumulatedTime] = useLocalStorage(
+    "study_accumulatedTime",
+    0,
+  );
+
   // The timestamp (Date.now()) when the current running segment started
-  const [startTimeOfSegment, setStartTimeOfSegment] = useLocalStorage('study_segmentStart', null);
-  
+  const [startTimeOfSegment, setStartTimeOfSegment] = useLocalStorage(
+    "study_segmentStart",
+    null,
+  );
+
   // The timestamp when the study session FIRST started (used for history records)
-  const [sessionStartTime, setSessionStartTime] = useLocalStorage('study_sessionStart', null);
+  const [sessionStartTime, setSessionStartTime] = useLocalStorage(
+    "study_sessionStart",
+    null,
+  );
 
   // --- Local UI State ---
   const [isSessionRunning, setIsSessionRunning] = useState(false);
@@ -46,7 +60,15 @@ export const useStudyTimer = () => {
     }
     setPersistedIsRunning(true);
     setIsSessionRunning(true);
-  }, [persistedIsRunning, sessionStartTime, setPersistedIsRunning, setStartTimeOfSegment, setSessionStartTime]);
+    setSessionDisplayTime(accumulatedTime);
+  }, [
+    persistedIsRunning,
+    sessionStartTime,
+    accumulatedTime,
+    setPersistedIsRunning,
+    setStartTimeOfSegment,
+    setSessionStartTime,
+  ]);
 
   // Pause
   const pauseTimer = useCallback(() => {
@@ -54,14 +76,23 @@ export const useStudyTimer = () => {
 
     const now = Date.now();
     const segmentDuration = now - startTimeOfSegment;
-    
-    setAccumulatedTime(prev => prev + segmentDuration);
+    const finalElapsed = accumulatedTime + segmentDuration;
+
+    setAccumulatedTime((prev) => prev + segmentDuration);
     setStartTimeOfSegment(null);
     setPersistedIsRunning(false);
     setIsSessionRunning(false);
-    
+    setSessionDisplayTime(finalElapsed);
+
     clearInterval(intervalRef.current);
-  }, [persistedIsRunning, startTimeOfSegment, setAccumulatedTime, setStartTimeOfSegment, setPersistedIsRunning]);
+  }, [
+    persistedIsRunning,
+    startTimeOfSegment,
+    accumulatedTime,
+    setAccumulatedTime,
+    setStartTimeOfSegment,
+    setPersistedIsRunning,
+  ]);
 
   // Complete Reset
   const resetTimer = useCallback(() => {
@@ -72,14 +103,20 @@ export const useStudyTimer = () => {
     setStartTimeOfSegment(null);
     setSessionStartTime(null);
     setSessionDisplayTime(0);
-  }, [setPersistedIsRunning, setAccumulatedTime, setStartTimeOfSegment, setSessionStartTime]);
+  }, [
+    setPersistedIsRunning,
+    setAccumulatedTime,
+    setStartTimeOfSegment,
+    setSessionStartTime,
+  ]);
 
   // Stop and return final duration for saving
   const endSessionAndGetDuration = useCallback(() => {
-    const finalDuration = persistedIsRunning && startTimeOfSegment
-      ? Date.now() - startTimeOfSegment + accumulatedTime
-      : accumulatedTime;
-    
+    const finalDuration =
+      persistedIsRunning && startTimeOfSegment
+        ? Date.now() - startTimeOfSegment + accumulatedTime
+        : accumulatedTime;
+
     resetTimer();
     return finalDuration;
   }, [persistedIsRunning, startTimeOfSegment, accumulatedTime, resetTimer]);
@@ -89,7 +126,7 @@ export const useStudyTimer = () => {
     if (persistedIsRunning) {
       setIsSessionRunning(true);
       tick(); // Sync immediately
-      intervalRef.current = setInterval(tick, 1000);
+      intervalRef.current = setInterval(tick, UI_TICK_MS);
     } else {
       setIsSessionRunning(false);
       clearInterval(intervalRef.current);
