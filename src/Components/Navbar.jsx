@@ -15,25 +15,31 @@ import { useTheme, themes } from "../contexts/ThemeContext";
 import TrackerLogo from "../../public/clock.png";
 
 // 1. EXTRACTED FOR PERFORMANCE: Prevents lag during animations
-const MobileLink = React.memo(({ onClick, children, icon, variant = "default" }) => (
-  <button
-    onClick={onClick}
-    className={`w-full flex items-center gap-4 px-4 py-3.5 text-[15px] font-medium rounded-2xl transition-all duration-300 ease-in-out focus:outline-none select-none active:scale-[0.98] ${
-      variant === "danger"
-        ? "text-rose-400 hover:bg-rose-500/10"
-        : variant === "primary"
-        ? "text-[var(--color-emerald-400)] bg-[var(--color-emerald-500)]/10 hover:bg-[var(--color-emerald-500)]/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]"
-        : "text-[var(--color-slate-300)] hover:bg-white/5 hover:text-white"
-    }`}
-  >
-    {icon && (
-      <span className={`text-[18px] flex justify-center ${variant === 'primary' ? 'opacity-100' : 'opacity-50'}`}>
-        {icon}
-      </span>
-    )}
-    {children}
-  </button>
-));
+const MobileLink = React.memo(
+  ({ onClick, children, icon, variant = "default" }) => (
+    <button
+      onClick={onClick}
+      className={`w-full flex items-center gap-4 px-4 py-3.5 text-[15px] font-medium rounded-2xl transition-all duration-300 ease-in-out focus:outline-none select-none active:scale-[0.98] ${
+        variant === "danger"
+          ? "text-rose-400 hover:bg-rose-500/10"
+          : variant === "primary"
+          ? "text-[var(--color-emerald-400)] bg-[var(--color-emerald-500)]/10 hover:bg-[var(--color-emerald-500)]/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]"
+          : "text-[var(--color-slate-300)] hover:bg-white/5 hover:text-white"
+      }`}
+    >
+      {icon && (
+        <span
+          className={`text-[18px] flex justify-center ${
+            variant === "primary" ? "opacity-100" : "opacity-50"
+          }`}
+        >
+          {icon}
+        </span>
+      )}
+      {children}
+    </button>
+  ),
+);
 
 const Navbar = ({
   onNewProjectClick,
@@ -66,7 +72,9 @@ const Navbar = ({
   }, []);
 
   useEffect(() => {
-    const onResize = () => { if (window.innerWidth >= 768) setMobileOpen(false); };
+    const onResize = () => {
+      if (window.innerWidth >= 768) setMobileOpen(false);
+    };
     window.addEventListener("resize", onResize, { passive: true });
     return () => window.removeEventListener("resize", onResize);
   }, []);
@@ -79,12 +87,19 @@ const Navbar = ({
     };
   }, []);
 
-  const userInitial = user?.displayName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "U";
+  const userInitial =
+    user?.displayName?.[0]?.toUpperCase() ||
+    user?.email?.[0]?.toUpperCase() ||
+    "U";
 
   return (
     <>
       {/* DESKTOP NAVBAR (Kept your existing styling here) */}
-      <div className={`sticky top-0 w-full px-3 sm:px-5 pt-3 native-app:pt-0 native-app:safe-mt transition-all duration-300 z-40 ${mobileOpen ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
+      <div
+        className={`sticky top-0 w-full px-3 sm:px-5 pt-3 max-[700px]:pt-2 native-app:pt-0 native-app:safe-mt transition-all duration-300 z-40 ${
+          mobileOpen ? "opacity-0 pointer-events-none" : "opacity-100"
+        }`}
+      >
         <motion.header
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -95,23 +110,39 @@ const Navbar = ({
               : "bg-[var(--color-slate-900)]/50 backdrop-blur-xl border border-[var(--color-slate-700)] shadow-[0_4px_24px_rgba(0,0,0,0.25)]"
           }`}
         >
-          <div className="flex items-center justify-between h-[52px] px-3 sm:px-4">
-            <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="flex items-center gap-2.5 group focus:outline-none select-none">
+          <div className="flex items-center justify-between h-[52px] max-[700px]:h-[46px] px-3 sm:px-4">
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              className="flex items-center gap-2.5 group focus:outline-none select-none"
+            >
               <div className="relative">
                 <div className="absolute inset-0 bg-emerald-400/20 rounded-xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <img src={TrackerLogo} alt="FocusFlow" className="relative h-10 w-10 object-contain transition-transform duration-300" loading="eager" />
+                <img
+                  src={TrackerLogo}
+                  alt="FocusFlow"
+                  className="relative h-10 w-10 object-contain transition-transform duration-300"
+                  loading="eager"
+                />
               </div>
-              <span className="hidden sm:block text-[16px] font-bold text-[var(--color-white)] tracking-tight">FocusFlow</span>
+              <span className="hidden sm:block text-[16px] font-bold text-[var(--color-white)] tracking-tight">
+                FocusFlow
+              </span>
             </button>
 
             <div className="flex-1" />
 
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <button onClick={onHistoryClick} className="hidden md:flex items-center justify-center w-9 h-9 text-[var(--color-slate-300)] hover:text-[var(--color-white)] hover:bg-[var(--color-white)]/10 rounded-full transition-all duration-300 focus:outline-none select-none" title="History">
+              <button
+                onClick={onHistoryClick}
+                className="hidden md:flex items-center justify-center w-9 h-9 text-[var(--color-slate-300)] hover:text-[var(--color-white)] hover:bg-[var(--color-white)]/10 rounded-full transition-all duration-300 focus:outline-none select-none"
+                title="History"
+              >
                 <FaHistory className="text-[14px]" />
               </button>
 
-              <div className="hidden sm:block"><AmbientSounds /></div>
+              <div className="hidden sm:block">
+                <AmbientSounds />
+              </div>
 
               <motion.button
                 onClick={onNewProjectClick}
@@ -124,47 +155,111 @@ const Navbar = ({
               <div className="hidden md:block relative" ref={profileRef}>
                 <motion.button
                   onClick={() => setProfileOpen(!profileOpen)}
-                  className={`flex items-center gap-1.5 h-[34px] pl-1 pr-2.5 rounded-full transition-all duration-300 focus:outline-none select-none border ${profileOpen ? "bg-white/[0.1] border-white/[0.12]" : "hover:bg-white/[0.06] border-transparent"}`}
+                  className={`flex items-center gap-1.5 h-[34px] pl-1 pr-2.5 rounded-full transition-all duration-300 focus:outline-none select-none border ${
+                    profileOpen
+                      ? "bg-white/[0.1] border-white/[0.12]"
+                      : "hover:bg-white/[0.06] border-transparent"
+                  }`}
                   whileTap={{ scale: 0.97 }}
                 >
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-400 via-teal-400 to-indigo-500 flex items-center justify-center text-[11px] font-bold text-[#ffffff] ring-2 ring-[var(--color-slate-900)]/50">{userInitial}</div>
-                  <FaChevronDown className={`text-[9px] text-[var(--color-slate-400)] transition-transform duration-300 ${profileOpen ? "rotate-180" : ""}`} />
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-400 via-teal-400 to-indigo-500 flex items-center justify-center text-[11px] font-bold text-[#ffffff] ring-2 ring-[var(--color-slate-900)]/50">
+                    {userInitial}
+                  </div>
+                  <FaChevronDown
+                    className={`text-[9px] text-[var(--color-slate-400)] transition-transform duration-300 ${
+                      profileOpen ? "rotate-180" : ""
+                    }`}
+                  />
                 </motion.button>
 
                 {/* Profile Dropdown Logic Kept Identical for Desktop */}
                 <AnimatePresence>
                   {profileOpen && (
-                    <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} transition={{ duration: 0.2 }} className="absolute right-0 mt-2.5 w-72 bg-[var(--color-slate-900)] backdrop-blur-2xl border border-[var(--color-slate-700)] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.5)] overflow-hidden origin-top-right">
-                        {/* Dropdown Content */}
-                        <div className="p-4 border-b border-[var(--color-slate-700)]/50">
-                          <div className="flex items-center gap-3">
-                            <div className="w-11 h-11 rounded-full bg-gradient-to-br from-emerald-400 via-teal-400 to-indigo-500 flex items-center justify-center text-sm font-bold text-[#ffffff] shadow-lg ring-2 ring-[var(--color-slate-700)]">{userInitial}</div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-[14px] font-semibold text-[var(--color-white)] truncate">{user?.displayName || "FocusFlow User"}</p>
-                              <p className="text-[12px] text-[var(--color-slate-400)] truncate">{user?.email || ""}</p>
-                            </div>
+                    <motion.div
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -5 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 mt-2.5 w-72 bg-[var(--color-slate-900)] backdrop-blur-2xl border border-[var(--color-slate-700)] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.5)] overflow-hidden origin-top-right"
+                    >
+                      {/* Dropdown Content */}
+                      <div className="p-4 border-b border-[var(--color-slate-700)]/50">
+                        <div className="flex items-center gap-3">
+                          <div className="w-11 h-11 rounded-full bg-gradient-to-br from-emerald-400 via-teal-400 to-indigo-500 flex items-center justify-center text-sm font-bold text-[#ffffff] shadow-lg ring-2 ring-[var(--color-slate-700)]">
+                            {userInitial}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[14px] font-semibold text-[var(--color-white)] truncate">
+                              {user?.displayName || "FocusFlow User"}
+                            </p>
+                            <p className="text-[12px] text-[var(--color-slate-400)] truncate">
+                              {user?.email || ""}
+                            </p>
                           </div>
                         </div>
-                        <div className="p-1.5">
-                            <div className="px-3 py-2 mb-1">
-                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Theme</p>
-                                <div className="flex items-center gap-2">
-                                  {themes.map((theme) => (
-                                      <button key={theme.id} onClick={() => setCurrentThemeId(theme.id)} title={theme.name} className={`w-8 h-8 rounded-full border-2 transition-transform duration-300 ease-in-out ${currentThemeId === theme.id ? "border-[var(--color-emerald-500)] scale-110 shadow-lg" : "border-[var(--color-slate-700)] hover:border-[var(--color-emerald-500)]/50"}`} style={{ background: `linear-gradient(135deg, ${theme.colors["--color-slate-950"]} 50%, ${theme.colors["--color-emerald-500"]} 50%)` }} />
-                                  ))}
-                                </div>
-                            </div>
-                            <div className="h-px bg-white/[0.06] mx-2 my-1" />
-                            {[ { icon: <FaInfoCircle />, label: "About", onClick: onAboutClick }, { icon: <FaStar />, label: "Features", onClick: onFeaturesClick } ].map((item) => (
-                                <button key={item.label} onClick={() => { setProfileOpen(false); item.onClick(); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-[13px] text-[var(--color-slate-300)] hover:text-[var(--color-white)] hover:bg-[var(--color-slate-700)]/50 rounded-xl transition-all duration-200 ease-in-out select-none">
-                                  <span className="text-[13px] opacity-50 w-4 flex justify-center">{item.icon}</span>{item.label}
-                                </button>
+                      </div>
+                      <div className="p-1.5">
+                        <div className="px-3 py-2 mb-1">
+                          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">
+                            Theme
+                          </p>
+                          <div className="flex items-center gap-2">
+                            {themes.map((theme) => (
+                              <button
+                                key={theme.id}
+                                onClick={() => setCurrentThemeId(theme.id)}
+                                title={theme.name}
+                                className={`w-8 h-8 rounded-full border-2 transition-transform duration-300 ease-in-out ${
+                                  currentThemeId === theme.id
+                                    ? "border-[var(--color-emerald-500)] scale-110 shadow-lg"
+                                    : "border-[var(--color-slate-700)] hover:border-[var(--color-emerald-500)]/50"
+                                }`}
+                                style={{
+                                  background: `linear-gradient(135deg, ${theme.colors["--color-slate-950"]} 50%, ${theme.colors["--color-emerald-500"]} 50%)`,
+                                }}
+                              />
                             ))}
-                            <div className="h-px bg-white/[0.06] mx-2 my-1" />
-                            <button onClick={() => { setProfileOpen(false); onLogout(); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-[13px] text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-xl transition-all duration-200 ease-in-out select-none">
-                                <FaSignOutAlt className="text-[13px] w-4 flex justify-center" /> Sign out
-                            </button>
+                          </div>
                         </div>
+                        <div className="h-px bg-white/[0.06] mx-2 my-1" />
+                        {[
+                          {
+                            icon: <FaInfoCircle />,
+                            label: "About",
+                            onClick: onAboutClick,
+                          },
+                          {
+                            icon: <FaStar />,
+                            label: "Features",
+                            onClick: onFeaturesClick,
+                          },
+                        ].map((item) => (
+                          <button
+                            key={item.label}
+                            onClick={() => {
+                              setProfileOpen(false);
+                              item.onClick();
+                            }}
+                            className="w-full flex items-center gap-3 px-3 py-2.5 text-[13px] text-[var(--color-slate-300)] hover:text-[var(--color-white)] hover:bg-[var(--color-slate-700)]/50 rounded-xl transition-all duration-200 ease-in-out select-none"
+                          >
+                            <span className="text-[13px] opacity-50 w-4 flex justify-center">
+                              {item.icon}
+                            </span>
+                            {item.label}
+                          </button>
+                        ))}
+                        <div className="h-px bg-white/[0.06] mx-2 my-1" />
+                        <button
+                          onClick={() => {
+                            setProfileOpen(false);
+                            onLogout();
+                          }}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 text-[13px] text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-xl transition-all duration-200 ease-in-out select-none"
+                        >
+                          <FaSignOutAlt className="text-[13px] w-4 flex justify-center" />{" "}
+                          Sign out
+                        </button>
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -207,8 +302,14 @@ const Navbar = ({
               {/* Header */}
               <div className="flex items-center justify-between h-[68px] px-6 safe-pt">
                 <div className="flex items-center gap-3">
-                  <img src={TrackerLogo} alt="FocusFlow" className="h-8 w-8 object-contain" />
-                  <span className="text-[17px] font-semibold text-white tracking-tight">FocusFlow</span>
+                  <img
+                    src={TrackerLogo}
+                    alt="FocusFlow"
+                    className="h-8 w-8 object-contain"
+                  />
+                  <span className="text-[17px] font-semibold text-white tracking-tight">
+                    FocusFlow
+                  </span>
                 </div>
                 <button
                   onClick={() => setMobileOpen(false)}
@@ -225,18 +326,29 @@ const Navbar = ({
                     {userInitial}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[15px] font-semibold text-white truncate">{user.displayName || "User"}</p>
-                    <p className="text-[13px] text-[var(--color-slate-400)] truncate">{user.email || ""}</p>
+                    <p className="text-[15px] font-semibold text-white truncate">
+                      {user.displayName || "User"}
+                    </p>
+                    <p className="text-[13px] text-[var(--color-slate-400)] truncate">
+                      {user.email || ""}
+                    </p>
                   </div>
                 </div>
               )}
 
               {/* Navigation Links - Pure whitespace, no headers */}
               <div className="flex-1 overflow-y-auto px-4 py-6 space-y-1.5">
-                <MobileLink onClick={handleMobileAction(onNewProjectClick)} icon={<FaPlus />} variant="primary">
+                <MobileLink
+                  onClick={handleMobileAction(onNewProjectClick)}
+                  icon={<FaPlus />}
+                  variant="primary"
+                >
                   New Project
                 </MobileLink>
-                <MobileLink onClick={handleMobileAction(onHistoryClick)} icon={<FaHistory />}>
+                <MobileLink
+                  onClick={handleMobileAction(onHistoryClick)}
+                  icon={<FaHistory />}
+                >
                   Session History
                 </MobileLink>
 
@@ -244,19 +356,27 @@ const Navbar = ({
                   <AmbientSounds
                     customTrigger={
                       <button className="w-full flex items-center gap-4 px-4 py-3.5 text-[15px] font-medium rounded-2xl transition-all text-[var(--color-slate-300)] hover:bg-white/5 hover:text-white active:scale-[0.98]">
-                        <span className="text-[18px] opacity-50 flex justify-center w-5"><FaMusic /></span>
+                        <span className="text-[18px] opacity-50 flex justify-center w-5">
+                          <FaMusic />
+                        </span>
                         Ambient Sounds
                       </button>
                     }
                   />
                 </div>
-                
+
                 <div className="h-px bg-white/[0.05] mx-4 my-4" />
 
-                <MobileLink onClick={handleMobileAction(onAboutClick)} icon={<FaInfoCircle />}>
+                <MobileLink
+                  onClick={handleMobileAction(onAboutClick)}
+                  icon={<FaInfoCircle />}
+                >
                   About FocusFlow
                 </MobileLink>
-                <MobileLink onClick={handleMobileAction(onFeaturesClick)} icon={<FaStar />}>
+                <MobileLink
+                  onClick={handleMobileAction(onFeaturesClick)}
+                  icon={<FaStar />}
+                >
                   Features
                 </MobileLink>
               </div>
@@ -285,7 +405,11 @@ const Navbar = ({
                   </div>
                 </div>
 
-                <MobileLink onClick={handleMobileAction(onLogout)} icon={<FaSignOutAlt />} variant="danger">
+                <MobileLink
+                  onClick={handleMobileAction(onLogout)}
+                  icon={<FaSignOutAlt />}
+                  variant="danger"
+                >
                   Sign out
                 </MobileLink>
               </div>

@@ -52,12 +52,12 @@ const TimerControls = React.memo(
     }, []);
 
     return (
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 max-[700px]:gap-3">
         {/* Main Play/Pause Button */}
         <motion.button
           onPointerDown={handleStartPausePointerDown}
           onClick={handleStartPause}
-          className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full text-btn font-bold text-2xl flex items-center justify-center shadow-lg focus:outline-none focus:ring-4 touch-manipulation ${
+          className={`w-20 h-20 max-[700px]:w-16 max-[700px]:h-16 sm:w-24 sm:h-24 rounded-full text-btn font-bold text-2xl max-[700px]:text-xl flex items-center justify-center shadow-lg focus:outline-none focus:ring-4 touch-manipulation ${
             isRunning
               ? "bg-amber-500 hover:bg-amber-600 focus:ring-amber-400/50"
               : "bg-[var(--color-emerald-500)] hover:bg-[var(--color-emerald-600)]"
@@ -97,7 +97,7 @@ const TimerControls = React.memo(
                 <AnimatedButton
                   onPointerDown={handleStopResetPointerDown}
                   onClick={handleStopReset}
-                  className="bg-[var(--color-slate-700)] hover:bg-[var(--color-slate-600)] text-[var(--color-white)] !px-4 sm:!px-6 border border-[var(--color-slate-600)] shadow-lg"
+                  className="bg-[var(--color-slate-700)] hover:bg-[var(--color-slate-600)] text-[var(--color-white)] !px-4 max-[700px]:!px-3 max-[700px]:!py-2 sm:!px-6 border border-[var(--color-slate-600)] shadow-lg"
                   icon={<FaRedo className="text-sm" />}
                   aria-label="Reset Timer"
                 />

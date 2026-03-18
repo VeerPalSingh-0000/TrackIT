@@ -348,7 +348,7 @@ const StudyTracker = () => {
 
   if (activeModal === "welcome") {
     return (
-      <div className="min-h-screen bg-[var(--color-slate-950)] flex items-center justify-center relative overflow-hidden">
+      <div className="h-[100dvh] bg-[var(--color-slate-950)] flex items-center justify-center relative overflow-hidden">
         <WelcomeScreen
           onComplete={() => {
             markOnboardingComplete(currentUser.uid);
@@ -390,7 +390,7 @@ const StudyTracker = () => {
           },
         }}
       />
-      <div className="min-h-screen bg-[var(--color-slate-950)] text-[var(--color-slate-300)] flex flex-col relative overflow-hidden transition-colors duration-500">
+      <div className="h-[100dvh] max-h-[100dvh] bg-[var(--color-slate-950)] text-[var(--color-slate-300)] flex flex-col relative overflow-hidden transition-colors duration-500">
         <Navbar
           onNewProjectClick={() => {
             setEditingProject(null);
@@ -403,7 +403,7 @@ const StudyTracker = () => {
           onFeaturesClick={() => setActiveModal("features")}
         />
 
-        <main className="flex-grow flex flex-col items-center justify-center p-6 sm:p-8 text-center relative z-10 native-app:pb-24">
+        <main className="flex-1 min-h-0 flex flex-col items-center justify-center max-[700px]:justify-start px-4 py-4 max-[700px]:py-2 sm:p-6 text-center relative z-10 native-app:pb-24 overflow-hidden">
           <TimerModeToggle mode={timerMode} setMode={setTimerMode} />
           <TimerDisplay
             time={displayTime}
@@ -419,7 +419,7 @@ const StudyTracker = () => {
             <div className="h-7 mt-4" />
           )}
 
-          <div className="mt-8 space-y-6 w-full max-w-md">
+          <div className="mt-8 max-[700px]:mt-3 space-y-6 max-[700px]:space-y-3 w-full max-w-md">
             <CurrentTask
               project={selectedProject}
               topic={selectedTopic}
@@ -429,7 +429,7 @@ const StudyTracker = () => {
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
               <AnimatedButton
                 onClick={() => setActiveModal("selection")}
-                className="bg-[var(--color-emerald-600)] hover:bg-[var(--color-emerald-500)] text-btn w-full sm:w-auto shadow-lg shadow-[var(--color-emerald-600)]/20"
+                className="bg-[var(--color-emerald-600)] hover:bg-[var(--color-emerald-500)] text-btn w-full sm:w-auto max-[700px]:!py-2 max-[700px]:text-sm shadow-lg shadow-[var(--color-emerald-600)]/20"
                 icon={<FaTasks />}
               >
                 Select Task
@@ -443,12 +443,6 @@ const StudyTracker = () => {
             </div>
           </div>
         </main>
-
-        <footer className="relative z-10 py-6 px-4 text-center border-t border-[var(--color-slate-700)]/30 mt-auto">
-          <p className="text-[11px] text-[var(--color-slate-500)] font-bold tracking-[0.2em] uppercase">
-            FocusFlow · Deep Work Companion © {new Date().getFullYear()}
-          </p>
-        </footer>
 
         <AnimatePresence>
           <Suspense fallback={<LoadingScreen message="" overlay={true} />}>

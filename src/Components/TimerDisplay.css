@@ -1,24 +1,33 @@
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap");
 
 .fct-root {
   /* ── THEME VARIABLES (Maps to your global theme vars) ── */
   /* Change these 3 accent colors to change the entire timer's color scheme */
   --timer-accent-light: var(--color-emerald-400, #34d399);
-  --timer-accent-mid:   var(--color-emerald-500, #10b981);
-  --timer-accent-dark:  var(--color-emerald-900, #064e3b);
-  
+  --timer-accent-mid: var(--color-emerald-500, #10b981);
+  --timer-accent-dark: var(--color-emerald-900, #064e3b);
+
   /* Glass and Background variables */
-  --timer-glass-bg:     var(--color-slate-900, #0f172a); 
-  --timer-glass-border: color-mix(in srgb, var(--timer-text-main) 9%, transparent);
-  
+  --timer-glass-bg: var(--color-slate-900, #0f172a);
+  --timer-glass-border: color-mix(
+    in srgb,
+    var(--timer-text-main) 9%,
+    transparent
+  );
+
   /* Text and Shadow variables */
-  --timer-text-main:    var(--color-white, #ffffff);
-  --timer-shadow-color: rgba(0, 0, 0, 0.8); /* Adjust for light mode if needed */
+  --timer-text-main: var(--color-white, #ffffff);
+  --timer-shadow-color: rgba(
+    0,
+    0,
+    0,
+    0.8
+  ); /* Adjust for light mode if needed */
 
   /* Responsive Scale Variable */
   --scale: 1;
 
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -31,18 +40,74 @@
 }
 
 /* Media Queries to scale the entire timer smoothly down to small phones */
-@media (max-width: 440px) { .fct-root { --scale: 0.85; min-height: 340px; } }
-@media (max-width: 380px) { .fct-root { --scale: 0.75; min-height: 300px; } }
-@media (max-width: 330px) { .fct-root { --scale: 0.65; min-height: 260px; } }
+@media (max-width: 440px) {
+  .fct-root {
+    --scale: 0.85;
+    min-height: 340px;
+  }
+}
+@media (max-width: 380px) {
+  .fct-root {
+    --scale: 0.75;
+    min-height: 300px;
+  }
+}
+@media (max-width: 330px) {
+  .fct-root {
+    --scale: 0.65;
+    min-height: 260px;
+  }
+}
+
+/* Scale down by screen height to avoid vertical overflow on short devices */
+@media (max-height: 820px) {
+  .fct-root {
+    --scale: 0.88;
+    min-height: 330px;
+    padding: 0.5rem 0;
+  }
+}
+@media (max-height: 740px) {
+  .fct-root {
+    --scale: 0.78;
+    min-height: 290px;
+    padding: 0.4rem 0;
+  }
+}
+@media (max-height: 700px) {
+  .fct-root {
+    --scale: 0.62;
+    min-height: 210px;
+    padding: 0.2rem 0;
+  }
+}
+@media (max-height: 640px) {
+  .fct-root {
+    --scale: 0.56;
+    min-height: 190px;
+    padding: 0.15rem 0;
+  }
+}
 
 /* ── NEBULA ── */
 .fct-nebula {
   position: absolute;
   inset: -80px;
-  background:
-    radial-gradient(ellipse 60% 50% at 50% 50%, color-mix(in srgb, var(--timer-accent-light) 8%, transparent) 0%, transparent 70%),
-    radial-gradient(ellipse 40% 60% at 30% 70%, color-mix(in srgb, var(--color-sky-400, #38bdf8) 5%, transparent) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 40% at 70% 30%, color-mix(in srgb, var(--timer-accent-mid) 5%, transparent) 0%, transparent 60%);
+  background: radial-gradient(
+      ellipse 60% 50% at 50% 50%,
+      color-mix(in srgb, var(--timer-accent-light) 8%, transparent) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 40% 60% at 30% 70%,
+      color-mix(in srgb, var(--color-sky-400, #38bdf8) 5%, transparent) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 50% 40% at 70% 30%,
+      color-mix(in srgb, var(--timer-accent-mid) 5%, transparent) 0%,
+      transparent 60%
+    );
   pointer-events: none;
   z-index: 0;
 }
@@ -57,39 +122,78 @@
   z-index: 0;
 }
 @keyframes fct-blink {
-  0%,100%{ opacity:0 }
-  50%{ opacity:var(--op) }
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: var(--op);
+  }
 }
 
 /* ── SCAN LINE ── */
 .fct-scanline {
   position: absolute;
-  left: 0; right: 0;
+  left: 0;
+  right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--timer-accent-light) 15%, transparent), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--timer-accent-light) 15%, transparent),
+    transparent
+  );
   pointer-events: none;
   animation: fct-scan 8s linear infinite;
   opacity: 0;
   transition: opacity 0.6s;
   z-index: 2;
 }
-.fct-scanline.on { opacity: 1; }
-@keyframes fct-scan { 0%{top:0%} 100%{top:100%} }
+.fct-scanline.on {
+  opacity: 1;
+}
+@keyframes fct-scan {
+  0% {
+    top: 0%;
+  }
+  100% {
+    top: 100%;
+  }
+}
 
 /* ── CORNER HUD BRACKETS ── */
 .fct-corner {
   position: absolute;
-  width: 56px; height: 56px;
+  width: 56px;
+  height: 56px;
   pointer-events: none;
   opacity: 0.18;
   transition: opacity 0.5s;
   z-index: 1;
 }
-.fct-root.is-running .fct-corner { opacity: 0.5; }
-.fct-corner.tl { top:0px;    left:0px;  transform:rotate(0deg)   }
-.fct-corner.tr { top:0px;    right:0px; transform:rotate(90deg)  }
-.fct-corner.bl { bottom:0px; left:0px;  transform:rotate(270deg) }
-.fct-corner.br { bottom:0px; right:0px; transform:rotate(180deg) }
+.fct-root.is-running .fct-corner {
+  opacity: 0.5;
+}
+.fct-corner.tl {
+  top: 0px;
+  left: 0px;
+  transform: rotate(0deg);
+}
+.fct-corner.tr {
+  top: 0px;
+  right: 0px;
+  transform: rotate(90deg);
+}
+.fct-corner.bl {
+  bottom: 0px;
+  left: 0px;
+  transform: rotate(270deg);
+}
+.fct-corner.br {
+  bottom: 0px;
+  right: 0px;
+  transform: rotate(180deg);
+}
 
 /* ── SCENE ── */
 .fct-scene {
@@ -106,29 +210,39 @@
 /* ── HALO ── */
 .fct-halo {
   position: absolute;
-  width: 380px; height: 380px;
+  width: 380px;
+  height: 380px;
   border-radius: 50%;
   pointer-events: none;
   transition: box-shadow 0.9s ease;
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--timer-accent-mid) 6%, transparent),
+  box-shadow: 0 0 0 1px
+      color-mix(in srgb, var(--timer-accent-mid) 6%, transparent),
     0 0 60px 20px color-mix(in srgb, var(--timer-accent-mid) 4%, transparent),
     0 0 120px 40px color-mix(in srgb, var(--timer-accent-dark) 3%, transparent);
   animation: fct-breath 6s ease-in-out infinite;
 }
 .fct-halo.on {
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--timer-accent-light) 16%, transparent),
+  box-shadow: 0 0 0 1px
+      color-mix(in srgb, var(--timer-accent-light) 16%, transparent),
     0 0 60px 20px color-mix(in srgb, var(--timer-accent-mid) 14%, transparent),
     0 0 120px 50px color-mix(in srgb, var(--timer-accent-dark) 9%, transparent),
     0 0 200px 80px color-mix(in srgb, var(--timer-accent-dark) 5%, transparent);
 }
-@keyframes fct-breath { 0%,100%{transform:scale(1)} 50%{transform:scale(1.03)} }
+@keyframes fct-breath {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+}
 
 /* ── RINGS SVG ── */
 .fct-rings {
   position: absolute;
-  width: 380px; height: 380px;
+  width: 380px;
+  height: 380px;
   pointer-events: none;
 }
 
@@ -145,19 +259,28 @@
 .fct-mid-ring.on {
   animation: fct-spin 28s linear infinite reverse;
 }
-@keyframes fct-spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes fct-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 /* ── TICK MARKS SVG ── */
 .fct-ticks {
   position: absolute;
-  width: 280px; height: 280px;
+  width: 280px;
+  height: 280px;
   pointer-events: none;
 }
 
 /* ── DIAL ── */
 .fct-dial {
   position: relative;
-  width: 280px; height: 280px;
+  width: 280px;
+  height: 280px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -168,36 +291,52 @@
 /* ── GLASS PLATE ── */
 .fct-glass {
   position: absolute;
-  width: 240px; height: 240px;
+  width: 240px;
+  height: 240px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 25%,
+  background: radial-gradient(
+    circle at 35% 25%,
     color-mix(in srgb, var(--timer-text-main) 6.5%, transparent) 0%,
     color-mix(in srgb, var(--timer-text-main) 1.8%, transparent) 30%,
-    color-mix(in srgb, var(--timer-glass-bg) 65%, transparent) 100%);
+    color-mix(in srgb, var(--timer-glass-bg) 65%, transparent) 100%
+  );
   border: 1px solid var(--timer-glass-border);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--timer-text-main) 12%, transparent),
-    inset 0 -1px 0 rgba(0,0,0,0.32),
-    0 0 40px var(--timer-shadow-color),
+  box-shadow: inset 0 1px 0
+      color-mix(in srgb, var(--timer-text-main) 12%, transparent),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.32), 0 0 40px var(--timer-shadow-color),
     0 0 0 1px color-mix(in srgb, var(--timer-shadow-color) 50%, transparent);
   overflow: hidden;
 }
 .fct-glass::before {
-  content:'';
-  position:absolute;
-  top:0;left:0;right:0;height:52%;
-  background:linear-gradient(180deg, color-mix(in srgb, var(--timer-text-main) 7.5%, transparent) 0%, transparent 100%);
-  border-radius:50% 50% 0 0;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 52%;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--timer-text-main) 7.5%, transparent) 0%,
+    transparent 100%
+  );
+  border-radius: 50% 50% 0 0;
 }
 .fct-glass::after {
-  content:'';
-  position:absolute;
-  bottom:-18px;left:20%;right:20%;height:58px;
-  background:radial-gradient(ellipse, color-mix(in srgb, var(--timer-accent-light) 14%, transparent) 0%, transparent 70%);
-  filter:blur(10px);
-  pointer-events:none;
+  content: "";
+  position: absolute;
+  bottom: -18px;
+  left: 20%;
+  right: 20%;
+  height: 58px;
+  background: radial-gradient(
+    ellipse,
+    color-mix(in srgb, var(--timer-accent-light) 14%, transparent) 0%,
+    transparent 70%
+  );
+  filter: blur(10px);
+  pointer-events: none;
 }
 
 /* ── DIAL CONTENT ── */
@@ -211,31 +350,31 @@
 }
 
 .fct-mode-label {
-  font-family: 'Share Tech Mono', monospace;
+  font-family: "Share Tech Mono", monospace;
   font-size: 10px;
   letter-spacing: 0.35em;
   color: color-mix(in srgb, var(--timer-accent-light) 55%, transparent);
   text-transform: uppercase;
   transition: color 0.5s;
 }
-.fct-mode-label.on { color: var(--timer-accent-light); }
+.fct-mode-label.on {
+  color: var(--timer-accent-light);
+}
 
 .fct-time {
-  font-family: 'Share Tech Mono', monospace;
+  font-family: "Share Tech Mono", monospace;
   font-size: 52px;
   font-weight: 400;
   letter-spacing: -0.02em;
   line-height: 1;
   color: var(--timer-text-main);
-  text-shadow:
-    0 0 20px transparent,
-    0 0 40px transparent;
+  text-shadow: 0 0 20px transparent, 0 0 40px transparent;
   transition: text-shadow 0.6s;
-  tabular-nums: true;
+  font-variant-numeric: tabular-nums;
 }
 .fct-time.on {
-  text-shadow:
-    0 0 22px color-mix(in srgb, var(--timer-accent-light) 45%, transparent),
+  text-shadow: 0 0 22px
+      color-mix(in srgb, var(--timer-accent-light) 45%, transparent),
     0 0 64px color-mix(in srgb, var(--timer-accent-mid) 22%, transparent);
 }
 
@@ -252,22 +391,34 @@
   transform: translateY(5px);
   transition: opacity 0.4s, transform 0.4s;
 }
-.fct-badge.on { opacity: 1; transform: translateY(0); }
+.fct-badge.on {
+  opacity: 1;
+  transform: translateY(0);
+}
 
 .fct-pulse-dot {
-  width: 6px; height: 6px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: var(--timer-accent-light);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--timer-accent-light) 85%, transparent);
+  box-shadow: 0 0 8px
+    color-mix(in srgb, var(--timer-accent-light) 85%, transparent);
   animation: fct-pulse-dot 1.4s ease-in-out infinite;
 }
 @keyframes fct-pulse-dot {
-  0%,100%{ transform:scale(1); opacity:1 }
-  50%{ transform:scale(1.55); opacity:0.55 }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.55);
+    opacity: 0.55;
+  }
 }
 
 .fct-badge-text {
-  font-family: 'Share Tech Mono', monospace;
+  font-family: "Share Tech Mono", monospace;
   font-size: 10px;
   letter-spacing: 0.25em;
   color: var(--timer-accent-light);
@@ -277,15 +428,28 @@
 /* ── PARTICLES ── */
 .fct-particle {
   position: absolute;
-  width: 2px; height: 2px;
+  width: 2px;
+  height: 2px;
   border-radius: 50%;
   background: color-mix(in srgb, var(--timer-accent-light) 70%, transparent);
   pointer-events: none;
   animation: fct-pfloat var(--dur) ease-in-out forwards var(--delay);
 }
 @keyframes fct-pfloat {
-  0%   { opacity:0; transform:translate(0,0) scale(0) }
-  20%  { opacity:1; transform:translate(var(--x1),var(--y1)) scale(1) }
-  80%  { opacity:0.45; transform:translate(var(--x2),var(--y2)) scale(0.5) }
-  100%{ opacity:0; transform:translate(var(--x3),var(--y3)) scale(0) }
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(var(--x1), var(--y1)) scale(1);
+  }
+  80% {
+    opacity: 0.45;
+    transform: translate(var(--x2), var(--y2)) scale(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--x3), var(--y3)) scale(0);
+  }
 }
