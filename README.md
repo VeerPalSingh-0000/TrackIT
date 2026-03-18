@@ -153,5 +153,5 @@ firebase deploy
 
 ## License 📄
 
-No license file is currently present.
-Add a `LICENSE` file if you plan to open-source under a specific license.
+This project is licensed under the MIT License.
+See [LICENSE](LICENSE) for details.
