@@ -1,8 +1,15 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { FaCheck, FaPlay } from 'react-icons/fa';
+import React from "react";
+import { motion } from "framer-motion";
+import { FaCheck, FaPlay } from "react-icons/fa";
 
-const SubTopicCard = ({ project, topic, subTopic, onSelect, formatTime, subTopicTimers }) => {
+const SubTopicCard = ({
+  project,
+  topic,
+  subTopic,
+  onSelect,
+  formatTime,
+  subTopicTimers,
+}) => {
   const subTopicTime = subTopicTimers[subTopic.id]?.totalTime || 0;
 
   return (
@@ -10,11 +17,23 @@ const SubTopicCard = ({ project, topic, subTopic, onSelect, formatTime, subTopic
       <div className="flex items-center gap-3 flex-1 min-w-0">
         <FaCheck className="text-sm text-[var(--color-emerald-400)] flex-shrink-0 transition-colors" />
         <div className="flex-1 min-w-0">
-          <span className="text-[var(--color-white)] block truncate text-sm font-medium transition-colors">{subTopic.name}</span>
-          <p className="text-xs text-[var(--color-slate-400)] transition-colors">{formatTime(subTopicTime)}</p>
+          <span className="text-[var(--color-white)] block truncate text-sm font-medium transition-colors">
+            {subTopic.name}
+          </span>
+          <p className="text-xs text-[var(--color-slate-400)] transition-colors">
+            {formatTime(subTopicTime)}
+          </p>
         </div>
       </div>
-      <motion.button onClick={() => onSelect(project, topic, subTopic)} className="flex items-center gap-2 px-3 py-1.5 bg-[var(--color-emerald-600)] hover:bg-[var(--color-emerald-500)] text-btn rounded-md text-xs font-bold transition-all shadow-md shadow-[var(--color-emerald-600)]/20" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}><FaPlay className="text-[10px]" /> Select</motion.button>
+      <motion.button
+        onClick={() => onSelect(project, topic, subTopic)}
+        className="flex items-center gap-2 px-3 py-1.5 bg-[var(--color-emerald-600)] hover:bg-[var(--color-emerald-500)] text-btn rounded-md text-xs font-bold transition-all shadow-md shadow-[var(--color-emerald-600)]/20"
+        whileHover={{ scale: 1.08 }}
+        whileTap={{ scale: 0.92 }}
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      >
+        <FaPlay className="text-[10px]" /> Select
+      </motion.button>
     </div>
   );
 };

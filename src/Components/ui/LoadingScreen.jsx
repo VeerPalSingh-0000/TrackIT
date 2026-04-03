@@ -1,6 +1,6 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import TrackerLogo from '../../../public/clock.png'; // Adjust path if necessary
+import React from "react";
+import { motion } from "framer-motion";
+import TrackerLogo from "/clock.png?url"; // Adjust path if necessary
 
 const LoadingScreen = ({ message = "Loading...", overlay = false }) => {
   // If overlay is true, it covers existing content (for lazy-loaded modals).
@@ -21,17 +21,23 @@ const LoadingScreen = ({ message = "Loading...", overlay = false }) => {
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
         className="relative z-10 flex flex-col items-center gap-6 motion-safe-gpu"
       >
         <div className="relative">
           <div className="absolute inset-0 bg-emerald-400/15 rounded-3xl blur-2xl scale-150 animate-pulse" />
-          <img src={TrackerLogo} alt="FocusFlow" className="relative w-32 h-32 object-contain drop-shadow-2xl animate-pulse" />
+          <img
+            src={TrackerLogo}
+            alt="FocusFlow"
+            className="relative w-32 h-32 object-contain drop-shadow-2xl animate-pulse"
+          />
         </div>
 
         {message && (
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-[var(--color-white)] tracking-tight">FocusFlow</h1>
+            <h1 className="text-2xl font-bold text-[var(--color-white)] tracking-tight">
+              FocusFlow
+            </h1>
             <p className="text-sm text-slate-500 mt-1">{message}</p>
           </div>
         )}

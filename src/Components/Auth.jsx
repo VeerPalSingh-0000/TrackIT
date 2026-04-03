@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { AuthComponent } from './ui/sign-up';
-import TrackerLogo from '../../public/clock.png';
-import { Gem } from 'lucide-react';
+import React, { useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { AuthComponent } from "./ui/sign-up";
+import TrackerLogo from "/clock.png?url";
+import { Gem } from "lucide-react";
 
 const FocusFlowLogo = () => (
   <div className="flex items-center gap-2">

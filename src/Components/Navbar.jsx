@@ -12,7 +12,7 @@ import {
 } from "react-icons/fa";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
 import { useTheme, themes } from "../contexts/ThemeContext";
-import TrackerLogo from "../../public/clock.png";
+import TrackerLogo from "/clock.png?url";
 
 // 1. EXTRACTED FOR PERFORMANCE: Prevents lag during animations
 const MobileLink = React.memo(
@@ -52,6 +52,7 @@ const Navbar = ({
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [themeDropdownOpen, setThemeDropdownOpen] = useState(false);
   const profileRef = useRef(null);
 
   const { currentThemeId, setCurrentThemeId } = useTheme();
@@ -147,7 +148,9 @@ const Navbar = ({
               <motion.button
                 onClick={onNewProjectClick}
                 className="hidden md:flex items-center gap-1.5 h-[34px] px-4 text-[13px] font-semibold text-[#000000] bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 rounded-full shadow-[0_2px_12px_rgba(16,185,129,0.25)] transition-all duration-300 focus:outline-none select-none"
-                whileTap={{ scale: 0.97 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.93 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
               >
                 <FaPlus className="text-[10px]" /> New Project
               </motion.button>
@@ -160,26 +163,34 @@ const Navbar = ({
                       ? "bg-white/[0.1] border-white/[0.12]"
                       : "hover:bg-white/[0.06] border-transparent"
                   }`}
-                  whileTap={{ scale: 0.97 }}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 >
                   <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-400 via-teal-400 to-indigo-500 flex items-center justify-center text-[11px] font-bold text-[#ffffff] ring-2 ring-[var(--color-slate-900)]/50">
                     {userInitial}
                   </div>
-                  <FaChevronDown
-                    className={`text-[9px] text-[var(--color-slate-400)] transition-transform duration-300 ${
-                      profileOpen ? "rotate-180" : ""
-                    }`}
-                  />
+                  <motion.div
+                    animate={{ rotate: profileOpen ? 180 : 0 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                    className="flex items-center justify-center"
+                  >
+                    <FaChevronDown className="text-[9px] text-[var(--color-slate-400)]" />
+                  </motion.div>
                 </motion.button>
 
                 {/* Profile Dropdown Logic Kept Identical for Desktop */}
                 <AnimatePresence>
                   {profileOpen && (
                     <motion.div
-                      initial={{ opacity: 0, y: -5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -5 }}
-                      transition={{ duration: 0.2 }}
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      transition={{
+                        type: "spring",
+                        damping: 25,
+                        stiffness: 250,
+                      }}
                       className="absolute right-0 mt-2.5 w-72 bg-[var(--color-slate-900)] backdrop-blur-2xl border border-[var(--color-slate-700)] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.5)] overflow-hidden origin-top-right"
                     >
                       {/* Dropdown Content */}
@@ -199,27 +210,74 @@ const Navbar = ({
                         </div>
                       </div>
                       <div className="p-1.5">
-                        <div className="px-3 py-2 mb-1">
-                          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">
-                            Theme
-                          </p>
-                          <div className="flex items-center gap-2">
-                            {themes.map((theme) => (
-                              <button
-                                key={theme.id}
-                                onClick={() => setCurrentThemeId(theme.id)}
-                                title={theme.name}
-                                className={`w-8 h-8 rounded-full border-2 transition-transform duration-300 ease-in-out ${
-                                  currentThemeId === theme.id
-                                    ? "border-[var(--color-emerald-500)] scale-110 shadow-lg"
-                                    : "border-[var(--color-slate-700)] hover:border-[var(--color-emerald-500)]/50"
-                                }`}
-                                style={{
-                                  background: `linear-gradient(135deg, ${theme.colors["--color-slate-950"]} 50%, ${theme.colors["--color-emerald-500"]} 50%)`,
+                        <div className="px-3 py-1 mb-1">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setThemeDropdownOpen(!themeDropdownOpen);
+                            }}
+                            className="flex items-center justify-between w-full text-[10px] font-bold text-slate-500 hover:text-slate-300 uppercase tracking-wider mb-1 py-1 focus:outline-none transition-colors"
+                          >
+                            <span>Theme</span>
+                            <motion.div
+                              animate={{ rotate: themeDropdownOpen ? 180 : 0 }}
+                              transition={{
+                                type: "spring",
+                                stiffness: 300,
+                                damping: 25,
+                              }}
+                            >
+                              <FaChevronDown className="text[10px]" />
+                            </motion.div>
+                          </button>
+
+                          <AnimatePresence>
+                            {themeDropdownOpen && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0, scale: 0.95 }}
+                                animate={{
+                                  height: "auto",
+                                  opacity: 1,
+                                  scale: 1,
                                 }}
-                              />
-                            ))}
-                          </div>
+                                exit={{ height: 0, opacity: 0, scale: 0.95 }}
+                                transition={{
+                                  type: "spring",
+                                  damping: 25,
+                                  stiffness: 250,
+                                }}
+                                className="overflow-hidden"
+                              >
+                                <div className="flex items-center justify-between gap-1 py-2">
+                                  {themes.map((theme) => (
+                                    <motion.button
+                                      key={theme.id}
+                                      onClick={() => {
+                                        setCurrentThemeId(theme.id);
+                                        setProfileOpen(false);
+                                      }}
+                                      title={theme.name}
+                                      className={`w-8 h-8 rounded-full border-2 transition-transform duration-300 ease-in-out ${
+                                        currentThemeId === theme.id
+                                          ? "border-[var(--color-emerald-500)] scale-110 shadow-lg"
+                                          : "border-[var(--color-slate-700)] hover:border-[var(--color-emerald-500)]/50"
+                                      }`}
+                                      style={{
+                                        background: `linear-gradient(135deg, ${theme.colors["--color-slate-950"]} 50%, ${theme.colors["--color-emerald-500"]} 50%)`,
+                                      }}
+                                      whileHover={{ scale: 1.15 }}
+                                      whileTap={{ scale: 0.9 }}
+                                      transition={{
+                                        type: "spring",
+                                        stiffness: 300,
+                                        damping: 20,
+                                      }}
+                                    />
+                                  ))}
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </div>
                         <div className="h-px bg-white/[0.06] mx-2 my-1" />
                         {[
@@ -281,23 +339,23 @@ const Navbar = ({
       <AnimatePresence>
         {mobileOpen && (
           <>
-            {/* Backdrop: Darker, smoother blur */}
+            {/* Backdrop: Solid color instead of blur to prevent massive GPU lag on mobile */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
               onClick={() => setMobileOpen(false)}
-              className="fixed inset-0 z-[60] bg-[var(--color-slate-950)]/60 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 z-[60] bg-[var(--color-slate-950)]/80 md:hidden motion-safe-gpu"
             />
 
-            {/* Side Drawer: High glassmorphism, floating feel, spring physics */}
+            {/* Side Drawer: Clean and high performance mapping */}
             <motion.nav
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 28, stiffness: 250 }}
-              className="fixed top-0 right-0 bottom-0 z-[70] w-full max-w-[320px] bg-[var(--color-slate-950)]/80 backdrop-blur-3xl border-l border-white/[0.05] flex flex-col md:hidden shadow-2xl"
+              transition={{ type: "tween", ease: "circOut", duration: 0.3 }}
+              className="fixed top-0 right-0 bottom-0 z-[70] w-full max-w-[320px] bg-[var(--color-slate-950)]/95 border-l border-white/[0.05] flex flex-col md:hidden shadow-2xl motion-safe-gpu"
             >
               {/* Header */}
               <div className="flex items-center justify-between h-[68px] px-6 safe-pt">
@@ -384,25 +442,64 @@ const Navbar = ({
               {/* Footer: Themes & Logout */}
               <div className="px-4 pb-8 pt-4 border-t border-white/[0.05] bg-white/[0.01]">
                 <div className="px-4 mb-4">
-                  <p className="text-[11px] font-semibold text-[var(--color-slate-500)] uppercase tracking-widest mb-3">
-                    Theme
-                  </p>
-                  <div className="flex items-center gap-4">
-                    {themes.map((theme) => (
-                      <button
-                        key={theme.id}
-                        onClick={() => setCurrentThemeId(theme.id)}
-                        className={`w-10 h-10 rounded-full border-[3px] transition-all duration-300 ease-in-out ${
-                          currentThemeId === theme.id
-                            ? "border-[var(--color-emerald-500)] scale-110 shadow-[0_0_15px_rgba(16,185,129,0.3)]"
-                            : "border-transparent hover:border-white/20"
-                        }`}
-                        style={{
-                          background: `linear-gradient(135deg, ${theme.colors["--color-slate-900"]} 0%, ${theme.colors["--color-emerald-600"]} 100%)`,
+                  <button
+                    onClick={() => setThemeDropdownOpen(!themeDropdownOpen)}
+                    className="flex items-center justify-between w-full text-[11px] font-semibold text-[var(--color-slate-500)] uppercase tracking-widest mb-1 py-2 focus:outline-none transition-colors"
+                  >
+                    <span>Theme</span>
+                    <motion.div
+                      animate={{ rotate: themeDropdownOpen ? 180 : 0 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 25,
+                      }}
+                    >
+                      <FaChevronDown />
+                    </motion.div>
+                  </button>
+                  <AnimatePresence>
+                    {themeDropdownOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0, scale: 0.95 }}
+                        animate={{ height: "auto", opacity: 1, scale: 1 }}
+                        exit={{ height: 0, opacity: 0, scale: 0.95 }}
+                        transition={{
+                          type: "spring",
+                          damping: 25,
+                          stiffness: 250,
                         }}
-                      />
-                    ))}
-                  </div>
+                        className="overflow-hidden"
+                      >
+                        <div className="flex items-center gap-4 py-3">
+                          {themes.map((theme) => (
+                            <motion.button
+                              key={theme.id}
+                              onClick={() => {
+                                setCurrentThemeId(theme.id);
+                                setMobileOpen(false);
+                              }}
+                              className={`w-10 h-10 rounded-full border-[3px] transition-all duration-300 ease-in-out ${
+                                currentThemeId === theme.id
+                                  ? "border-[var(--color-emerald-500)] scale-110 shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+                                  : "border-transparent hover:border-white/20"
+                              }`}
+                              style={{
+                                background: `linear-gradient(135deg, ${theme.colors["--color-slate-900"]} 0%, ${theme.colors["--color-emerald-600"]} 100%)`,
+                              }}
+                              whileHover={{ scale: 1.15 }}
+                              whileTap={{ scale: 0.9 }}
+                              transition={{
+                                type: "spring",
+                                stiffness: 300,
+                                damping: 20,
+                              }}
+                            />
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
                 <MobileLink

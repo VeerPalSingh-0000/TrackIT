@@ -125,6 +125,8 @@
     );
   pointer-events: none;
   z-index: 0;
+  will-change: background, filter;
+  transform: translateZ(0); /* Hardware acceleration */
 }
 
 /* ── STARS ── */
@@ -135,6 +137,8 @@
   animation: fct-blink var(--dur) ease-in-out infinite var(--delay);
   opacity: 0;
   z-index: 0;
+  will-change: opacity;
+  transform: translateZ(0); /* Hardware acceleration */
 }
 @keyframes fct-blink {
   0%,

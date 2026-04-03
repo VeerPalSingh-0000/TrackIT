@@ -23,7 +23,7 @@ const AnimatedButton = ({
       // Tap karne par thoda aaram se dabega
       whileTap={disabled ? {} : { scale: 0.96 }}
       // JADU YAHAN HAI: easeInOut aur 0.25s duration se ekdum makkhan jaisa chalega! 🧈
-      transition={{ type: "tween", ease: "easeInOut", duration: 0.25 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30, mass: 1 }}
     >
       {icon && <span className="text-lg">{icon}</span>}
       <span>{children}</span>

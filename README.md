@@ -137,16 +137,18 @@ For Android Google Sign-In/Firebase support, keep `android/app/google-services.j
 - `npm run preview` -> preview production build locally
 - `npm run lint` -> run ESLint
 
-## Deployment (Firebase Hosting) 🌐
+## Deployment (GitHub Pages) 🌐
 
-This repo is already configured with SPA rewrites in `firebase.json`.
+This repository is configured to easily deploy directly to GitHub Pages, skipping the need for Netlify or Firebase Hosting!
 
-Typical deploy steps:
+To set it up:
 
-```bash
-npm run build
-firebase deploy
-```
+1. Push your code to the `main` branch.
+2. In your GitHub repository, go to **Settings > Pages**.
+3. Under **Build and deployment**, set the **Source** to **GitHub Actions**.
+4. GitHub will automatically run the `.github/workflows/deploy.yml` workflow and publish your site to `https://<your-username>.github.io/TrackIT/`.
+
+_(Note: Ensure your `vite.config.js` has `base: '/TrackIT/'` configured for correct asset paths!)_
 
 ## Troubleshooting 🧰
 
