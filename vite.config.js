@@ -5,7 +5,7 @@ import path from "path";
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "/TrackIT/", // Required for GitHub Pages deployment
+  base: "./", // Use relative path for maximum compatibility (GH Pages, Firebase, Capacitor)
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
