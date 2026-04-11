@@ -57,12 +57,23 @@ body {
   font-family: "Inter", system-ui, -apple-system, sans-serif;
   background: var(--color-slate-950);
   color: var(--color-slate-300);
+  /* Default width for mobile/extension popup */
+  width: 400px !important;
+  min-width: 400px !important;
+  margin: 0 auto;
   overflow-x: hidden;
   transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
     color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  /* Prevent layout shifting issues */
   -webkit-tap-highlight-color: transparent;
   text-rendering: optimizeLegibility;
+}
+
+/* Expand to full width on non-mobile/non-extension screens */
+@media (min-width: 450px) {
+  body {
+    width: 100% !important;
+    min-width: 100% !important;
+  }
 }
 
 /* App-wide hardware acceleration class */
@@ -365,4 +376,84 @@ body {
     padding-top: 0.85rem !important;
     padding-bottom: 0.85rem !important;
   }
+}
+/* --- CHROME EXTENSION POPUP STYLES --- */
+/* We apply these as high-priority rules for the extension environment */
+html.extension-mode,
+body.extension-mode,
+#extension-root.extension-mode {
+  width: 400px !important;
+  min-width: 400px !important;
+  max-width: 400px !important;
+  height: 600px !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+  background-color: var(--color-slate-950);
+}
+
+/* Ensure the scene fits the narrow width */
+.extension-mode.home-shell,
+body.extension-mode .home-shell {
+  width: 400px !important;
+  min-width: 400px !important;
+  max-width: 400px !important;
+  height: 600px !important;
+  overflow-x: hidden !important;
+  overflow-y: hidden !important; /* Managed by home-main instead */
+}
+
+.extension-mode .home-main {
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+  justify-content: flex-start !important;
+  overflow-y: auto !important;
+}
+
+.extension-mode .fct-root {
+  transform: scale(0.85);
+  transform-origin: top center;
+  margin-bottom: -2rem;
+  margin-top: 0.5rem;
+}
+
+/* Hide the desktop navbar in extension mode */
+.extension-mode .home-navbar-wrap {
+  display: none !important;
+}
+
+.extension-mode .home-task-block {
+  margin-top: -1rem !important;
+  width: 100%;
+}
+
+.extension-mode .home-task-block > * + * {
+  margin-top: 0.75rem !important;
+}
+
+.extension-mode .home-actions-row {
+  flex-direction: row !important;
+  width: 100%;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin-top: 0.5rem;
+}
+
+.extension-mode .home-select-task-btn {
+  flex: 1;
+  width: auto !important;
+  margin: 0 !important;
+}
+
+.extension-mode .home-actions-row > div {
+  flex-shrink: 0;
+}
+
+/* Custom header for extension mode */
+.extension-header {
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  height: 55px;
 }

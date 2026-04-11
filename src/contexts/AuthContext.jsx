@@ -12,8 +12,9 @@ import {
   setPersistence,
   browserLocalPersistence,
 } from "firebase/auth";
-import { isNative } from "../services/nativeBridge";
 import { FirebaseAuthentication } from "@capacitor-firebase/authentication";
+import { extensionAuth } from "../services/authBridge";
+import { isNative } from "../services/nativeBridge";
 
 const AuthContext = React.createContext();
 const GOOGLE_REDIRECT_KEY = "googleRedirectInProgress";
@@ -73,6 +74,11 @@ export function AuthProvider({ children }) {
         logAuthDebug("google_signin_native_success", {
           hasIdToken: !!result?.credential?.idToken,
         });
+      } else if (typeof chrome !== "undefined" && chrome.identity) {
+        // Use the Chrome Identity bridge for the extension
+        logAuthDebug("google_signin_extension_start");
+        const user = await extensionAuth.signIn();
+        logAuthDebug("google_signin_extension_success", { uid: user.uid });
       } else {
         await setPersistence(auth, browserLocalPersistence);
         const provider = new GoogleAuthProvider();
@@ -89,21 +95,17 @@ export function AuthProvider({ children }) {
       }
     } catch (error) {
       const code = error?.code || "unknown";
-      console.error("Google Auth Caught Error:", error);
+      const errorMsg =
+        error?.message || String(error) || "Unknown authentication error";
+      console.error("Google Auth Caught Error:", errorMsg);
       logAuthDebug("google_signin_error", {
         code,
-        message: error?.message,
+        message: errorMsg,
         customData: error?.customData,
       });
-      if (code === "auth/unauthorized-domain") {
-        console.error(
-          "[AuthDebug] Firebase unauthorized-domain: add this host in Firebase Console > Authentication > Settings > Authorized domains:",
-          window.location.hostname,
-        );
-      }
-      sessionStorage.removeItem(GOOGLE_REDIRECT_KEY);
       setIsProcessing(false);
       setRedirectResolved(true);
+      throw error;
     }
   }
 
@@ -113,6 +115,11 @@ export function AuthProvider({ children }) {
       if (isNative()) {
         await FirebaseAuthentication.signOut().catch(() => {});
       }
+
+      if (typeof chrome !== "undefined" && chrome.identity) {
+        await extensionAuth.signOut();
+      }
+
       return await signOut(auth);
     } finally {
       setIsProcessing(false);
@@ -138,6 +145,26 @@ export function AuthProvider({ children }) {
         providers: user?.providerData?.map((p) => p?.providerId) || [],
       });
       setCurrentUser(user);
+
+      // Sync to Chrome storage for background worker
+      if (
+        typeof chrome !== "undefined" &&
+        chrome.storage &&
+        chrome.storage.local
+      ) {
+        if (user) {
+          chrome.storage.local.set({
+            currentUser: {
+              uid: user.uid,
+              email: user.email,
+              displayName: user.displayName,
+            },
+          });
+        } else {
+          chrome.storage.local.set({ currentUser: null });
+        }
+      }
+
       setAuthStateResolved(true);
       setIsProcessing(false);
     });

@@ -5,25 +5,36 @@ import path from "path";
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "./", // Use relative path for maximum compatibility (GH Pages, Firebase, Capacitor)
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react(), 
+    tailwindcss(),
+  ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  // Add this server block to fix the Firebase popup issue
   server: {
+    port: 5173,
+    hmr: {
+        overlay: false,
+    },
     headers: {
       "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
     },
   },
-  // --- PHASE 4: VITE BUILD OPTIMIZATION (Manual Chunking) ---
-  // This splits your heavy dependencies into separate cacheable files,
-  // drastically speeding up load times for returning users.
   build: {
+    outDir: 'dist',
     rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+        background: path.resolve(__dirname, 'src/background/timerWorker.js'),
+      },
       output: {
+        // Ensuring background.js stays at the root of /dist for manifest compatibility
+        entryFileNames: (chunkInfo) => {
+          return chunkInfo.name === 'background' ? '[name].js' : 'assets/[name]-[hash].js';
+        },
         manualChunks: {
           "react-vendor": ["react", "react-dom"],
           "framer-motion": ["framer-motion"],

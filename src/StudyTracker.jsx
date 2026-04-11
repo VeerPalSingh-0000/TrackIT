@@ -21,10 +21,11 @@ import {
   getUserProfile,
   markOnboardingComplete,
 } from "./firebase/services";
-import { useLocalStorage } from "./hooks/useLocalStorage";
+import { useChromeStorage } from "./hooks/useChromeStorage";
 import { useStudyTimer } from "./hooks/useStudyTimer";
 import { usePomodoroTimer } from "./hooks/usePomodoroTimer";
 import { useSessionManager } from "./hooks/useSessionManager";
+import timerService from "./services/timerService";
 
 // Components (Static Imports)
 import Navbar from "./Components/Navbar";
@@ -36,9 +37,18 @@ import LoadingScreen from "./Components/ui/LoadingScreen";
 import TimerModeToggle from "./Components/TimerModeToggle";
 import CurrentTask from "./Components/CurrentTask";
 import TimerControls from "./Components/TimerControls";
+import AmbientSounds from "./Components/AmbientSounds";
 
 // Icons
-import { FaTasks } from "react-icons/fa";
+import {
+  FaTasks,
+  FaHistory,
+  FaInfoCircle,
+  FaRocket,
+  FaPlus,
+  FaSignOutAlt,
+  FaStar,
+} from "react-icons/fa";
 
 // Lazy Loaded Components
 const SelectionModal = lazy(() => import("./Components/SelectionModal"));
@@ -64,28 +74,45 @@ const StudyTracker = () => {
   const [activeModal, setActiveModal] = useState(null); // 'selection', 'history', 'about', 'features', 'project', 'welcome'
   const [editingProject, setEditingProject] = useState(null);
 
-  // Local Storage States
-  const [timerMode, setTimerMode] = useLocalStorage("timerMode", "stopwatch");
-  const [pomodoroCycle, setPomodoroCycle] = useLocalStorage(
+  // Local Storage States (now Chrome Storage)
+  const [timerMode, setTimerMode] = useChromeStorage("timerMode", "stopwatch");
+  const [pomodoroCycle, setPomodoroCycle] = useChromeStorage(
     `pomodoroCycle_${currentUser?.uid}`,
     0,
   );
-  const [selectedProject, setSelectedProject] = useLocalStorage(
+  const [selectedProject, setSelectedProject] = useChromeStorage(
     `selectedProj_${currentUser?.uid}`,
     null,
   );
-  const [selectedTopic, setSelectedTopic] = useLocalStorage(
+  const [selectedTopic, setSelectedTopic] = useChromeStorage(
     `selectedTopic_${currentUser?.uid}`,
     null,
   );
-  const [selectedSubTopic, setSelectedSubTopic] = useLocalStorage(
+  const [selectedSubTopic, setSelectedSubTopic] = useChromeStorage(
     `selectedSubTopic_${currentUser?.uid}`,
     null,
   );
 
   // Timers & Hooks
+  const isExtensionPopup =
+    typeof chrome !== "undefined" && chrome.runtime && !!chrome.runtime.id;
   const stopwatch = useStudyTimer();
   const pomodoro = usePomodoroTimer(POMODORO_DURATIONS);
+
+  // Apply extension-mode class to body/html/root for global layout constraints
+  useEffect(() => {
+    if (isExtensionPopup) {
+      document.body.classList.add("extension-mode");
+      document.documentElement.classList.add("extension-mode");
+      const extRoot = document.getElementById("extension-root");
+      if (extRoot) extRoot.classList.add("extension-mode");
+    } else {
+      document.body.classList.remove("extension-mode");
+      document.documentElement.classList.remove("extension-mode");
+      const extRoot = document.getElementById("extension-root");
+      if (extRoot) extRoot.classList.remove("extension-mode");
+    }
+  }, [isExtensionPopup]);
 
   // Extracted Session Manager Hook
   const {
@@ -123,14 +150,28 @@ const StudyTracker = () => {
     return () => document.removeEventListener("click", initAudio);
   }, []);
 
-  // Load User Profile
+  // Load User Profile and Sync Background State
   useEffect(() => {
     if (!currentUser) return;
     getUserProfile(currentUser.uid).then((profile) => {
       if (!profile || !profile.onboardingCompleted) setActiveModal("welcome");
       setIsProfileLoaded(true);
     });
-  }, [currentUser]);
+
+    // Check if a session was completed in the background
+    const syncBackgroundState = async () => {
+      const state = await timerService.getState();
+      if (state.needsFinalize) {
+        // Pomodoro work session completed in background
+        saveSession(POMODORO_DURATIONS.work * 1000);
+        // Clear the flag
+        if (typeof chrome !== "undefined" && chrome.storage) {
+          chrome.storage.local.set({ needsFinalize: false });
+        }
+      }
+    };
+    syncBackgroundState();
+  }, [currentUser, saveSession]);
 
   // Synchronize Projects State
   const selectedStateRef = useRef({
@@ -390,20 +431,93 @@ const StudyTracker = () => {
           },
         }}
       />
-      <div className="home-shell h-[100dvh] max-h-[100dvh] bg-[var(--color-slate-950)] text-[var(--color-slate-300)] flex flex-col relative overflow-hidden transition-colors duration-500">
-        <Navbar
-          onNewProjectClick={() => {
-            setEditingProject(null);
-            setActiveModal("project");
-          }}
-          onHistoryClick={() => setActiveModal("history")}
-          onLogout={logout}
-          user={currentUser}
-          onAboutClick={() => setActiveModal("about")}
-          onFeaturesClick={() => setActiveModal("features")}
-        />
+      <div
+        className={`home-shell ${
+          isExtensionPopup ? "extension-mode" : ""
+        } h-[100dvh] max-h-[100dvh] bg-[var(--color-slate-950)] text-[var(--color-slate-300)] flex flex-col relative overflow-hidden transition-colors duration-500`}
+      >
+        {!isExtensionPopup ? (
+          <Navbar
+            onNewProjectClick={() => {
+              setEditingProject(null);
+              setActiveModal("project");
+            }}
+            onHistoryClick={() => setActiveModal("history")}
+            onLogout={logout}
+            user={currentUser}
+            onAboutClick={() => setActiveModal("about")}
+            onFeaturesClick={() => setActiveModal("features")}
+          />
+        ) : (
+          <header className="extension-header flex justify-between items-center px-4 z-50 shadow-[0_2px_10px_rgba(0,0,0,0.2)] bg-slate-900/90 backdrop-blur-md">
+            <div className="flex items-center gap-2 pr-3 shrink-0">
+              <img
+                src="/clock.png"
+                className="h-6 w-6 lg:h-7 lg:w-7 drop-shadow-md"
+                alt="Logo"
+              />
+              <span className="text-[14px] font-extrabold bg-gradient-to-r from-slate-100 to-slate-300 bg-clip-text text-transparent hidden sm:inline tracking-tight">
+                FocusFlow
+              </span>
+            </div>
+            <div className="flex items-center gap-x-[2px] justify-end flex-wrap flex-1">
+              <AmbientSounds />
+              <div className="w-[1px] h-4 bg-slate-700/60 mx-1"></div>
+              <button
+                onClick={() => {
+                  setEditingProject(null);
+                  setActiveModal("project");
+                }}
+                className="p-1.5 text-slate-400 hover:text-emerald-400 hover:bg-white/5 rounded-md transition-all active:scale-95"
+                title="New Task/Project"
+              >
+                <FaPlus size={14} />
+              </button>
+              <button
+                onClick={() => setActiveModal("selection")}
+                className="p-1.5 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-400/10 rounded-md transition-all active:scale-95"
+                title="Change Task"
+              >
+                <FaTasks size={14} />
+              </button>
+              <button
+                onClick={() => setActiveModal("history")}
+                className="p-1.5 text-slate-400 hover:text-slate-100 hover:bg-white/5 rounded-md transition-all active:scale-95"
+                title="History"
+              >
+                <FaHistory size={14} />
+              </button>
+              <button
+                onClick={() => setActiveModal("features")}
+                className="p-1.5 text-slate-400 hover:text-slate-100 hover:bg-white/5 rounded-md transition-all active:scale-95"
+                title="Features"
+              >
+                <FaStar size={14} />
+              </button>
+              <button
+                onClick={() => setActiveModal("about")}
+                className="p-1.5 text-slate-400 hover:text-slate-100 hover:bg-white/5 rounded-md transition-all active:scale-95"
+                title="About"
+              >
+                <FaInfoCircle size={14} />
+              </button>
+              <div className="w-[1px] h-4 bg-slate-700/60 mx-1"></div>
+              <button
+                onClick={logout}
+                className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-400/10 rounded-md transition-all active:scale-95"
+                title="Log Out"
+              >
+                <FaSignOutAlt size={14} />
+              </button>
+            </div>
+          </header>
+        )}
 
-        <main className="home-main flex-1 min-h-0 flex flex-col items-center justify-center px-4 py-3 sm:p-6 text-center relative z-10 native-app:pb-24 overflow-hidden">
+        <main
+          className={`home-main flex-1 min-h-0 flex flex-col items-center justify-center px-4 py-3 sm:p-6 text-center relative z-10 native-app:pb-24 overflow-hidden ${
+            isExtensionPopup ? "pt-2" : ""
+          }`}
+        >
           <TimerModeToggle mode={timerMode} setMode={setTimerMode} />
           <TimerDisplay
             time={displayTime}
