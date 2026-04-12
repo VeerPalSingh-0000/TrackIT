@@ -353,6 +353,11 @@ const StudyTracker = () => {
 
   const handleSelection = useCallback(
     (project, topic = null, subTopic = null) => {
+      console.log("🎯 handleSelection called with:", {
+        project: project?.name,
+        topic: topic?.name,
+        subTopic: subTopic?.name,
+      });
       const isRunning =
         timerMode === "stopwatch"
           ? stopwatch.isSessionRunning

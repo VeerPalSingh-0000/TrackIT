@@ -207,6 +207,11 @@ const HistoryView = ({
                                     › {session.topicName}
                                   </span>
                                 )}
+                                {session.subTopicName && (
+                                  <span className="text-[var(--color-slate-500)] font-medium ml-1.5">
+                                    › {session.subTopicName}
+                                  </span>
+                                )}
                               </p>
                               <p className="text-[12px] text-[var(--color-slate-400)] font-medium mt-1">
                                 {new Date(session.startTime).toLocaleTimeString(

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 /**
  * Custom hook to use chrome.storage.local. Fallback to localStorage for development.
@@ -10,7 +10,11 @@ export const useChromeStorage = (key, initialValue) => {
 
   // Load initial value
   useEffect(() => {
-    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+    if (
+      typeof chrome !== "undefined" &&
+      chrome.storage &&
+      chrome.storage.local
+    ) {
       chrome.storage.local.get([key], (result) => {
         if (result[key] !== undefined) {
           setStoredValue(result[key]);
@@ -32,10 +36,17 @@ export const useChromeStorage = (key, initialValue) => {
   // Update value
   const setValue = (value) => {
     const valueToStore = value instanceof Function ? value(storedValue) : value;
+    console.log(`✏️ Setting ${key}:`, valueToStore);
     setStoredValue(valueToStore);
-    
-    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
-      chrome.storage.local.set({ [key]: valueToStore });
+
+    if (
+      typeof chrome !== "undefined" &&
+      chrome.storage &&
+      chrome.storage.local
+    ) {
+      chrome.storage.local.set({ [key]: valueToStore }, () => {
+        console.log(`✅ Saved to chrome storage - ${key}:`, valueToStore);
+      });
     } else {
       window.localStorage.setItem(key, JSON.stringify(valueToStore));
     }
