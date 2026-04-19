@@ -48,6 +48,7 @@ import {
   FaPlus,
   FaSignOutAlt,
   FaStar,
+  FaCog,
 } from "react-icons/fa";
 
 // Lazy Loaded Components
@@ -58,6 +59,7 @@ const DeleteHistoryModal = lazy(() =>
 );
 const About = lazy(() => import("./Components/About"));
 const Features = lazy(() => import("./Components/Features"));
+const SettingsModal = lazy(() => import("./Components/SettingsModal"));
 
 const POMODORO_DURATIONS = {
   work: 25 * 60,
@@ -125,6 +127,7 @@ const StudyTracker = () => {
     studyHistory,
     setStudyHistory,
     saveSession,
+    deleteSession,
     formatTime,
     clearCues,
   } = useSessionManager(
@@ -457,6 +460,7 @@ const StudyTracker = () => {
             user={currentUser}
             onAboutClick={() => setActiveModal("about")}
             onFeaturesClick={() => setActiveModal("features")}
+            onSettingsClick={() => setActiveModal("settings")}
           />
         ) : (
           <header className="extension-header flex justify-between items-center px-4 z-50 shadow-[0_2px_10px_rgba(0,0,0,0.2)] bg-slate-900/90 backdrop-blur-md">
@@ -510,6 +514,13 @@ const StudyTracker = () => {
                 title="About"
               >
                 <FaInfoCircle size={14} />
+              </button>
+              <button
+                onClick={() => setActiveModal("settings")}
+                className="p-1.5 text-slate-400 hover:text-emerald-400 hover:bg-emerald-400/10 rounded-md transition-all active:scale-95"
+                title="Settings"
+              >
+                <FaCog size={14} />
               </button>
               <div className="w-[1px] h-4 bg-slate-700/60 mx-1"></div>
               <button
@@ -600,6 +611,7 @@ const StudyTracker = () => {
             {activeModal === "deleteHistory" && (
               <DeleteHistoryModal
                 studyHistory={studyHistory}
+                deleteSession={deleteSession}
                 onClose={() => setActiveModal(null)}
               />
             )}
@@ -618,6 +630,9 @@ const StudyTracker = () => {
             )}
             {activeModal === "features" && (
               <Features onClose={() => setActiveModal(null)} />
+            )}
+            {activeModal === "settings" && (
+              <SettingsModal onClose={() => setActiveModal(null)} />
             )}
           </Suspense>
         </AnimatePresence>

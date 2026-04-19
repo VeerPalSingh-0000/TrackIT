@@ -70,7 +70,7 @@ export const subscribeToUserProjects = (userId, callback) => {
   return onSnapshot(q, (querySnapshot) => {
     const projects = [];
     querySnapshot.forEach((doc) => {
-      projects.push({ id: doc.id, ...doc.data() });
+      projects.push({ ...doc.data(), id: doc.id });
     });
     callback(projects);
   });
@@ -89,7 +89,7 @@ export const getUserProjects = async (userId) => {
     const querySnapshot = await getDocs(q);
     const projects = [];
     querySnapshot.forEach((doc) => {
-      projects.push({ id: doc.id, ...doc.data() });
+      projects.push({ ...doc.data(), id: doc.id });
     });
     return projects;
   } catch (error) {
@@ -158,37 +158,48 @@ export const addSessionToFirebase = async (sessionData, userId) => {
   }
 };
 
-// Subscribe to user sessions in real-time
+// Subscribe to user sessions in real-time ONLY
+// Firebase's real-time listener (onSnapshot) is the single source of truth
 export const subscribeToUserSessions = (userId, callback) => {
   const q = query(
     collection(db, "sessions"),
     where("userId", "==", userId),
-    orderBy("createdAt", "desc"), // <-- Added backend sorting here
+    orderBy("createdAt", "desc"),
   );
 
-  return onSnapshot(
-    q,
-    (snapshot) => {
+  const handleSnapshot = (snapshot) => {
+    try {
       const sessions = [];
       snapshot.forEach((doc) => {
-        sessions.push({ id: doc.id, ...doc.data() });
+        sessions.push({ ...doc.data(), id: doc.id }); // Make sure Firebase ID takes precedence!
       });
-
-      // Removed the client-side array sorting so Firebase handles it efficiently
+      console.log(
+        `📡 [Real-time Listener] Sessions updated: ${sessions.length} total`,
+      );
+      // ONLY this callback should update studyHistory - no periodic refresh
       callback(sessions);
-    },
-    (error) => {
-      console.error("Error subscribing to sessions:", error);
-    },
-  );
+    } catch (error) {
+      console.error("Error processing sessions snapshot:", error);
+    }
+  };
+
+  const handleError = (error) => {
+    console.error("Real-time listener error:", error);
+  };
+
+  // Return unsubscribe function - no setInterval, no periodic refresh
+  return onSnapshot(q, handleSnapshot, handleError);
 };
 
 // Delete a single session from Firestore
 export const deleteSessionFromFirebase = async (sessionId) => {
   try {
-    await deleteDoc(doc(db, "sessions", sessionId));
+    console.log(`Attempting to delete session: ${sessionId}`);
+    const docRef = doc(db, "sessions", sessionId);
+    await deleteDoc(docRef);
+    console.log(`Session deleted successfully: ${sessionId}`);
   } catch (error) {
-    console.error("Error deleting session:", error);
+    console.error(`Error deleting session ${sessionId}:`, error);
     throw error;
   }
 };
@@ -225,6 +236,25 @@ export const loadTimerDataFromFirebase = async (userId) => {
     console.error("Error loading timer data:", error);
     return null;
   }
+};
+
+// Subscribe to user timers in real-time
+export const subscribeToUserTimers = (userId, callback) => {
+  const timerDocRef = doc(db, "userTimers", userId);
+
+  return onSnapshot(
+    timerDocRef,
+    (snap) => {
+      if (snap.exists()) {
+        callback(snap.data());
+      } else {
+        callback(null);
+      }
+    },
+    (error) => {
+      console.error("Error in userTimers real-time listener:", error);
+    },
+  );
 };
 
 // ========== USER PROFILE / ONBOARDING ==========

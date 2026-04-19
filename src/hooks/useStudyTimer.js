@@ -10,10 +10,28 @@ const UI_TICK_MS = 250;
  */
 export const useStudyTimer = () => {
   // Sync state with chrome.storage.local (or localStorage fallback)
-  const [persistedIsRunning, setPersistedIsRunning] = useChromeStorage("study_isRunning", false);
-  const [accumulatedTime, setAccumulatedTime] = useChromeStorage("study_accumulatedTime", 0);
-  const [startTimeOfSegment, setStartTimeOfSegment] = useChromeStorage("study_segmentStart", null);
-  const [sessionStartTime, setSessionStartTime] = useChromeStorage("study_sessionStart", null);
+  const [persistedIsRunning, setPersistedIsRunning] = useChromeStorage(
+    "study_isRunning",
+    false,
+  );
+  const [accumulatedTime, setAccumulatedTime] = useChromeStorage(
+    "study_accumulatedTime",
+    0,
+  );
+  const [startTimeOfSegment, setStartTimeOfSegment] = useChromeStorage(
+    "study_segmentStart",
+    null,
+  );
+  const [sessionStartTime, setSessionStartTime] = useChromeStorage(
+    "study_sessionStart",
+    null,
+  );
+
+  // Add the maximum session length setting (default 2 hours)
+  const [maxSessionLengthHours] = useChromeStorage(
+    "study_maxSessionLengthHours",
+    2,
+  );
 
   // Local UI State
   const [isSessionRunning, setIsSessionRunning] = useState(false);
@@ -27,17 +45,35 @@ export const useStudyTimer = () => {
   // Main tick logic to update the display
   const tick = useCallback(() => {
     if (persistedIsRunning && startTimeOfSegment) {
-      const currentElapsed = Date.now() - startTimeOfSegment + accumulatedTime;
-      setSessionDisplayTime(currentElapsed);
+      let currentElapsed = Date.now() - startTimeOfSegment + accumulatedTime;
+      const maxMs = maxSessionLengthHours * 60 * 60 * 1000;
+
+      // If we go over the limit, force a pause and cap the time
+      if (currentElapsed >= maxMs) {
+        setSessionDisplayTime(maxMs);
+        setAccumulatedTime(maxMs);
+        setPersistedIsRunning(false);
+        setStartTimeOfSegment(null);
+      } else {
+        setSessionDisplayTime(currentElapsed);
+      }
     } else {
       setSessionDisplayTime(accumulatedTime);
     }
-  }, [persistedIsRunning, startTimeOfSegment, accumulatedTime]);
+  }, [
+    persistedIsRunning,
+    startTimeOfSegment,
+    accumulatedTime,
+    maxSessionLengthHours,
+    setAccumulatedTime,
+    setPersistedIsRunning,
+    setStartTimeOfSegment,
+  ]);
 
-  // Timer actions - now interacting with timerService if needed, 
+  // Timer actions - now interacting with timerService if needed,
   // though for stopwatch mode we mostly just update storage directly since it doesn't need alarms as much.
   // But we use the service for consistency.
-  
+
   const startTimer = useCallback(() => {
     if (persistedIsRunning) return;
 
@@ -47,11 +83,18 @@ export const useStudyTimer = () => {
       setSessionStartTime(now);
     }
     setPersistedIsRunning(true);
-    
+
     // We could call timerService.start here if we want the service worker to track it with an alarm,
     // but for a stopwatch, calculating based on startTime is sufficient even if service worker dies.
     // We'll just update storage.
-  }, [persistedIsRunning, sessionStartTime, accumulatedTime, setPersistedIsRunning, setStartTimeOfSegment, setSessionStartTime]);
+  }, [
+    persistedIsRunning,
+    sessionStartTime,
+    accumulatedTime,
+    setPersistedIsRunning,
+    setStartTimeOfSegment,
+    setSessionStartTime,
+  ]);
 
   const pauseTimer = useCallback(() => {
     if (!persistedIsRunning) return;
@@ -63,7 +106,14 @@ export const useStudyTimer = () => {
     setAccumulatedTime(finalElapsed);
     setStartTimeOfSegment(null);
     setPersistedIsRunning(false);
-  }, [persistedIsRunning, startTimeOfSegment, accumulatedTime, setAccumulatedTime, setStartTimeOfSegment, setPersistedIsRunning]);
+  }, [
+    persistedIsRunning,
+    startTimeOfSegment,
+    accumulatedTime,
+    setAccumulatedTime,
+    setStartTimeOfSegment,
+    setPersistedIsRunning,
+  ]);
 
   const resetTimer = useCallback(() => {
     setPersistedIsRunning(false);
@@ -71,17 +121,34 @@ export const useStudyTimer = () => {
     setStartTimeOfSegment(null);
     setSessionStartTime(null);
     setSessionDisplayTime(0);
-  }, [setPersistedIsRunning, setAccumulatedTime, setStartTimeOfSegment, setSessionStartTime]);
+  }, [
+    setPersistedIsRunning,
+    setAccumulatedTime,
+    setStartTimeOfSegment,
+    setSessionStartTime,
+  ]);
 
   const endSessionAndGetDuration = useCallback(() => {
-    const finalDuration =
-      persistedIsRunning && startTimeOfSegment
-        ? Date.now() - startTimeOfSegment + accumulatedTime
-        : accumulatedTime;
+    let finalDuration = accumulatedTime;
+
+    if (persistedIsRunning && startTimeOfSegment) {
+      finalDuration = Date.now() - startTimeOfSegment + accumulatedTime;
+    }
+
+    const maxMs = maxSessionLengthHours * 60 * 60 * 1000;
+    if (finalDuration > maxMs) {
+      finalDuration = maxMs;
+    }
 
     resetTimer();
     return finalDuration;
-  }, [persistedIsRunning, startTimeOfSegment, accumulatedTime, resetTimer]);
+  }, [
+    persistedIsRunning,
+    startTimeOfSegment,
+    accumulatedTime,
+    maxSessionLengthHours,
+    resetTimer,
+  ]);
 
   // Background Ticking Logic for UI
   useEffect(() => {
@@ -98,19 +165,28 @@ export const useStudyTimer = () => {
   // Listen for storage changes from background (if any)
   useEffect(() => {
     const handleStorageChange = (changes, area) => {
-        if (area === 'local') {
-            if (changes.study_isRunning) setPersistedIsRunning(changes.study_isRunning.newValue);
-            if (changes.study_accumulatedTime) setAccumulatedTime(changes.study_accumulatedTime.newValue);
-            if (changes.study_segmentStart) setStartTimeOfSegment(changes.study_segmentStart.newValue);
-            if (changes.study_sessionStart) setSessionStartTime(changes.study_sessionStart.newValue);
-        }
+      if (area === "local") {
+        if (changes.study_isRunning)
+          setPersistedIsRunning(changes.study_isRunning.newValue);
+        if (changes.study_accumulatedTime)
+          setAccumulatedTime(changes.study_accumulatedTime.newValue);
+        if (changes.study_segmentStart)
+          setStartTimeOfSegment(changes.study_segmentStart.newValue);
+        if (changes.study_sessionStart)
+          setSessionStartTime(changes.study_sessionStart.newValue);
+      }
     };
 
-    if (typeof chrome !== 'undefined' && chrome.storage) {
-        chrome.storage.onChanged.addListener(handleStorageChange);
-        return () => chrome.storage.onChanged.removeListener(handleStorageChange);
+    if (typeof chrome !== "undefined" && chrome.storage) {
+      chrome.storage.onChanged.addListener(handleStorageChange);
+      return () => chrome.storage.onChanged.removeListener(handleStorageChange);
     }
-  }, [setPersistedIsRunning, setAccumulatedTime, setStartTimeOfSegment, setSessionStartTime]);
+  }, [
+    setPersistedIsRunning,
+    setAccumulatedTime,
+    setStartTimeOfSegment,
+    setSessionStartTime,
+  ]);
 
   return {
     isSessionRunning,

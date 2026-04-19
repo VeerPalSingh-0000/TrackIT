@@ -10,6 +10,7 @@ import {
   FaChevronDown,
   FaMusic,
   FaTrash,
+  FaCog,
 } from "react-icons/fa";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
 import { useTheme, themes } from "../contexts/ThemeContext";
@@ -45,6 +46,7 @@ const MobileLink = React.memo(
 const Navbar = ({
   onNewProjectClick,
   onHistoryClick,
+  onSettingsClick,
   onLogout,
   user,
   onAboutClick,
@@ -293,6 +295,11 @@ const Navbar = ({
                             label: "Features",
                             onClick: onFeaturesClick,
                           },
+                          {
+                            icon: <FaCog />,
+                            label: "Settings",
+                            onClick: onSettingsClick,
+                          },
                         ].map((item) => (
                           <button
                             key={item.label}
@@ -449,6 +456,12 @@ const Navbar = ({
                   icon={<FaStar />}
                 >
                   Features
+                </MobileLink>
+                <MobileLink
+                  onClick={handleMobileAction(onSettingsClick)}
+                  icon={<FaCog />}
+                >
+                  Settings
                 </MobileLink>
                 <MobileLink
                   onClick={handleMobileAction(onDeleteHistoryClick)}

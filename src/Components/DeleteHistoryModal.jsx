@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import AnimatedModal from "./ui/AnimatedModal";
 import { FaCalendarDay, FaTrash } from "react-icons/fa";
 import toast from "react-hot-toast";
-import { deleteSessionFromFirebase } from "../firebase/services";
 
 const listVariants = {
   hidden: { opacity: 0 },
@@ -33,7 +32,7 @@ const itemVariants = {
   },
 };
 
-const DeleteHistoryModal = ({ studyHistory, onClose }) => {
+const DeleteHistoryModal = ({ studyHistory, deleteSession, onClose }) => {
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -64,18 +63,20 @@ const DeleteHistoryModal = ({ studyHistory, onClose }) => {
   );
 
   // Handle session deletion
-  const handleDeleteSession = async (sessionId, sessionName) => {
+  const handleDeleteSession = async (session) => {
     setIsDeleting(true);
     try {
-      await deleteSessionFromFirebase(sessionId);
-      toast.success(`Session "${sessionName}" deleted successfully`);
+      await deleteSession(session);
+      toast.success(`Session "${session.projectName}" deleted! ✓`);
       setConfirmDelete(null);
-      // Close modal to refresh data from real-time listener
-      setTimeout(() => onClose(), 800);
+      // Modal will auto-close when parent updates
+      setTimeout(() => {
+        setIsDeleting(false);
+        onClose();
+      }, 300);
     } catch (error) {
       console.error("Error deleting session:", error);
-      toast.error("Failed to delete session");
-    } finally {
+      toast.error("Failed to delete - check console");
       setIsDeleting(false);
     }
   };
@@ -153,6 +154,7 @@ const DeleteHistoryModal = ({ studyHistory, onClose }) => {
                           whileTap={{ scale: 0.95 }}
                           onClick={() =>
                             setConfirmDelete({
+                              session: session,
                               id: session.id,
                               name: session.projectName,
                               date: new Date(
@@ -217,9 +219,7 @@ const DeleteHistoryModal = ({ studyHistory, onClose }) => {
                     Cancel
                   </button>
                   <button
-                    onClick={() =>
-                      handleDeleteSession(confirmDelete.id, confirmDelete.name)
-                    }
+                    onClick={() => handleDeleteSession(confirmDelete.session)}
                     disabled={isDeleting}
                     className="flex-1 py-2.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 hover:text-red-300 rounded-lg text-[13px] font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                   >
