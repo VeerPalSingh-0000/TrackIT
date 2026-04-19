@@ -53,6 +53,9 @@ import {
 // Lazy Loaded Components
 const SelectionModal = lazy(() => import("./Components/SelectionModal"));
 const HistoryView = lazy(() => import("./Components/HistoryView"));
+const DeleteHistoryModal = lazy(() =>
+  import("./Components/DeleteHistoryModal"),
+);
 const About = lazy(() => import("./Components/About"));
 const Features = lazy(() => import("./Components/Features"));
 
@@ -207,7 +210,8 @@ const StudyTracker = () => {
             setSelectedTopic(null);
             setSelectedSubTopic(null);
           } else if (currTopic) {
-            const matchedTopic = matchedProject.topics?.find(
+            const matchedTopic = matchedProject.subProjects?.find(
+              // ✅ Fixed: use .subProjects
               (t) => t.id === currTopic.id,
             );
             if (!matchedTopic) {
@@ -448,6 +452,7 @@ const StudyTracker = () => {
               setActiveModal("project");
             }}
             onHistoryClick={() => setActiveModal("history")}
+            onDeleteHistoryClick={() => setActiveModal("deleteHistory")}
             onLogout={logout}
             user={currentUser}
             onAboutClick={() => setActiveModal("about")}
@@ -589,6 +594,12 @@ const StudyTracker = () => {
                 timers={timers}
                 topicTimers={topicTimers}
                 subTopicTimers={subTopicTimers}
+                onClose={() => setActiveModal(null)}
+              />
+            )}
+            {activeModal === "deleteHistory" && (
+              <DeleteHistoryModal
+                studyHistory={studyHistory}
                 onClose={() => setActiveModal(null)}
               />
             )}

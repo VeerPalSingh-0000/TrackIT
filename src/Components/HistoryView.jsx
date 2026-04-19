@@ -216,7 +216,10 @@ const HistoryView = ({
                               <p className="text-[12px] text-[var(--color-slate-400)] font-medium mt-1">
                                 {new Date(session.startTime).toLocaleTimeString(
                                   [],
-                                  { hour: "2-digit", minute: "2-digit" },
+                                  {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  },
                                 )}
                               </p>
                             </div>

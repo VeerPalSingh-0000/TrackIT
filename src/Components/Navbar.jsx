@@ -9,6 +9,7 @@ import {
   FaStar,
   FaChevronDown,
   FaMusic,
+  FaTrash,
 } from "react-icons/fa";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
 import { useTheme, themes } from "../contexts/ThemeContext";
@@ -48,6 +49,7 @@ const Navbar = ({
   user,
   onAboutClick,
   onFeaturesClick,
+  onDeleteHistoryClick,
 }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -310,6 +312,17 @@ const Navbar = ({
                         <button
                           onClick={() => {
                             setProfileOpen(false);
+                            onDeleteHistoryClick();
+                          }}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 text-[13px] text-orange-400 hover:text-orange-300 hover:bg-orange-500/10 rounded-xl transition-all duration-200 ease-in-out select-none"
+                        >
+                          <FaTrash className="text-[13px] w-4 flex justify-center" />
+                          Delete History
+                        </button>
+                        <div className="h-px bg-white/[0.06] mx-2 my-1" />
+                        <button
+                          onClick={() => {
+                            setProfileOpen(false);
                             onLogout();
                           }}
                           className="w-full flex items-center gap-3 px-3 py-2.5 text-[13px] text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-xl transition-all duration-200 ease-in-out select-none"
@@ -436,6 +449,13 @@ const Navbar = ({
                   icon={<FaStar />}
                 >
                   Features
+                </MobileLink>
+                <MobileLink
+                  onClick={handleMobileAction(onDeleteHistoryClick)}
+                  icon={<FaTrash />}
+                  variant="default"
+                >
+                  Delete History
                 </MobileLink>
               </div>
 

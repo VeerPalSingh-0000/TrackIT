@@ -24,9 +24,9 @@ service cloud.firestore {
     }
 
     match /sessions/{sessionId} {
-      allow create: if ownerByUserIdField();
-      allow read, delete: if existingOwnerByUserIdField();
-      allow update: if existingOwnerByUserIdField() && ownerByUserIdField();
+      allow create: if isSignedIn();
+      allow read, delete: if isSignedIn();
+      allow update: if isSignedIn();
     }
 
     match /timers/{timerId} {

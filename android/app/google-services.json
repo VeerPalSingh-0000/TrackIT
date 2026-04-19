@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "573843213419-9798p64matpp86cnuvb5buj8u07omf8h.apps.googleusercontent.com",
+          "client_id": "573843213419-n7dn9673j6m48oksut0opjaji8i8rb54.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.focusflow.app",
-            "certificate_hash": "921cb8bdb289221047ef8d6b8696db44ba7076c9"
+            "certificate_hash": "7e806534ab383a11318d93db18232c1898424c65"
           }
         },
         {
