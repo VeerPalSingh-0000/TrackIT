@@ -14,7 +14,7 @@ import {
 } from "firebase/auth";
 import { FirebaseAuthentication } from "@capacitor-firebase/authentication";
 import { extensionAuth } from "../services/authBridge";
-import { isNative } from "../services/nativeBridge";
+import { isElectron, isNative } from "../services/nativeBridge";
 
 const AuthContext = React.createContext();
 const GOOGLE_REDIRECT_KEY = "googleRedirectInProgress";
@@ -74,6 +74,19 @@ export function AuthProvider({ children }) {
         logAuthDebug("google_signin_native_success", {
           hasIdToken: !!result?.credential?.idToken,
         });
+      } else if (isElectron()) {
+        await setPersistence(auth, browserLocalPersistence);
+        const provider = new GoogleAuthProvider();
+        logAuthDebug("google_signin_popup_start", {
+          origin: window.location.origin,
+          authDomain: auth.config.authDomain,
+          userAgent: navigator.userAgent,
+        });
+        const popupResult = await signInWithPopup(auth, provider);
+        logAuthDebug("google_signin_popup_success", {
+          uid: popupResult?.user?.uid || null,
+          providerId: popupResult?.providerId || null,
+        });
       } else if (typeof chrome !== "undefined" && chrome.identity) {
         // Use the Chrome Identity bridge for the extension
         logAuthDebug("google_signin_extension_start");
@@ -130,6 +143,7 @@ export function AuthProvider({ children }) {
     let isMounted = true;
     logAuthDebug("auth_provider_init", {
       isNativePlatform: isNative(),
+      isElectronPlatform: isElectron(),
       origin: typeof window !== "undefined" ? window.location.origin : "n/a",
       host: typeof window !== "undefined" ? window.location.hostname : "n/a",
       authDomain: auth.config.authDomain,

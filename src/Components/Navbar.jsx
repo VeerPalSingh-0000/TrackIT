@@ -43,7 +43,7 @@ const MobileLink = React.memo(
   ),
 );
 
-const Navbar = ({
+const Navbar = React.memo(({
   onNewProjectClick,
   onHistoryClick,
   onSettingsClick,
@@ -549,6 +549,6 @@ const Navbar = ({
       </AnimatePresence>
     </>
   );
-};
+});
 
 export default Navbar;

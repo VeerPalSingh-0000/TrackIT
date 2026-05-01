@@ -223,11 +223,8 @@ export const useSessionManager = (
   const deleteSession = useCallback(
     async (session) => {
       try {
-        console.log("🗑️ Deleting session:", session.id);
-
         // 1. Delete from Firebase
         await deleteSessionFromFirebase(session.id);
-        console.log("✅ Deleted from Firebase");
 
         // 2. Update timers immediately
         const id = session.subTopicId || session.topicId || session.projectId;
@@ -268,10 +265,6 @@ export const useSessionManager = (
           subTopicTimers: newSubTopicTimers,
         });
 
-        console.log("✅ Timers synced to Firebase");
-        console.log(
-          "✅ Real-time listener will update studyHistory automatically",
-        );
         return true;
       } catch (error) {
         console.error("❌ Error deleting session:", error);

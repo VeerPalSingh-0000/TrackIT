@@ -9,6 +9,15 @@ import { Capacitor } from "@capacitor/core";
 /** Check if we are running inside a native app container */
 export const isNative = () => Capacitor.isNativePlatform();
 
+/** Check if we are running inside Electron. */
+export const isElectron = () => {
+  if (typeof navigator === "undefined") return false;
+  return (
+    /Electron/i.test(navigator.userAgent) ||
+    !!window?.process?.versions?.electron
+  );
+};
+
 /** ─── Status Bar ─── */
 let StatusBar = null;
 

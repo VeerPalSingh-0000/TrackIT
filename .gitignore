@@ -25,3 +25,13 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Electron / Build
+dist_electron
+out
+release
+*.exe
+*.dmg
+*.AppImage
+*.zip
+

@@ -3,17 +3,6 @@ import React from "react";
 const CurrentTask = React.memo(({ project, topic, subTopic }) => {
   const parts = [];
 
-  // Debug logging
-  React.useEffect(() => {
-    console.log("🔍 CurrentTask Debug:", {
-      project: project?.name || "null",
-      topic: topic?.name || "null",
-      subTopic: subTopic?.name || "null",
-      fullSubTopic: subTopic,
-      fullTopic: topic,
-    });
-  }, [project, topic, subTopic]);
-
   // Build hierarchical task name
   if (project && project.name) {
     parts.push(project.name);

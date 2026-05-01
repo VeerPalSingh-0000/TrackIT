@@ -223,13 +223,13 @@ body {
   background-color: rgba(15, 23, 42, 0.98) !important;
 }
 
-/* 120FPS Performance Hints */
-.native-app * {
-  /* Enable hardware acceleration for all components that might move */
+/* 120FPS Performance Hints — TARGETED only to elements that actually animate */
+.native-app .motion-safe-gpu,
+.native-app .fct-scene,
+.native-app .fct-dial {
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  -webkit-perspective: 1000;
-  perspective: 1000;
+  transform: translateZ(0);
 }
 
 .native-app .motion-safe-gpu {
@@ -303,6 +303,20 @@ body {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
       0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
   }
+
+  /* PERF: Disable timer particles and reduce animations on mobile web */
+  .fct-particle {
+    display: none !important;
+  }
+
+  .fct-star:nth-child(n + 9) {
+    display: none !important;
+  }
+}
+
+/* PERF: Modal overlay containment — isolate modal paint from rest of page */
+.fixed.inset-0 {
+  contain: layout style;
 }
 
 /* --- LONG PHONE SPACING TUNE (e.g., tall Android/iPhone screens) --- */
@@ -411,12 +425,7 @@ body.extension-mode .home-shell {
   overflow-y: auto !important;
 }
 
-.extension-mode .fct-root {
-  transform: scale(0.85);
-  transform-origin: top center;
-  margin-bottom: -2rem;
-  margin-top: 0.5rem;
-}
+
 
 /* Hide the desktop navbar in extension mode */
 .extension-mode .home-navbar-wrap {

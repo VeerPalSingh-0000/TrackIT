@@ -11,10 +11,10 @@ import {
 } from "react-icons/fa";
 
 // Sound files imports
-import rainSound from "/sounds/rain.mp3?url";
-import forestSound from "/sounds/forest.mp3?url";
-import cafeSound from "/sounds/cafe.mp3?url";
-import lofiSound from "/sounds/lofi.mp3?url";
+import rainSound from "/sounds/rain.ogg?url";
+import forestSound from "/sounds/forest.ogg?url";
+import cafeSound from "/sounds/cafe.ogg?url";
+import lofiSound from "/sounds/lofi.ogg?url";
 
 // 1. CREATE AUDIO INSTANCES GLOBALLY
 // Moving this outside ensures the audio survives when the mobile menu closes

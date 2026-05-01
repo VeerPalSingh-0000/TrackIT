@@ -20,14 +20,12 @@ export const timersCollection = collection(db, "timers");
 // Add project to Firebase
 export const addProjectToFirebase = async (projectData, userId) => {
   try {
-    console.log("Creating project:", projectData); // Debug log
     const docRef = await addDoc(projectsCollection, {
       ...projectData,
       userId,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
-    console.log("Project created with ID:", docRef.id); // Debug log
     return docRef.id;
   } catch (error) {
     console.error("Error adding project:", error);
@@ -171,12 +169,8 @@ export const subscribeToUserSessions = (userId, callback) => {
     try {
       const sessions = [];
       snapshot.forEach((doc) => {
-        sessions.push({ ...doc.data(), id: doc.id }); // Make sure Firebase ID takes precedence!
+        sessions.push({ ...doc.data(), id: doc.id });
       });
-      console.log(
-        `📡 [Real-time Listener] Sessions updated: ${sessions.length} total`,
-      );
-      // ONLY this callback should update studyHistory - no periodic refresh
       callback(sessions);
     } catch (error) {
       console.error("Error processing sessions snapshot:", error);
@@ -197,7 +191,6 @@ export const deleteSessionFromFirebase = async (sessionId) => {
     console.log(`Attempting to delete session: ${sessionId}`);
     const docRef = doc(db, "sessions", sessionId);
     await deleteDoc(docRef);
-    console.log(`Session deleted successfully: ${sessionId}`);
   } catch (error) {
     console.error(`Error deleting session ${sessionId}:`, error);
     throw error;

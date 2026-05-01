@@ -1,24 +1,22 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useChromeStorage } from "./useChromeStorage";
-import timerService from "../services/timerService";
 
-const UI_TICK_MS = 250;
+const UI_TICK_MS = 1000; // 1 second — timer only shows seconds, sub-second ticks are wasted cycles
 
 /**
- * A robust study timer hook that syncs with chrome.storage.local.
- * Now acts as a view-only listener that updates the UI based on background state.
+ * A robust study timer hook.
+ * Performance-optimized: high-frequency state lives in refs (not storage),
+ * storage is only written on start/pause/stop transitions.
  */
 export const useStudyTimer = () => {
-  // Sync state with chrome.storage.local (or localStorage fallback)
+  // Persisted state — only read on mount, written on state transitions
   const [persistedIsRunning, setPersistedIsRunning] = useChromeStorage(
     "study_isRunning",
     false,
   );
-  const [accumulatedTime, setAccumulatedTime] = useChromeStorage(
-    "study_accumulatedTime",
-    0,
-  );
-  const [startTimeOfSegment, setStartTimeOfSegment] = useChromeStorage(
+  const [persistedAccumulatedTime, setPersistedAccumulatedTime] =
+    useChromeStorage("study_accumulatedTime", 0);
+  const [persistedSegmentStart, setPersistedSegmentStart] = useChromeStorage(
     "study_segmentStart",
     null,
   );
@@ -26,154 +24,176 @@ export const useStudyTimer = () => {
     "study_sessionStart",
     null,
   );
-
-  // Add the maximum session length setting (default 2 hours)
   const [maxSessionLengthHours] = useChromeStorage(
     "study_maxSessionLengthHours",
     2,
   );
 
-  // Local UI State
+  // High-frequency refs — these change every tick but never hit storage
+  const isRunningRef = useRef(false);
+  const accumulatedTimeRef = useRef(0);
+  const segmentStartRef = useRef(null);
+  const maxMsRef = useRef(2 * 60 * 60 * 1000);
+
+  // UI state — only this triggers re-renders
   const [isSessionRunning, setIsSessionRunning] = useState(false);
   const [sessionDisplayTime, setSessionDisplayTime] = useState(0);
 
-  // Sync isSessionRunning with persisted state
+  // Sync persisted values into refs on load
   useEffect(() => {
+    isRunningRef.current = persistedIsRunning;
     setIsSessionRunning(persistedIsRunning);
   }, [persistedIsRunning]);
 
-  // Main tick logic to update the display
-  const tick = useCallback(() => {
-    if (persistedIsRunning && startTimeOfSegment) {
-      let currentElapsed = Date.now() - startTimeOfSegment + accumulatedTime;
-      const maxMs = maxSessionLengthHours * 60 * 60 * 1000;
+  useEffect(() => {
+    accumulatedTimeRef.current = persistedAccumulatedTime;
+  }, [persistedAccumulatedTime]);
 
-      // If we go over the limit, force a pause and cap the time
-      if (currentElapsed >= maxMs) {
-        setSessionDisplayTime(maxMs);
-        setAccumulatedTime(maxMs);
-        setPersistedIsRunning(false);
-        setStartTimeOfSegment(null);
-      } else {
-        setSessionDisplayTime(currentElapsed);
-      }
-    } else {
-      setSessionDisplayTime(accumulatedTime);
-    }
-  }, [
-    persistedIsRunning,
-    startTimeOfSegment,
-    accumulatedTime,
-    maxSessionLengthHours,
-    setAccumulatedTime,
-    setPersistedIsRunning,
-    setStartTimeOfSegment,
-  ]);
+  useEffect(() => {
+    segmentStartRef.current = persistedSegmentStart;
+  }, [persistedSegmentStart]);
 
-  // Timer actions - now interacting with timerService if needed,
-  // though for stopwatch mode we mostly just update storage directly since it doesn't need alarms as much.
-  // But we use the service for consistency.
+  useEffect(() => {
+    maxMsRef.current = maxSessionLengthHours * 60 * 60 * 1000;
+  }, [maxSessionLengthHours]);
 
+  // Timer actions — write to storage only on transitions
   const startTimer = useCallback(() => {
-    if (persistedIsRunning) return;
+    if (isRunningRef.current) return;
 
     const now = Date.now();
-    setStartTimeOfSegment(now);
+    segmentStartRef.current = now;
+    isRunningRef.current = true;
+
+    // Persist the transition
+    setPersistedSegmentStart(now);
     if (!sessionStartTime) {
       setSessionStartTime(now);
     }
     setPersistedIsRunning(true);
-
-    // We could call timerService.start here if we want the service worker to track it with an alarm,
-    // but for a stopwatch, calculating based on startTime is sufficient even if service worker dies.
-    // We'll just update storage.
+    setIsSessionRunning(true);
   }, [
-    persistedIsRunning,
     sessionStartTime,
-    accumulatedTime,
     setPersistedIsRunning,
-    setStartTimeOfSegment,
+    setPersistedSegmentStart,
     setSessionStartTime,
   ]);
 
   const pauseTimer = useCallback(() => {
-    if (!persistedIsRunning) return;
+    if (!isRunningRef.current) return;
 
     const now = Date.now();
-    const segmentDuration = now - startTimeOfSegment;
-    const finalElapsed = accumulatedTime + segmentDuration;
+    const segmentDuration = now - (segmentStartRef.current || now);
+    const finalElapsed = accumulatedTimeRef.current + segmentDuration;
 
-    setAccumulatedTime(finalElapsed);
-    setStartTimeOfSegment(null);
+    // Update refs immediately
+    accumulatedTimeRef.current = finalElapsed;
+    segmentStartRef.current = null;
+    isRunningRef.current = false;
+
+    // Persist the transition
+    setPersistedAccumulatedTime(finalElapsed);
+    setPersistedSegmentStart(null);
     setPersistedIsRunning(false);
-  }, [
-    persistedIsRunning,
-    startTimeOfSegment,
-    accumulatedTime,
-    setAccumulatedTime,
-    setStartTimeOfSegment,
-    setPersistedIsRunning,
-  ]);
+    setIsSessionRunning(false);
+    setSessionDisplayTime(finalElapsed);
+  }, [setPersistedAccumulatedTime, setPersistedSegmentStart, setPersistedIsRunning]);
 
   const resetTimer = useCallback(() => {
-    setPersistedIsRunning(false);
-    setAccumulatedTime(0);
-    setStartTimeOfSegment(null);
-    setSessionStartTime(null);
+    // Update refs
+    isRunningRef.current = false;
+    accumulatedTimeRef.current = 0;
+    segmentStartRef.current = null;
+
+    // Update UI
+    setIsSessionRunning(false);
     setSessionDisplayTime(0);
+
+    // Persist
+    setPersistedIsRunning(false);
+    setPersistedAccumulatedTime(0);
+    setPersistedSegmentStart(null);
+    setSessionStartTime(null);
   }, [
     setPersistedIsRunning,
-    setAccumulatedTime,
-    setStartTimeOfSegment,
+    setPersistedAccumulatedTime,
+    setPersistedSegmentStart,
     setSessionStartTime,
   ]);
 
   const endSessionAndGetDuration = useCallback(() => {
-    let finalDuration = accumulatedTime;
+    let finalDuration = accumulatedTimeRef.current;
 
-    if (persistedIsRunning && startTimeOfSegment) {
-      finalDuration = Date.now() - startTimeOfSegment + accumulatedTime;
+    if (isRunningRef.current && segmentStartRef.current) {
+      finalDuration =
+        Date.now() - segmentStartRef.current + accumulatedTimeRef.current;
     }
 
-    const maxMs = maxSessionLengthHours * 60 * 60 * 1000;
+    const maxMs = maxMsRef.current;
     if (finalDuration > maxMs) {
       finalDuration = maxMs;
     }
 
     resetTimer();
     return finalDuration;
-  }, [
-    persistedIsRunning,
-    startTimeOfSegment,
-    accumulatedTime,
-    maxSessionLengthHours,
-    resetTimer,
-  ]);
+  }, [resetTimer]);
 
-  // Background Ticking Logic for UI
+  // UI tick — only updates the display state, never touches storage
   useEffect(() => {
-    let interval;
-    if (persistedIsRunning) {
-      tick(); // Initial sync
-      interval = setInterval(tick, UI_TICK_MS);
-    } else {
-      tick(); // Final sync
+    if (!isRunningRef.current) {
+      // Show accumulated time when paused
+      setSessionDisplayTime(accumulatedTimeRef.current);
+      return;
     }
-    return () => clearInterval(interval);
-  }, [persistedIsRunning, tick]);
 
-  // Listen for storage changes from background (if any)
+    const tick = () => {
+      if (!isRunningRef.current || !segmentStartRef.current) return;
+
+      const elapsed =
+        Date.now() - segmentStartRef.current + accumulatedTimeRef.current;
+      const maxMs = maxMsRef.current;
+
+      if (elapsed >= maxMs) {
+        // Auto-pause at max
+        accumulatedTimeRef.current = maxMs;
+        segmentStartRef.current = null;
+        isRunningRef.current = false;
+
+        setSessionDisplayTime(maxMs);
+        setIsSessionRunning(false);
+        setPersistedAccumulatedTime(maxMs);
+        setPersistedIsRunning(false);
+        setPersistedSegmentStart(null);
+      } else {
+        setSessionDisplayTime(elapsed);
+      }
+    };
+
+    tick(); // Immediate first tick
+    const interval = setInterval(tick, UI_TICK_MS);
+    return () => clearInterval(interval);
+  }, [isSessionRunning, setPersistedAccumulatedTime, setPersistedIsRunning, setPersistedSegmentStart]);
+
+  // Listen for storage changes from background (Chrome extension only)
   useEffect(() => {
     const handleStorageChange = (changes, area) => {
       if (area === "local") {
-        if (changes.study_isRunning)
-          setPersistedIsRunning(changes.study_isRunning.newValue);
-        if (changes.study_accumulatedTime)
-          setAccumulatedTime(changes.study_accumulatedTime.newValue);
-        if (changes.study_segmentStart)
-          setStartTimeOfSegment(changes.study_segmentStart.newValue);
-        if (changes.study_sessionStart)
+        if (changes.study_isRunning) {
+          const val = changes.study_isRunning.newValue;
+          isRunningRef.current = val;
+          setPersistedIsRunning(val);
+        }
+        if (changes.study_accumulatedTime) {
+          accumulatedTimeRef.current = changes.study_accumulatedTime.newValue;
+          setPersistedAccumulatedTime(changes.study_accumulatedTime.newValue);
+        }
+        if (changes.study_segmentStart) {
+          segmentStartRef.current = changes.study_segmentStart.newValue;
+          setPersistedSegmentStart(changes.study_segmentStart.newValue);
+        }
+        if (changes.study_sessionStart) {
           setSessionStartTime(changes.study_sessionStart.newValue);
+        }
       }
     };
 
@@ -183,8 +203,8 @@ export const useStudyTimer = () => {
     }
   }, [
     setPersistedIsRunning,
-    setAccumulatedTime,
-    setStartTimeOfSegment,
+    setPersistedAccumulatedTime,
+    setPersistedSegmentStart,
     setSessionStartTime,
   ]);
 

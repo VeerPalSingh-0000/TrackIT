@@ -7,7 +7,6 @@ import React, {
   Suspense,
 } from "react";
 import { useAuth } from "./contexts/AuthContext";
-import { motion, AnimatePresence } from "framer-motion";
 import toast, { Toaster } from "react-hot-toast";
 import audioService from "./services/audioService";
 import { preloadNativeFeedback } from "./services/nativeBridge";
@@ -360,11 +359,6 @@ const StudyTracker = () => {
 
   const handleSelection = useCallback(
     (project, topic = null, subTopic = null) => {
-      console.log("🎯 handleSelection called with:", {
-        project: project?.name,
-        topic: topic?.name,
-        subTopic: subTopic?.name,
-      });
       const isRunning =
         timerMode === "stopwatch"
           ? stopwatch.isSessionRunning
@@ -579,8 +573,7 @@ const StudyTracker = () => {
           </div>
         </main>
 
-        <AnimatePresence>
-          <Suspense fallback={<LoadingScreen message="" overlay={true} />}>
+        <Suspense fallback={<LoadingScreen message="" overlay={true} />}>
             {activeModal === "selection" && (
               <SelectionModal
                 projects={projects}
@@ -634,8 +627,7 @@ const StudyTracker = () => {
             {activeModal === "settings" && (
               <SettingsModal onClose={() => setActiveModal(null)} />
             )}
-          </Suspense>
-        </AnimatePresence>
+        </Suspense>
       </div>
     </>
   );
