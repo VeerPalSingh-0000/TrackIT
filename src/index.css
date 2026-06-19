@@ -466,3 +466,27 @@ body.extension-mode .home-shell {
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   height: 55px;
 }
+
+/* --- LANDING PAGE STYLES --- */
+/* Smooth scroll offset for fixed navbar */
+[id] {
+  scroll-margin-top: 100px;
+}
+
+/* Animated gradient text shimmer */
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.landing-gradient-text {
+  background-size: 200% 200%;
+  animation: gradient-shift 6s ease infinite;
+}

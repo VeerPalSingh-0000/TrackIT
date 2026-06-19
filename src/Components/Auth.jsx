@@ -1,8 +1,16 @@
 import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import TrackerLogo from "/clock.png?url";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, Lock, ArrowRight, Loader2, AlertCircle } from "lucide-react";
+import {
+  Mail,
+  Lock,
+  ArrowRight,
+  ArrowLeft,
+  Loader2,
+  AlertCircle,
+  Clock,
+  Sparkles,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const GoogleIcon = (props) => (
@@ -35,24 +43,29 @@ const GoogleIcon = (props) => (
   </svg>
 );
 
+/* ───────── Input Field ───────── */
 const InputField = ({ icon: Icon, ...props }) => (
   <div className="relative group">
-    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500 group-focus-within:text-indigo-500 transition-colors">
+    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[var(--color-slate-500)] group-focus-within:text-[var(--color-emerald-500)] transition-colors duration-300">
       <Icon className="h-5 w-5" />
     </div>
     <input
       {...props}
       className={cn(
-        "w-full bg-zinc-950/50 border border-zinc-800 rounded-xl py-3.5 pl-11 pr-4",
-        "text-zinc-100 placeholder:text-zinc-500 text-sm font-medium",
-        "focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-zinc-900",
-        "transition-all duration-200 ease-out",
+        "w-full bg-[var(--color-slate-900)]/50 border border-[var(--color-slate-700)] rounded-xl py-3.5 pl-11 pr-4",
+        "text-[var(--color-slate-300)] placeholder:text-[var(--color-slate-500)] text-sm font-medium",
+        "focus:outline-none focus:ring-2 focus:ring-[var(--color-emerald-500)]/50 focus:border-[var(--color-emerald-500)] focus:bg-[var(--color-slate-900)]/80",
+        "transition-all duration-300 ease-out",
+        "hover:border-[var(--color-slate-600)]"
       )}
     />
   </div>
 );
 
-const Auth = () => {
+/* ═══════════════════════════════════════════════
+   AUTH COMPONENT
+   ═══════════════════════════════════════════════ */
+const Auth = ({ onBack }) => {
   const [isLogin, setIsLogin] = useState(true);
   const { signup, login, loginWithGoogle } = useAuth();
 
@@ -116,46 +129,71 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-zinc-950 p-4 font-sans selection:bg-indigo-500/30">
+    <div className="min-h-screen w-full flex items-center justify-center bg-[var(--color-slate-950)] p-4 font-sans selection:bg-[var(--color-emerald-500)]/30 relative overflow-hidden transition-colors duration-500">
+
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-[400px]"
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full max-w-[420px] relative z-10"
       >
-        <div className="bg-zinc-900 border border-zinc-800/80 rounded-2xl p-8 shadow-2xl relative overflow-hidden">
-          {/* Header */}
-          <div className="flex flex-col items-center text-center mb-8">
-            <div className="mb-6 p-3 bg-zinc-800/50 rounded-xl flex items-center justify-center border border-zinc-700/50 shadow-inner">
-              <img
-                src={TrackerLogo}
-                alt="FocusFlow"
-                className="h-8 w-8 object-contain"
-              />
-            </div>
-            <motion.h1
-              key={isLogin ? "login" : "signup"}
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-2xl font-bold text-zinc-100 tracking-tight mb-2"
+        {/* ─── Back Button (outside card) ─── */}
+        {onBack && (
+          <motion.button
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            type="button"
+            onClick={onBack}
+            className="mb-5 flex items-center gap-2 text-[var(--color-slate-500)] hover:text-[var(--color-slate-300)] transition-colors group"
+          >
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+            <span className="text-sm font-medium">Back to home</span>
+          </motion.button>
+        )}
+
+        {/* ─── Card ─── */}
+        <div className="relative bg-[var(--color-slate-900)]/90 backdrop-blur-xl border border-[var(--color-slate-700)] rounded-3xl p-8 shadow-2xl overflow-hidden transition-colors duration-500">
+          
+          {/* ─── Header ─── */}
+          <div className="flex flex-col items-center text-center mb-8 relative z-10">
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.15, ease: "easeOut" }}
+              className="mb-5 w-14 h-14 rounded-2xl bg-[var(--color-emerald-500)] flex items-center justify-center shadow-lg shadow-[var(--color-emerald-500)]/20 transition-colors duration-500"
             >
-              {isLogin ? "Welcome back" : "Create an account"}
-            </motion.h1>
-            <p className="text-zinc-400 text-sm">
-              {isLogin
-                ? "Enter your credentials to access your account"
-                : "Sign up to start tracking your focused time"}
-            </p>
+              <Clock className="w-7 h-7 text-btn" strokeWidth={1.8} />
+            </motion.div>
+
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={isLogin ? "login-header" : "signup-header"}
+                initial={{ opacity: 0, y: -12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 12 }}
+                transition={{ duration: 0.3 }}
+              >
+                <h1 className="text-2xl font-bold text-[var(--color-white)] tracking-tight mb-1.5 transition-colors duration-500">
+                  {isLogin ? "Welcome back" : "Create your account"}
+                </h1>
+                <p className="text-[var(--color-slate-400)] text-sm transition-colors duration-500">
+                  {isLogin
+                    ? "Sign in to continue your focus journey"
+                    : "Start tracking your study sessions for free"}
+                </p>
+              </motion.div>
+            </AnimatePresence>
           </div>
 
-          {/* Error Message */}
+          {/* ─── Error Message ─── */}
           <AnimatePresence mode="wait">
             {error && (
               <motion.div
                 initial={{ opacity: 0, height: 0, marginBottom: 0 }}
-                animate={{ opacity: 1, height: "auto", marginBottom: 24 }}
+                animate={{ opacity: 1, height: "auto", marginBottom: 20 }}
                 exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-                className="bg-rose-500/10 border border-rose-500/20 text-rose-400 p-3 rounded-xl flex items-start gap-3 text-sm overflow-hidden"
+                className="bg-[var(--color-destructive)]/10 border border-[var(--color-destructive)]/30 text-[var(--color-destructive)] p-3.5 rounded-xl flex items-start gap-3 text-sm overflow-hidden"
               >
                 <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
                 <span className="leading-relaxed">{error}</span>
@@ -163,8 +201,34 @@ const Auth = () => {
             )}
           </AnimatePresence>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {/* ─── Google Button (first for better UX) ─── */}
+          <button
+            type="button"
+            onClick={handleGoogle}
+            disabled={isLoading}
+            className={cn(
+              "w-full bg-[var(--color-slate-950)]/50 hover:bg-[var(--color-slate-800)] border border-[var(--color-slate-700)] text-[var(--color-slate-300)] rounded-xl py-3.5 px-4 font-medium text-sm",
+              "flex items-center justify-center gap-3 transition-all duration-300 active:scale-[0.98]",
+              "disabled:opacity-50 disabled:active:scale-100",
+              "focus:ring-2 focus:ring-[var(--color-emerald-500)]/20 focus:outline-none",
+              "hover:border-[var(--color-slate-600)] hover:text-[var(--color-white)]"
+            )}
+          >
+            <GoogleIcon />
+            Continue with Google
+          </button>
+
+          {/* ─── Divider ─── */}
+          <div className="my-6 flex items-center gap-4">
+            <div className="h-px flex-1 bg-[var(--color-slate-700)]" />
+            <span className="text-[var(--color-slate-500)] text-xs font-medium uppercase tracking-wider">
+              or
+            </span>
+            <div className="h-px flex-1 bg-[var(--color-slate-700)]" />
+          </div>
+
+          {/* ─── Form ─── */}
+          <form onSubmit={handleSubmit} className="space-y-3.5">
             <InputField
               type="email"
               placeholder="Email address"
@@ -186,61 +250,52 @@ const Auth = () => {
               type="submit"
               disabled={isLoading}
               className={cn(
-                "w-full bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl py-3.5 px-4 font-medium text-sm",
-                "flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98]",
-                "disabled:opacity-50 disabled:active:scale-100 mt-2 shadow-sm focus:ring-2 focus:ring-indigo-500/50 focus:outline-none",
+                "w-full bg-[var(--color-emerald-500)] hover:bg-[var(--color-emerald-600)] text-btn rounded-xl py-3.5 px-4 font-semibold text-sm",
+                "flex items-center justify-center gap-2 transition-all duration-300 active:scale-[0.97]",
+                "disabled:opacity-50 disabled:active:scale-100 mt-1",
+                "shadow-lg shadow-[var(--color-emerald-500)]/15 hover:shadow-xl hover:shadow-[var(--color-emerald-500)]/25",
+                "focus:ring-2 focus:ring-[var(--color-emerald-500)]/40 focus:outline-none"
               )}
             >
               {isLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin text-white" />
+                <Loader2 className="w-5 h-5 animate-spin text-btn" />
               ) : (
                 <>
-                  {isLogin ? "Sign In" : "Sign Up"}
+                  {isLogin ? "Sign In" : "Create Account"}
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </form>
 
-          {/* Divider */}
-          <div className="my-6 flex items-center gap-4">
-            <div className="h-px flex-1 bg-zinc-800" />
-            <span className="text-zinc-500 text-xs font-medium uppercase tracking-wider">
-              OR
-            </span>
-            <div className="h-px flex-1 bg-zinc-800" />
-          </div>
-
-          {/* Google Button */}
-          <button
-            type="button"
-            onClick={handleGoogle}
-            disabled={isLoading}
-            className={cn(
-              "w-full bg-zinc-950/50 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 rounded-xl py-3 px-4 font-medium text-sm",
-              "flex items-center justify-center gap-3 transition-all duration-200 active:scale-[0.98]",
-              "disabled:opacity-50 disabled:active:scale-100 focus:ring-2 focus:ring-zinc-700 focus:outline-none",
-            )}
-          >
-            <GoogleIcon />
-            Continue with Google
-          </button>
-
-          {/* Toggle Login/Signup */}
-          <div className="mt-8 text-center text-sm text-zinc-400">
-            {isLogin ? "Don't have an account? " : "Already have an account? "}
+          {/* ─── Toggle Login/Signup ─── */}
+          <div className="mt-7 text-center text-sm text-[var(--color-slate-400)]">
+            {isLogin
+              ? "Don't have an account? "
+              : "Already have an account? "}
             <button
               type="button"
               onClick={() => {
                 setError("");
                 setIsLogin(!isLogin);
               }}
-              className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors focus:outline-none focus:underline"
+              className="text-[var(--color-emerald-500)] hover:text-[var(--color-emerald-600)] font-semibold transition-colors focus:outline-none focus:underline"
             >
               {isLogin ? "Sign Up" : "Sign In"}
             </button>
           </div>
         </div>
+
+        {/* ─── Footer note ─── */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          className="mt-5 text-center text-xs text-[var(--color-slate-500)] flex items-center justify-center gap-1.5 transition-colors duration-500"
+        >
+          <Sparkles className="w-3 h-3 text-[var(--color-emerald-500)]" />
+          A simple space for deep work.
+        </motion.p>
       </motion.div>
     </div>
   );

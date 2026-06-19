@@ -151,7 +151,7 @@ const Navbar = React.memo(({
 
               <motion.button
                 onClick={onNewProjectClick}
-                className="hidden md:flex items-center gap-1.5 h-[34px] px-4 text-[13px] font-semibold text-[#000000] bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 rounded-full shadow-[0_2px_12px_rgba(16,185,129,0.25)] transition-all duration-300 focus:outline-none select-none"
+                className="hidden md:flex items-center gap-1.5 h-[34px] px-4 text-[13px] font-semibold text-btn bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 rounded-full shadow-[0_2px_12px_rgba(16,185,129,0.25)] transition-all duration-300 focus:outline-none select-none"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.93 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
@@ -252,7 +252,7 @@ const Navbar = React.memo(({
                                 }}
                                 className="overflow-hidden"
                               >
-                                <div className="flex items-center justify-between gap-1 py-2">
+                                <div className="flex items-center justify-between gap-1 py-2 px-1">
                                   {themes.map((theme) => (
                                     <motion.button
                                       key={theme.id}
@@ -267,7 +267,7 @@ const Navbar = React.memo(({
                                           : "border-[var(--color-slate-700)] hover:border-[var(--color-emerald-500)]/50"
                                       }`}
                                       style={{
-                                        background: `linear-gradient(135deg, ${theme.colors["--color-slate-950"]} 50%, ${theme.colors["--color-emerald-500"]} 50%)`,
+                                        background: theme.id === 'white-theme' ? '#ffffff' : theme.id === 'black-theme' ? '#000000' : theme.colors["--color-emerald-500"],
                                       }}
                                       whileHover={{ scale: 1.15 }}
                                       whileTap={{ scale: 0.9 }}
@@ -504,7 +504,7 @@ const Navbar = React.memo(({
                         }}
                         className="overflow-hidden"
                       >
-                        <div className="flex items-center gap-4 py-3">
+                        <div className="flex items-center gap-4 py-3 px-1">
                           {themes.map((theme) => (
                             <motion.button
                               key={theme.id}
@@ -518,7 +518,7 @@ const Navbar = React.memo(({
                                   : "border-transparent hover:border-white/20"
                               }`}
                               style={{
-                                background: `linear-gradient(135deg, ${theme.colors["--color-slate-900"]} 0%, ${theme.colors["--color-emerald-600"]} 100%)`,
+                                background: theme.id === 'white-theme' ? '#ffffff' : theme.id === 'black-theme' ? '#000000' : theme.colors["--color-emerald-500"],
                               }}
                               whileHover={{ scale: 1.15 }}
                               whileTap={{ scale: 0.9 }}
