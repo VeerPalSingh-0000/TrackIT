@@ -53,14 +53,14 @@ const FeatureCard = ({ icon: Icon, title, desc, index }) => {
       transition={{ duration: 0.6, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
       className="group relative"
     >
-      <div className="relative h-full bg-[var(--color-slate-900)]/60 backdrop-blur-sm border border-[var(--color-slate-800)] rounded-2xl p-6 sm:p-7 overflow-hidden transition-all duration-500 hover:border-[var(--color-slate-600)] hover:bg-[var(--color-slate-900)]/90 hover:shadow-xl hover:-translate-y-1">
+      <div className="relative h-full glass-card rounded-2xl p-6 sm:p-7 overflow-hidden transition-all duration-500 hover:border-white/20 hover:shadow-2xl hover:-translate-y-1">
         <div className="relative z-10">
           <div
             className="w-12 h-12 rounded-xl flex items-center justify-center mb-5 bg-[var(--color-emerald-500)]/10 text-[var(--color-emerald-500)] group-hover:bg-[var(--color-emerald-500)] group-hover:text-btn transition-all duration-300"
           >
             <Icon className="w-6 h-6" strokeWidth={1.5} />
           </div>
-          <h3 className="text-lg font-bold text-[var(--color-white)] mb-2 transition-colors">
+          <h3 className="text-lg font-bold text-white mb-2 transition-colors">
             {title}
           </h3>
           <p className="text-[var(--color-slate-400)] text-sm leading-relaxed transition-colors">
@@ -325,10 +325,75 @@ const LandingPage = ({ onGetStarted }) => {
             </button>
             <a
               href="#features"
-              className="px-8 py-4 bg-[var(--color-slate-900)]/60 border border-[var(--color-slate-700)] text-[var(--color-white)] text-base font-semibold rounded-2xl hover:bg-[var(--color-slate-800)] hover:border-[var(--color-slate-600)] transition-all duration-300"
+              className="px-8 py-4 glass-card-subtle text-white text-base font-semibold rounded-2xl hover:bg-white/5 transition-all duration-300"
             >
               See What It Does
             </a>
+          </motion.div>
+
+          {/* APP MOCKUP REPLACEMENT */}
+          <motion.div
+            initial={{ opacity: 0, y: 40, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.8, delay: 1, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-16 sm:mt-24 relative max-w-4xl mx-auto hidden sm:block"
+          >
+            <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-slate-950)] via-[var(--color-slate-950)]/40 to-transparent z-20 top-[50%] pointer-events-none"></div>
+            
+            <div className="relative rounded-3xl border border-white/10 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.6)] bg-[var(--color-slate-900)]/80 backdrop-blur-3xl aspect-[16/9] flex items-center justify-center p-8">
+              <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent z-0"></div>
+              
+              {/* Abstract Timer UI inside the mockup */}
+              <div className="relative z-10 w-full max-w-lg glass-card-elevated border border-white/10 rounded-[2rem] p-10 flex flex-col items-center justify-center shadow-2xl">
+                <div className="absolute top-6 left-6 flex items-center gap-2 text-[var(--color-slate-400)] text-sm font-medium">
+                  <Clock className="w-4 h-4" /> Focus Session
+                </div>
+                
+                <div className="mt-8 mb-6 relative flex items-center justify-center">
+                  <svg className="w-64 h-64 -rotate-90 transform" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="2" className="text-white/5" />
+                    <motion.circle 
+                      cx="50" cy="50" r="45" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      strokeWidth="2.5" 
+                      strokeLinecap="round"
+                      className="text-[var(--color-emerald-500)]"
+                      initial={{ strokeDasharray: "283", strokeDashoffset: "283" }}
+                      animate={{ strokeDashoffset: "70" }}
+                      transition={{ duration: 2, ease: "easeOut", delay: 1.5 }}
+                    />
+                  </svg>
+                  
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="font-mono text-5xl font-bold text-white tracking-tighter shadow-sm">
+                      25:00
+                    </span>
+                    <span className="text-[var(--color-slate-400)] text-sm mt-2 uppercase tracking-widest font-semibold">
+                      Focusing
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-6 mt-4">
+                  <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center opacity-50">
+                    <div className="w-4 h-4 bg-white/30 rounded-[2px]"></div>
+                  </div>
+                  <div className="w-16 h-16 rounded-full bg-[var(--color-emerald-500)]/20 border border-[var(--color-emerald-500)]/30 flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+                    <div className="flex gap-1.5">
+                      <div className="w-1.5 h-5 bg-[var(--color-emerald-400)] rounded-full"></div>
+                      <div className="w-1.5 h-5 bg-[var(--color-emerald-400)] rounded-full"></div>
+                    </div>
+                  </div>
+                  <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center opacity-50">
+                    <ArrowRight className="w-5 h-5 text-white/50" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Glowing orbs behind mockup */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-[var(--color-emerald-500)]/20 blur-[120px] rounded-full -z-10"></div>
           </motion.div>
 
           {/* Scroll indicator */}
@@ -453,7 +518,7 @@ const LandingPage = ({ onGetStarted }) => {
       <div className="relative px-4 sm:px-6 py-16 sm:py-20 border-t border-[var(--color-slate-900)]">
         <div className="max-w-4xl mx-auto">
           <AnimatedSection>
-            <div className="relative bg-[var(--color-slate-900)]/80 border border-[var(--color-slate-800)] rounded-3xl p-8 sm:p-12 overflow-hidden text-center">
+            <div className="relative glass-card-elevated rounded-3xl p-8 sm:p-12 overflow-hidden text-center">
               <div className="w-14 h-14 mx-auto rounded-2xl bg-[var(--color-emerald-500)]/10 border border-[var(--color-emerald-500)]/20 flex items-center justify-center mb-5">
                 <Github className="w-7 h-7 text-[var(--color-emerald-500)]" strokeWidth={1.5} />
               </div>
@@ -466,10 +531,10 @@ const LandingPage = ({ onGetStarted }) => {
                 better.
               </p>
               <a
-                href="https://github.com"
+                href="https://github.com/v818/FocusFlow"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--color-slate-950)] border border-[var(--color-slate-800)] text-[var(--color-white)] text-sm font-semibold rounded-xl hover:bg-[var(--color-slate-800)] hover:border-[var(--color-slate-700)] transition-all duration-300"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--color-slate-950)] border border-white/10 text-[var(--color-white)] text-sm font-semibold rounded-xl hover:bg-white/5 transition-all duration-300"
               >
                 <Github className="w-4 h-4" />
                 View on GitHub

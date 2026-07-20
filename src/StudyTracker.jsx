@@ -440,8 +440,22 @@ const StudyTracker = () => {
       <div
         className={`home-shell ${
           isExtensionPopup ? "extension-mode" : ""
-        } h-[100dvh] max-h-[100dvh] bg-[var(--color-slate-950)] text-[var(--color-slate-300)] flex flex-col relative overflow-hidden transition-colors duration-500`}
+        } h-[100dvh] max-h-[100dvh] bg-[var(--color-slate-950)] text-[var(--color-slate-300)] flex flex-col relative overflow-hidden transition-colors duration-700`}
       >
+        {/* Ambient Background Glows */}
+        <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+          <div 
+            className={`absolute top-[-20%] left-[-10%] w-[70vw] h-[70vw] md:w-[40vw] md:h-[40vw] rounded-full mix-blend-screen blur-[100px] md:blur-[120px] transition-all duration-1000 ${
+              isRunning ? "bg-[var(--color-emerald-500)]/30 scale-110" : "bg-indigo-500/10 scale-100"
+            }`}
+          />
+          <div 
+            className={`absolute bottom-[-20%] right-[-10%] w-[60vw] h-[60vw] md:w-[35vw] md:h-[35vw] rounded-full mix-blend-screen blur-[120px] md:blur-[140px] transition-all duration-1000 delay-150 ${
+              isRunning ? "bg-teal-500/20 scale-105" : "bg-purple-500/10 scale-100"
+            }`}
+          />
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 mix-blend-overlay"></div>
+        </div>
         {!isExtensionPopup ? (
           <Navbar
             onNewProjectClick={() => {

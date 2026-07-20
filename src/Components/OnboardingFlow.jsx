@@ -106,13 +106,13 @@ const OnboardingFlow = ({ onFinish, onCancel, projectToEdit = null }) => {
   return (
     <AnimatedModal onClose={onCancel}>
         {/* Header: Title and progress bar */}
-        <div className="p-4 sm:p-6 border-b border-[var(--color-slate-700)] flex-shrink-0">
-          <h2 className="text-xl sm:text-2xl font-bold text-[var(--color-white)] text-center">
+        <div className="p-6 sm:p-8 border-b border-white/[0.06] bg-gradient-to-b from-white/[0.03] to-transparent flex-shrink-0">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white text-center tracking-tight">
             {isEditMode ? 'Edit Project' : 'Create New Project'}
           </h2>
-          <div className="w-full bg-[var(--color-slate-700)] rounded-full h-2.5 mt-4">
+          <div className="w-full max-w-sm mx-auto bg-slate-800/50 rounded-full h-1 mt-6 overflow-hidden shadow-inner">
             <motion.div
-              className="bg-indigo-500 h-2.5 rounded-full"
+              className="bg-emerald-400 h-1 rounded-full shadow-[0_0_12px_rgba(52,211,153,0.8)]"
               initial={{ width: '0%' }}
               animate={{ width: step === 1 ? '50%' : '100%' }}
               transition={{ type: 'spring', stiffness: 100 }}
@@ -124,94 +124,99 @@ const OnboardingFlow = ({ onFinish, onCancel, projectToEdit = null }) => {
         <div className="flex-1 overflow-y-auto p-4 sm:p-8">
           <AnimatePresence mode="wait">
              {step === 1 && (
-              <motion.div key="step1" variants={stepVariants} initial="hidden" animate="visible" exit="exit">
-                <h3 className="text-lg sm:text-xl font-semibold text-center text-[var(--color-emerald-500)] mb-6">Project Details</h3>
+              <motion.div key="step1" variants={stepVariants} initial="hidden" animate="visible" exit="exit" className="max-w-xl mx-auto mt-4 sm:mt-8">
                 <div className="space-y-6">
-                  <input
-                    type="text"
-                    placeholder="Project Name (e.g., Learn React)"
-                    value={projectSetup.name}
-                    onChange={(e) => setProjectSetup({ ...projectSetup, name: e.target.value })}
-                    className="w-full p-3 sm:p-4 rounded-xl text-base sm:text-lg bg-[var(--color-slate-800)]/50 border-2 border-[var(--color-slate-700)] text-[var(--color-white)] focus:border-[var(--color-emerald-500)] outline-none transition placeholder:[var(--color-slate-400)]"
-                  />
-                  <textarea
-                    placeholder="Project Description (Optional)"
-                    value={projectSetup.description}
-                    onChange={(e) => setProjectSetup({ ...projectSetup, description: e.target.value })}
-                    className="w-full p-3 sm:p-4 rounded-xl text-base sm:text-lg bg-[var(--color-slate-800)]/50 border-2 border-[var(--color-slate-700)] text-[var(--color-white)] h-24 resize-none focus:border-[var(--color-emerald-500)] outline-none transition placeholder:[var(--color-slate-400)]"
-                  />
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2 ml-1">Project Name</label>
+                    <input
+                      type="text"
+                      placeholder="e.g., Learn React"
+                      value={projectSetup.name}
+                      onChange={(e) => setProjectSetup({ ...projectSetup, name: e.target.value })}
+                      className="w-full p-4 rounded-2xl text-base sm:text-lg bg-white/[0.02] border border-white/10 text-white focus:border-emerald-500 focus:bg-white/[0.04] focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all placeholder:text-slate-500 shadow-inner"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2 ml-1">Description <span className="opacity-50 text-slate-400">(Optional)</span></label>
+                    <textarea
+                      placeholder="What is this project about?"
+                      value={projectSetup.description}
+                      onChange={(e) => setProjectSetup({ ...projectSetup, description: e.target.value })}
+                      className="w-full p-4 rounded-2xl text-base sm:text-lg bg-white/[0.02] border border-white/10 text-white h-32 resize-none focus:border-emerald-500 focus:bg-white/[0.04] focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all placeholder:text-slate-500 shadow-inner"
+                    />
+                  </div>
                 </div>
               </motion.div>
             )}
             
              {step === 2 && (
               <motion.div key="step2" variants={stepVariants} initial="hidden" animate="visible" exit="exit">
-                <h3 className="text-lg sm:text-xl font-semibold text-center text-[var(--color-emerald-500)] mb-6">Edit Topics & Sub-Topics</h3>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
                   {/* Input Column */ }
-                  <div className="bg-[var(--color-slate-900)]/40 p-4 sm:p-6 rounded-2xl space-y-4 border border-[var(--color-slate-700)]/50">
-                    <h3 className="font-bold text-lg sm:text-xl text-[var(--color-white)]">Add New Topic</h3>
-                    <input
-                      type="text"
-                      placeholder="Topic Name (e.g., Hooks)"
-                      value={currentTopic.name}
-                      onChange={(e) => setCurrentTopic({ ...currentTopic, name: e.target.value })}
-                      className="w-full p-3 rounded-lg bg-[var(--color-slate-800)]/50 border border-[var(--color-slate-700)] text-[var(--color-white)] focus:border-[var(--color-emerald-500)] outline-none"
-                    />
+                  <div className="bg-white/[0.02] p-5 sm:p-7 rounded-3xl space-y-6 border border-white/5 backdrop-blur-sm shadow-[0_4px_24px_rgba(0,0,0,0.2)]">
+                    <h3 className="font-semibold text-lg text-white">Add New Topic</h3>
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Topic Name (e.g., Hooks)"
+                        value={currentTopic.name}
+                        onChange={(e) => setCurrentTopic({ ...currentTopic, name: e.target.value })}
+                        className="w-full p-4 rounded-xl bg-white/[0.03] border border-white/10 text-white focus:border-emerald-500 focus:bg-white/[0.05] focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all placeholder:text-slate-500 shadow-inner"
+                      />
+                    </div>
 
-                    <div className="bg-[var(--color-slate-800)]/30 p-4 rounded-lg">
-                      <h4 className="text-sm font-bold text-[var(--color-slate-400)] mb-3">Add Sub-Topics</h4>
-                      <div className="flex flex-col sm:flex-row gap-2 mb-3">
+                    <div className="bg-black/20 border border-white/5 p-5 rounded-2xl">
+                      <h4 className="text-xs font-semibold text-slate-400 mb-3 uppercase tracking-wider">Sub-Topics</h4>
+                      <div className="flex flex-col sm:flex-row gap-3 mb-3">
                         <input
                           type="text"
-                          placeholder="Sub-Topic Name (e.g., useState)"
+                          placeholder="e.g., useState"
                           value={currentSubTopicName}
                           onChange={(e) => setCurrentSubTopicName(e.target.value)}
                           onKeyPress={(e) => handleKeyPress(e, addSubTopic)}
-                          className="w-full px-3 py-2 rounded bg-[var(--color-slate-900)]/50 border border-[var(--color-slate-700)] text-[var(--color-white)] focus:border-[var(--color-emerald-500)] outline-none text-sm sm:text-base"
+                          className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/10 text-white focus:border-emerald-500 focus:bg-white/[0.05] outline-none text-sm transition-all placeholder:text-slate-500 shadow-inner"
                         />
-                        <button onClick={addSubTopic} disabled={!currentSubTopicName.trim()} className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-[var(--color-emerald-600)] text-btn rounded-lg hover:bg-[var(--color-emerald-500)] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-[var(--color-emerald-600)]/20">
+                        <button onClick={addSubTopic} disabled={!currentSubTopicName.trim()} className="w-full sm:w-auto px-5 py-3 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center border border-white/10 font-medium active:scale-95">
                           <FaPlus />
-                          <span className="sm:hidden">Add Sub-Topic</span>
                         </button>
                       </div>
                       <AnimatePresence>
                       {currentTopic.subTopics.length > 0 && (
-                        <motion.div layout className="space-y-2 max-h-32 overflow-y-auto p-1">
+                        <motion.div layout className="space-y-2 mt-4 max-h-32 overflow-y-auto p-1 scrollbar-hide">
                           {currentTopic.subTopics.map((st) => (
-                            <motion.div layout key={st.id} variants={listItemVariants} initial="hidden" animate="visible" exit="exit" className="flex items-center justify-between bg-[var(--color-slate-900)]/50 p-2 rounded">
-                              <span className="text-sm text-[var(--color-slate-300)] font-medium"> • {st.name}</span>
-                              <button onClick={() => removeSubTopic(st.id)} className="text-rose-400 hover:text-rose-300 p-1"><FaTrash className="text-xs" /></button>
+                            <motion.div layout key={st.id} variants={listItemVariants} initial="hidden" animate="visible" exit="exit" className="flex items-center justify-between bg-white/[0.04] border border-white/5 p-3 rounded-xl shadow-sm">
+                              <span className="text-sm text-slate-200 font-medium"> • {st.name}</span>
+                              <button onClick={() => removeSubTopic(st.id)} className="text-rose-400/80 hover:text-rose-400 hover:bg-rose-400/10 p-2 rounded-lg transition-colors active:scale-90"><FaTrash className="text-xs" /></button>
                             </motion.div>
                           ))}
                         </motion.div>
                       )}
                       </AnimatePresence>
                     </div>
-                    <AnimatedButton onClick={addTopic} disabled={!currentTopic.name.trim()} className="w-full bg-[var(--color-emerald-600)] hover:bg-[var(--color-emerald-500)] text-btn shadow-lg shadow-[var(--color-emerald-600)]/20" icon={<FaPlus />}>Add Topic</AnimatedButton>
+                    <AnimatedButton variant="primary" onClick={addTopic} disabled={!currentTopic.name.trim()} className="w-full" icon={<FaPlus />}>Add Topic</AnimatedButton>
                   </div>
                   
                    {/* Display Column */ }
-                  <div className="bg-[var(--color-slate-900)]/40 p-4 sm:p-6 rounded-2xl flex flex-col min-h-[300px] border border-[var(--color-slate-700)]/50">
-                    <h3 className="font-bold text-lg sm:text-xl text-[var(--color-white)] mb-4 flex-shrink-0">Project Structure</h3>
-                    <div className="space-y-3 flex-grow overflow-y-auto p-1">
+                  <div className="bg-white/[0.02] p-5 sm:p-7 rounded-3xl flex flex-col min-h-[350px] border border-white/5 backdrop-blur-sm shadow-[0_4px_24px_rgba(0,0,0,0.2)]">
+                    <h3 className="font-semibold text-lg text-white mb-5 flex-shrink-0">Project Structure</h3>
+                    <div className="space-y-3 flex-grow overflow-y-auto p-1 scrollbar-hide">
                       {projectSetup.topics.length === 0 && (
-                        <div className="flex flex-col items-center justify-center h-full text-[var(--color-slate-400)] transition-colors">
-                          <FaFolderOpen className="text-3xl sm:text-4xl mb-4 opacity-50"/>
-                          <p className="font-medium">Your topics will appear here.</p>
+                        <div className="flex flex-col items-center justify-center h-full text-slate-500 transition-colors">
+                          <FaFolderOpen className="text-5xl mb-4 opacity-20"/>
+                          <p className="font-medium text-sm text-slate-400">Your topics will appear here.</p>
                         </div>
                       )}
                       <AnimatePresence>
                       {projectSetup.topics.map((t) => (
-                        <motion.div layout key={t.id} variants={listItemVariants} initial="hidden" animate="visible" exit="exit" className="bg-[var(--color-slate-800)] p-3 rounded-lg">
+                        <motion.div layout key={t.id} variants={listItemVariants} initial="hidden" animate="visible" exit="exit" className="bg-white/[0.03] border border-white/5 p-4 rounded-2xl shadow-sm hover:bg-white/[0.05] transition-colors">
                           <div className="flex items-center justify-between mb-2">
-                            <p className="font-bold text-[var(--color-emerald-500)] flex items-center gap-2 transition-colors"><FaBookmark />{t.name}</p>
-                            <button onClick={() => removeTopic(t.id)} className="text-rose-400 hover:text-rose-300 p-1"><FaTrash className="text-xs" /></button>
+                            <p className="font-bold text-emerald-400 flex items-center gap-3 transition-colors text-base"><FaBookmark className="opacity-80" />{t.name}</p>
+                            <button onClick={() => removeTopic(t.id)} className="text-rose-400/80 hover:text-rose-400 hover:bg-rose-400/10 p-2 rounded-lg transition-colors active:scale-90"><FaTrash className="text-sm" /></button>
                           </div>
                           {t.subTopics.length > 0 && (
-                            <div className="pl-4 space-y-1 border-l-2 border-[var(--color-slate-700)] ml-2 transition-colors">
+                            <div className="pl-6 space-y-2 border-l border-white/[0.08] ml-2.5 mt-3 transition-colors">
                                 {t.subTopics.map((st) => (
-                                    <p key={st.id} className="text-xs text-[var(--color-slate-400)] flex items-center gap-2 pt-1 font-medium transition-colors"><FaCheck className="text-[var(--color-emerald-400)] transition-colors" />{st.name}</p>
+                                    <p key={st.id} className="text-sm text-slate-300 flex items-center gap-2.5 font-medium transition-colors"><FaCheck className="text-emerald-500/60 text-[10px]" />{st.name}</p>
                                 ))}
                             </div>
                           )}
@@ -227,18 +232,18 @@ const OnboardingFlow = ({ onFinish, onCancel, projectToEdit = null }) => {
         </div>
 
          {/* Footer: Navigation buttons */}
-        <div className="p-4 sm:p-6 border-t border-[var(--color-slate-700)] flex justify-between items-center flex-shrink-0 transition-colors">
+        <div className="p-5 sm:p-6 border-t border-white/[0.06] bg-black/20 flex justify-between items-center flex-shrink-0 transition-colors">
             {step === 1 ? (
-                <AnimatedButton onClick={onCancel} className="bg-[var(--color-slate-700)] text-[var(--color-white)] hover:bg-[var(--color-slate-600)]">Cancel</AnimatedButton>
+                <AnimatedButton variant="ghost" onClick={onCancel} className="text-slate-300 hover:text-white px-6">Cancel</AnimatedButton>
             ) : (
-                <AnimatedButton onClick={() => setStep(1)} className="bg-[var(--color-slate-700)] text-[var(--color-white)] hover:bg-[var(--color-slate-600)] p-3 sm:px-4 sm:py-2" icon={<FaArrowLeft />}><span className="hidden sm:inline ml-2">Back</span></AnimatedButton>
+                <AnimatedButton variant="glass" onClick={() => setStep(1)} icon={<FaArrowLeft />} className="px-6 hover:bg-white/10"><span className="hidden sm:inline">Back</span></AnimatedButton>
             )}
 
             {step === 1 ? (
-                <AnimatedButton onClick={() => setStep(2)} disabled={!projectSetup.name.trim()} className="bg-[var(--color-emerald-600)] text-btn hover:bg-[var(--color-emerald-500)] p-3 sm:px-4 sm:py-2" icon={<FaArrowRight />}><span className="hidden sm:inline ml-2">Next</span></AnimatedButton>
+                <AnimatedButton variant="primary" onClick={() => setStep(2)} disabled={!projectSetup.name.trim()} icon={<FaArrowRight />} className="px-8 shadow-emerald-500/20"><span className="hidden sm:inline">Next</span></AnimatedButton>
             ) : (
-                <AnimatedButton onClick={handleFinish} disabled={!projectSetup.name.trim()} className="bg-[var(--color-emerald-600)] text-btn hover:bg-[var(--color-emerald-500)] p-3 sm:px-4 sm:py-2" icon={<FaCheck />}>
-                    <span className="hidden sm:inline ml-2">{isEditMode ? 'Save Changes' : 'Finish & Create'}</span>
+                <AnimatedButton variant="primary" onClick={handleFinish} disabled={!projectSetup.name.trim()} icon={<FaCheck />} className="px-8 shadow-emerald-500/20">
+                    <span className="hidden sm:inline">{isEditMode ? 'Save Changes' : 'Finish & Create'}</span>
                 </AnimatedButton>
             )}
         </div>

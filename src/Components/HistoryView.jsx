@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import AnimatedModal from "./ui/AnimatedModal";
 import ProjectSummaryCard from "./ProjectSummaryCard";
 import { FaCalendarDay } from "react-icons/fa";
+import StatsBar from "./ui/StatsBar";
+import StreakCalendar from "./ui/StreakCalendar";
 
 const listVariants = {
   hidden: { opacity: 0 },
@@ -56,9 +58,9 @@ const HistoryView = ({
 
   return (
     <AnimatedModal onClose={onClose}>
-      <div className="flex flex-col w-[90vw] h-[85vh] max-w-4xl bg-[var(--color-slate-950)]/80 backdrop-blur-3xl border border-white/[0.08] rounded-3xl shadow-2xl overflow-hidden motion-safe-gpu">
+      <div className="flex flex-col w-[90vw] h-[85vh] max-w-4xl glass-card-elevated border border-white/10 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] overflow-hidden motion-safe-gpu">
         {/* Sleek Header & Segmented Control */}
-        <div className="p-5 sm:p-6 border-b border-white/[0.05] flex flex-col sm:flex-row sm:justify-between sm:items-center gap-5 flex-shrink-0 bg-white/[0.01]">
+        <div className="p-5 sm:p-6 border-b border-white/10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-5 flex-shrink-0 bg-white/[0.02]">
           <h2 className="text-[20px] sm:text-[22px] font-semibold text-white text-center sm:text-left tracking-tight">
             Session History
           </h2>
@@ -106,6 +108,17 @@ const HistoryView = ({
                   animate="visible"
                   className="space-y-3"
                 >
+                  <motion.div variants={itemVariants}>
+                    <StatsBar studyHistory={studyHistory} formatTime={formatTime} />
+                  </motion.div>
+                  <motion.div variants={itemVariants}>
+                    <StreakCalendar studyHistory={studyHistory} />
+                  </motion.div>
+                  
+                  <motion.div variants={itemVariants}>
+                    <h3 className="text-white font-bold tracking-tight mb-2 mt-4 text-[15px]">Project Breakdown</h3>
+                  </motion.div>
+
                   {projects.map((p) => (
                     <motion.div key={p.id} variants={itemVariants}>
                       <ProjectSummaryCard
@@ -146,7 +159,7 @@ const HistoryView = ({
                       <motion.div
                         key={date}
                         variants={itemVariants}
-                        className="bg-white/[0.02] border border-white/[0.05] p-5 rounded-2xl flex justify-between items-center hover:bg-white/[0.04] transition-colors"
+                        className="bg-white/[0.03] border border-white/[0.05] p-5 rounded-2xl flex justify-between items-center hover:bg-white/[0.05] hover:border-white/10 transition-colors shadow-inner"
                       >
                         <h3 className="flex items-center gap-3 text-[15px] font-semibold text-white">
                           <FaCalendarDay className="text-[var(--color-emerald-500)] opacity-80" />
@@ -197,7 +210,7 @@ const HistoryView = ({
                         {groupedSessions[date].map((session) => (
                           <div
                             key={session.id}
-                            className="bg-white/[0.02] border border-white/[0.05] p-4 sm:p-5 rounded-2xl flex justify-between items-center hover:bg-white/[0.04] transition-colors"
+                            className="bg-white/[0.03] border border-white/[0.05] p-4 sm:p-5 rounded-2xl flex justify-between items-center hover:bg-white/[0.05] hover:border-white/10 transition-colors shadow-inner"
                           >
                             <div className="pr-4">
                               <p className="font-semibold text-white text-[14px] sm:text-[15px] leading-snug">

@@ -2,29 +2,29 @@ import React from "react";
 import { motion } from "framer-motion";
 
 const TimerModeToggle = React.memo(({ mode, setMode }) => (
-  <div className="home-mode-toggle relative flex p-1.5 rounded-full bg-slate-800/60 backdrop-blur-sm border border-white/[0.06] mb-8 sm:mb-10">
+  <div className="home-mode-toggle relative flex p-1.5 rounded-full glass-card-subtle mb-8 sm:mb-10 w-64 max-w-full">
     <motion.div
-      className="absolute top-1 bottom-1 rounded-full bg-gradient-to-r from-[var(--color-emerald-500)] to-[var(--color-emerald-600)] shadow-lg motion-safe-gpu"
+      className="absolute top-1.5 bottom-1.5 rounded-full bg-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.1)] border border-white/10"
       animate={{ x: mode === "stopwatch" ? 0 : "100%", width: "50%" }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      style={{ width: "calc(50% - 2px)", left: 2 }}
+      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+      style={{ width: "calc(50% - 6px)", left: 6 }}
     />
     <button
       onClick={() => setMode("stopwatch")}
-      className={`relative z-10 px-5 py-2.5 text-[14px] font-semibold rounded-full transition-colors duration-200 ${
+      className={`relative z-10 flex-1 px-5 py-2.5 text-[13px] uppercase tracking-wider font-bold rounded-full transition-colors duration-300 ${
         mode === "stopwatch"
-          ? "text-btn"
-          : "text-[var(--color-slate-400)] hover:text-[var(--color-slate-300)]"
+          ? "text-[var(--color-emerald-400)]"
+          : "text-[var(--color-slate-500)] hover:text-[var(--color-slate-300)]"
       }`}
     >
       Stopwatch
     </button>
     <button
       onClick={() => setMode("pomodoro")}
-      className={`relative z-10 px-5 py-2.5 text-[14px] font-semibold rounded-full transition-colors duration-200 ${
+      className={`relative z-10 flex-1 px-5 py-2.5 text-[13px] uppercase tracking-wider font-bold rounded-full transition-colors duration-300 ${
         mode === "pomodoro"
-          ? "text-btn"
-          : "text-[var(--color-slate-400)] hover:text-[var(--color-slate-300)]"
+          ? "text-[var(--color-emerald-400)]"
+          : "text-[var(--color-slate-500)] hover:text-[var(--color-slate-300)]"
       }`}
     >
       Pomodoro

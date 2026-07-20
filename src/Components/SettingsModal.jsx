@@ -21,13 +21,13 @@ const SettingsModal = ({ onClose }) => {
         initial={{ scale: 0.95, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.95, opacity: 0, y: 20 }}
-        className="w-full max-w-md bg-[var(--color-slate-900)] border border-[var(--color-slate-700)] rounded-3xl overflow-hidden shadow-2xl"
+        className="w-full max-w-md glass-card-elevated border border-white/10 rounded-3xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
       >
         <div className="p-6 sm:p-8">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/10">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-[var(--color-emerald-500)]/10 rounded-xl">
+              <div className="p-2.5 bg-[var(--color-emerald-500)]/10 border border-[var(--color-emerald-500)]/20 rounded-xl shadow-inner">
                 <FaCog className="text-[var(--color-emerald-400)] text-xl" />
               </div>
               <h2 className="text-2xl font-bold text-[var(--color-white)] tracking-tight">
@@ -36,7 +36,7 @@ const SettingsModal = ({ onClose }) => {
             </div>
             <button
               onClick={onClose}
-              className="p-2 text-[var(--color-slate-400)] hover:text-[var(--color-white)] hover:bg-[var(--color-slate-800)] rounded-full transition-colors focus:outline-none"
+              className="p-2 text-[var(--color-slate-400)] hover:text-[var(--color-white)] hover:bg-white/10 rounded-full transition-colors focus:outline-none"
             >
               <FaTimes className="text-lg" />
             </button>
@@ -61,8 +61,8 @@ const SettingsModal = ({ onClose }) => {
                     onClick={() => setMaxSessionLengthHours(hours)}
                     className={`py-2.5 px-4 rounded-xl text-sm font-semibold transition-all duration-200 border ${
                       maxSessionLengthHours === hours
-                        ? "bg-[var(--color-emerald-500)]/20 border-[var(--color-emerald-500)]/50 text-[var(--color-emerald-400)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]"
-                        : "bg-[var(--color-slate-800)]/50 border-[var(--color-slate-700)] text-[var(--color-slate-300)] hover:bg-[var(--color-slate-800)] hover:border-[var(--color-slate-600)]"
+                        ? "bg-[var(--color-emerald-500)]/20 border-[var(--color-emerald-500)]/50 text-[var(--color-emerald-400)] shadow-[0_0_15px_rgba(16,185,129,0.15)]"
+                        : "bg-white/5 border-white/5 text-[var(--color-slate-300)] hover:bg-white/10 hover:border-white/10"
                     }`}
                   >
                     {hours} {hours === 1 ? "Hour" : "Hours"}
@@ -73,10 +73,10 @@ const SettingsModal = ({ onClose }) => {
           </div>
 
           {/* Footer actions */}
-          <div className="mt-8 pt-6 border-t border-[var(--color-slate-800)]">
+          <div className="mt-8 pt-6 border-t border-white/10">
             <button
               onClick={onClose}
-              className="w-full py-3.5 bg-[var(--color-slate-800)] hover:bg-[var(--color-slate-700)] text-[var(--color-white)] text-[15px] font-semibold rounded-xl transition-all duration-200"
+              className="w-full py-3.5 bg-white/10 hover:bg-white/20 text-[var(--color-white)] text-[15px] font-bold rounded-xl transition-all duration-200 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] focus:outline-none"
             >
               Done
             </button>

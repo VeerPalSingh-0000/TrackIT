@@ -83,11 +83,11 @@ const DeleteHistoryModal = ({ studyHistory, deleteSession, onClose }) => {
 
   return (
     <AnimatedModal onClose={onClose}>
-      <div className="flex flex-col w-[90vw] h-[85vh] max-w-4xl bg-[var(--color-slate-950)]/80 backdrop-blur-3xl border border-white/[0.08] rounded-3xl shadow-2xl overflow-hidden motion-safe-gpu">
+      <div className="flex flex-col w-[90vw] h-[85vh] max-w-4xl glass-card-elevated border border-white/10 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] overflow-hidden motion-safe-gpu">
         {/* Header */}
-        <div className="p-5 sm:p-6 border-b border-white/[0.05] flex flex-col sm:flex-row sm:justify-between sm:items-center gap-5 flex-shrink-0 bg-white/[0.01]">
+        <div className="p-5 sm:p-6 border-b border-white/10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-5 flex-shrink-0 bg-white/[0.02]">
           <div>
-            <h2 className="text-[20px] sm:text-[22px] font-semibold text-white text-center sm:text-left tracking-tight">
+            <h2 className="text-[20px] sm:text-[22px] font-bold text-white text-center sm:text-left tracking-tight">
               Delete Session History
             </h2>
             <p className="text-[12px] text-[var(--color-slate-400)] mt-1 text-center sm:text-left">
@@ -126,7 +126,7 @@ const DeleteHistoryModal = ({ studyHistory, deleteSession, onClose }) => {
                       <motion.div
                         key={session.id}
                         variants={itemVariants}
-                        className="bg-white/[0.02] border border-white/[0.05] p-4 sm:p-5 rounded-2xl flex justify-between items-center hover:bg-white/[0.04] transition-colors group"
+                        className="bg-white/[0.03] border border-white/[0.05] p-4 sm:p-5 rounded-2xl flex justify-between items-center hover:bg-white/[0.05] hover:border-white/10 transition-colors group"
                       >
                         <div className="pr-4 flex-1">
                           <p className="font-semibold text-white text-[14px] sm:text-[15px] leading-snug">
@@ -191,7 +191,7 @@ const DeleteHistoryModal = ({ studyHistory, deleteSession, onClose }) => {
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-[var(--color-slate-950)] border border-white/[0.08] rounded-2xl p-6 max-w-sm w-[90%] shadow-2xl"
+                className="glass-card-elevated border border-white/10 rounded-3xl p-6 max-w-sm w-[90%] shadow-2xl"
               >
                 <h3 className="text-[18px] font-bold text-white mb-2">
                   Delete Session?

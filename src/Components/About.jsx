@@ -10,14 +10,14 @@ const About = ({ onClose }) => {
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="w-full max-w-2xl bg-[var(--color-slate-900)] border border-[var(--color-slate-700)] rounded-3xl shadow-2xl relative mx-4 max-h-[90dvh] flex flex-col overflow-hidden transition-colors"
+        className="w-full max-w-2xl glass-card-elevated rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] border border-white/10 relative mx-4 max-h-[90dvh] flex flex-col overflow-hidden transition-colors"
       >
         {/* Header - fixed at top */}
-        <div className="flex-shrink-0 p-6 sm:p-8 pb-4 sm:pb-6 relative border-b border-[var(--color-slate-700)]/50">
+        <div className="flex-shrink-0 p-6 sm:p-8 pb-4 sm:pb-6 relative border-b border-white/10 bg-white/[0.02]">
           <div className="absolute top-4 right-4 z-10">
             <button
               onClick={onClose}
-              className="p-2 text-[var(--color-slate-400)] hover:text-[var(--color-emerald-500)] transition-colors bg-[var(--color-slate-800)]/50 rounded-full"
+              className="p-2 text-[var(--color-slate-400)] hover:text-white transition-colors bg-white/5 hover:bg-white/10 rounded-full"
             >
               <FaTimes />
             </button>
@@ -26,7 +26,7 @@ const About = ({ onClose }) => {
           <div className="absolute top-0 right-0 -mt-20 -mr-20 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="flex items-center gap-3">
-            <div className="w-14 h-14 rounded-xl bg-[var(--color-slate-800)]/50 border border-[var(--color-slate-700)]/50 flex items-center justify-center p-2">
+            <div className="w-14 h-14 rounded-xl bg-[var(--color-emerald-500)]/10 border border-[var(--color-emerald-500)]/20 shadow-inner flex items-center justify-center p-2">
               <img
                 src={TrackerLogo}
                 alt="Logo"
@@ -45,10 +45,10 @@ const About = ({ onClose }) => {
         </div>
 
         {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6 text-[var(--color-slate-300)] leading-relaxed text-sm sm:text-base relative">
+        <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6 text-[var(--color-slate-300)] leading-relaxed text-sm sm:text-base relative bg-white/[0.01]">
           <div className="absolute top-1/2 -left-20 w-40 h-40 bg-[var(--color-emerald-500)]/10 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="bg-[var(--color-slate-800)]/30 border border-[var(--color-slate-700)]/50 p-5 rounded-2xl relative z-10 transition-colors">
+          <div className="bg-white/[0.03] border border-white/5 p-5 rounded-2xl relative z-10 transition-colors shadow-inner">
             <p className="mb-0 text-[var(--color-white)] font-medium">
               Welcome to <strong>FocusFlow</strong>, your ultimate companion for
               deep work, study sessions, and mindful productivity.
@@ -72,8 +72,8 @@ const About = ({ onClose }) => {
             </p>
           </div>
 
-          <div className="pt-4 border-t border-[var(--color-slate-700)]/50 relative z-10">
-            <h3 className="text-[var(--color-emerald-500)] font-bold mb-2">
+          <div className="pt-4 border-t border-white/10 relative z-10">
+            <h3 className="text-[var(--color-emerald-400)] font-bold mb-2">
               Our Core Philosophy
             </h3>
             <ul className="space-y-2 text-[var(--color-slate-400)]">

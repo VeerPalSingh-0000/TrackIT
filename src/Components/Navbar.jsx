@@ -111,8 +111,8 @@ const Navbar = React.memo(({
           transition={{ type: "tween", ease: "easeOut", duration: 0.5 }}
           className={`mx-auto max-w-5xl rounded-2xl transition-all duration-500 motion-safe-gpu ${
             scrolled
-              ? "bg-[var(--color-slate-900)]/70 backdrop-blur-2xl border border-[var(--color-slate-700)] shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
-              : "bg-[var(--color-slate-900)]/50 backdrop-blur-xl border border-[var(--color-slate-700)] shadow-[0_4px_24px_rgba(0,0,0,0.25)]"
+              ? "glass-card-elevated shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
+              : "glass-card shadow-[0_4px_24px_rgba(0,0,0,0.25)]"
           }`}
         >
           <div className="home-navbar-inner flex items-center justify-between h-[56px] max-[700px]:h-[50px] px-3 sm:px-4">
@@ -151,7 +151,7 @@ const Navbar = React.memo(({
 
               <motion.button
                 onClick={onNewProjectClick}
-                className="hidden md:flex items-center gap-1.5 h-[34px] px-4 text-[13px] font-semibold text-btn bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 rounded-full shadow-[0_2px_12px_rgba(16,185,129,0.25)] transition-all duration-300 focus:outline-none select-none"
+                className="hidden md:flex items-center gap-1.5 h-[34px] px-4 text-[13px] font-semibold text-btn bg-[var(--color-emerald-500)] hover:bg-[var(--color-emerald-600)] rounded-full shadow-[0_2px_12px_rgba(16,185,129,0.25)] transition-all duration-300 focus:outline-none select-none"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.93 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
@@ -195,7 +195,7 @@ const Navbar = React.memo(({
                         damping: 25,
                         stiffness: 250,
                       }}
-                      className="absolute right-0 mt-2.5 w-72 bg-[var(--color-slate-900)] backdrop-blur-2xl border border-[var(--color-slate-700)] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.5)] overflow-hidden origin-top-right"
+                      className="absolute right-0 mt-2.5 w-72 glass-card-elevated rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.5)] overflow-hidden origin-top-right"
                     >
                       {/* Dropdown Content */}
                       <div className="p-4 border-b border-[var(--color-slate-700)]/50">
@@ -375,7 +375,7 @@ const Navbar = React.memo(({
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "tween", ease: "circOut", duration: 0.3 }}
-              className="fixed top-0 right-0 bottom-0 z-[70] w-full max-w-[320px] bg-[var(--color-slate-950)]/95 border-l border-white/[0.05] flex flex-col md:hidden shadow-2xl motion-safe-gpu"
+              className="fixed top-0 right-0 bottom-0 z-[70] w-full max-w-[320px] glass-card-elevated border-l border-white/10 flex flex-col md:hidden shadow-2xl motion-safe-gpu"
             >
               {/* Header */}
               <div className="flex items-center justify-between h-[68px] px-6 safe-pt">
@@ -437,7 +437,7 @@ const Navbar = React.memo(({
                         <span className="text-[18px] opacity-50 flex justify-center w-5">
                           <FaMusic />
                         </span>
-                        Ambient Sounds
+                        Focus Sounds
                       </button>
                     }
                   />

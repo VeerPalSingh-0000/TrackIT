@@ -52,19 +52,19 @@ const TimerControls = React.memo(
     }, []);
 
     return (
-      <div className="flex items-center gap-3 sm:gap-4">
+      <div className="flex items-center gap-3 p-2 rounded-full glass-card border border-white/10 shadow-xl bg-[var(--color-slate-900)]/40 backdrop-blur-md transition-all duration-300">
         {/* Main Play/Pause Button */}
         <motion.button
           onPointerDown={handleStartPausePointerDown}
           onClick={handleStartPause}
-          className={`w-[72px] h-[72px] sm:w-24 sm:h-24 rounded-full text-btn font-bold text-xl sm:text-2xl flex items-center justify-center shadow-lg focus:outline-none focus:ring-4 touch-manipulation ${
+          className={`w-[60px] h-[60px] sm:w-[72px] sm:h-[72px] rounded-full text-btn font-bold text-xl sm:text-2xl flex items-center justify-center shadow-lg focus:outline-none focus:ring-2 touch-manipulation ${
             isRunning
-              ? "bg-amber-500 hover:bg-amber-600 focus:ring-amber-400/50"
-              : "bg-[var(--color-emerald-500)] hover:bg-[var(--color-emerald-600)]"
+              ? "bg-amber-500/90 hover:bg-amber-500 focus:ring-amber-400/50"
+              : "bg-[var(--color-emerald-500)]/90 hover:bg-[var(--color-emerald-500)] focus:ring-[var(--color-emerald-500)]/50"
           }`}
-          whileHover={{ scale: 1.06 }}
-          whileTap={{ scale: 0.92, y: 2 }}
-          transition={{ type: "spring", stiffness: 800, damping: 35 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
           aria-label={isRunning ? "Pause Timer" : "Start Timer"}
         >
           <AnimatePresence mode="wait">
@@ -73,9 +73,9 @@ const TimerControls = React.memo(
               initial={{ opacity: 0, scale: 0.6 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.6 }}
-              transition={{ duration: 0.1 }}
+              transition={{ duration: 0.15 }}
             >
-              {isRunning ? <FaPause /> : <FaPlay />}
+              {isRunning ? <FaPause className="ml-[1px]" /> : <FaPlay className="ml-1" />}
             </motion.div>
           </AnimatePresence>
         </motion.button>
@@ -84,24 +84,22 @@ const TimerControls = React.memo(
         <AnimatePresence>
           {hasStarted && (
             <motion.div
-              initial={{ opacity: 0, x: -15, scale: 0.9 }}
-              animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={{ opacity: 0, x: -15, scale: 0.9 }}
-              transition={{ type: "spring", stiffness: 700, damping: 32 }}
+              initial={{ opacity: 0, width: 0, scale: 0.8 }}
+              animate={{ opacity: 1, width: "auto", scale: 1 }}
+              exit={{ opacity: 0, width: 0, scale: 0.8 }}
+              transition={{ type: "spring", stiffness: 500, damping: 30 }}
+              className="overflow-hidden pr-2"
             >
-              <motion.div
-                whileHover={{ scale: 1.04 }}
-                whileTap={{ scale: 0.93, y: 1 }}
-                transition={{ type: "spring", stiffness: 800, damping: 35 }}
+              <motion.button
+                onPointerDown={handleStopResetPointerDown}
+                onClick={handleStopReset}
+                className="w-12 h-12 rounded-full flex items-center justify-center bg-[var(--color-slate-800)]/80 hover:bg-[var(--color-slate-700)] text-[var(--color-slate-300)] hover:text-white transition-colors"
+                whileHover={{ rotate: 15, scale: 1.05 }}
+                whileTap={{ scale: 0.9 }}
+                aria-label="Reset Timer"
               >
-                <AnimatedButton
-                  onPointerDown={handleStopResetPointerDown}
-                  onClick={handleStopReset}
-                  className="bg-[var(--color-slate-700)] hover:bg-[var(--color-slate-600)] text-[var(--color-white)] !px-4 !py-2.5 sm:!px-6 border border-[var(--color-slate-600)] shadow-lg"
-                  icon={<FaRedo className="text-sm" />}
-                  aria-label="Reset Timer"
-                />
-              </motion.div>
+                <FaRedo className="text-sm" />
+              </motion.button>
             </motion.div>
           )}
         </AnimatePresence>

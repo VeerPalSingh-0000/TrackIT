@@ -17,12 +17,13 @@ const CurrentTask = React.memo(({ project, topic, subTopic }) => {
   const taskName = parts.length > 0 ? parts.join(" › ") : "No Task Selected";
 
   return (
-    <div className="p-4 rounded-2xl bg-[var(--color-slate-900)]/40 backdrop-blur-sm border border-[var(--color-slate-700)]/40 w-full transition-colors">
-      <h3 className="text-[11px] font-semibold text-[var(--color-emerald-400)] uppercase tracking-[0.15em] mb-1.5 opacity-80">
+    <div className="px-5 py-3.5 rounded-2xl glass-card-elevated w-full transition-all duration-300 mx-auto max-w-sm">
+      <h3 className="text-[10px] font-bold text-[var(--color-emerald-400)] uppercase tracking-widest mb-1 opacity-90 flex items-center justify-center gap-1.5">
+        <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-emerald-400)] animate-pulse"></span>
         Current Task
       </h3>
       <p
-        className="text-base sm:text-lg font-semibold text-[var(--color-white)] truncate"
+        className="text-base sm:text-lg font-medium text-white truncate px-2"
         title={taskName}
       >
         {taskName}

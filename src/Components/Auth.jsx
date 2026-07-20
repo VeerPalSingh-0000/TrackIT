@@ -44,21 +44,25 @@ const GoogleIcon = (props) => (
 );
 
 /* ───────── Input Field ───────── */
-const InputField = ({ icon: Icon, ...props }) => (
+const InputField = ({ icon: Icon, label, ...props }) => (
   <div className="relative group">
-    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[var(--color-slate-500)] group-focus-within:text-[var(--color-emerald-500)] transition-colors duration-300">
+    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[var(--color-slate-500)] group-focus-within:text-[var(--color-emerald-500)] transition-colors duration-300 z-10">
       <Icon className="h-5 w-5" />
     </div>
     <input
       {...props}
+      placeholder=" " /* space required for peer-placeholder-shown to work */
       className={cn(
-        "w-full bg-[var(--color-slate-900)]/50 border border-[var(--color-slate-700)] rounded-xl py-3.5 pl-11 pr-4",
-        "text-[var(--color-slate-300)] placeholder:text-[var(--color-slate-500)] text-sm font-medium",
+        "peer w-full bg-[var(--color-slate-900)]/50 border border-[var(--color-slate-700)] rounded-xl pt-6 pb-2.5 pl-12 pr-4",
+        "text-[var(--color-slate-300)] text-sm font-medium",
         "focus:outline-none focus:ring-2 focus:ring-[var(--color-emerald-500)]/50 focus:border-[var(--color-emerald-500)] focus:bg-[var(--color-slate-900)]/80",
         "transition-all duration-300 ease-out",
         "hover:border-[var(--color-slate-600)]"
       )}
     />
+    <label className="absolute left-12 top-2 text-xs text-[var(--color-slate-500)] font-medium transition-all duration-300 peer-placeholder-shown:text-sm peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-[var(--color-slate-400)] peer-focus:top-2 peer-focus:text-xs peer-focus:text-[var(--color-emerald-500)] pointer-events-none">
+      {label}
+    </label>
   </div>
 );
 
@@ -129,15 +133,53 @@ const Auth = ({ onBack }) => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[var(--color-slate-950)] p-4 font-sans selection:bg-[var(--color-emerald-500)]/30 relative overflow-hidden transition-colors duration-500">
+    <div className="min-h-[100dvh] w-full flex bg-[var(--color-slate-950)] font-sans selection:bg-[var(--color-emerald-500)]/30 relative overflow-hidden transition-colors duration-500">
+      
+      {/* ─── Left Panel (Brand Showcase) ─── */}
+      <div className="hidden lg:flex flex-1 relative items-center justify-center border-r border-[var(--color-slate-800)]/60 bg-[var(--color-slate-900)]/40 overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute top-[20%] left-[20%] w-96 h-96 bg-[var(--color-emerald-500)]/20 rounded-full blur-[120px] mix-blend-screen animate-blob"></div>
+          <div className="absolute bottom-[20%] right-[20%] w-[30rem] h-[30rem] bg-indigo-500/10 rounded-full blur-[120px] mix-blend-screen animate-blob animation-delay-2000"></div>
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 mix-blend-overlay"></div>
+        </div>
+        
+        {/* Mockup / Content */}
+        <div className="relative z-10 w-full max-w-lg px-12">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="glass-card-elevated rounded-3xl p-2 relative shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+          >
+            <img src="/app-mockup.png" alt="FocusFlow Dashboard" className="w-full h-auto rounded-2xl opacity-90 object-cover" />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className="mt-12 text-center"
+          >
+            <h2 className="text-3xl font-bold text-white mb-4">Deep work made beautiful.</h2>
+            <p className="text-[var(--color-slate-400)] text-lg">Track your sessions, block distractions, and build real focus habits.</p>
+          </motion.div>
+        </div>
+      </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-[420px] relative z-10"
-      >
-        {/* ─── Back Button (outside card) ─── */}
+      {/* ─── Right Panel (Form) ─── */}
+      <div className="flex-1 flex flex-col items-center justify-center p-6 lg:p-12 relative bg-[var(--color-slate-950)]">
+        {/* Mobile background orbs */}
+        <div className="absolute inset-0 z-0 lg:hidden">
+          <div className="absolute top-[10%] -left-10 w-72 h-72 bg-[var(--color-emerald-500)]/10 rounded-full blur-[100px]"></div>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full max-w-[420px] relative z-10"
+        >
+          {/* ─── Back Button (outside card) ─── */}
         {onBack && (
           <motion.button
             initial={{ opacity: 0, x: -10 }}
@@ -153,7 +195,7 @@ const Auth = ({ onBack }) => {
         )}
 
         {/* ─── Card ─── */}
-        <div className="relative bg-[var(--color-slate-900)]/90 backdrop-blur-xl border border-[var(--color-slate-700)] rounded-3xl p-8 shadow-2xl overflow-hidden transition-colors duration-500">
+        <div className="relative glass-card-elevated rounded-3xl p-8 overflow-hidden transition-colors duration-500">
           
           {/* ─── Header ─── */}
           <div className="flex flex-col items-center text-center mb-8 relative z-10">
@@ -228,10 +270,10 @@ const Auth = ({ onBack }) => {
           </div>
 
           {/* ─── Form ─── */}
-          <form onSubmit={handleSubmit} className="space-y-3.5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <InputField
               type="email"
-              placeholder="Email address"
+              label="Email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               icon={Mail}
@@ -239,7 +281,7 @@ const Auth = ({ onBack }) => {
             />
             <InputField
               type="password"
-              placeholder="Password"
+              label="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               icon={Lock}
@@ -297,6 +339,7 @@ const Auth = ({ onBack }) => {
           A simple space for deep work.
         </motion.p>
       </motion.div>
+    </div>
     </div>
   );
 };

@@ -7,6 +7,36 @@
   .text-btn {
     color: var(--color-btn-text) !important;
   }
+  
+  /* Glass Card Utilities */
+  .glass-card {
+    background: color-mix(in srgb, var(--color-slate-900) 70%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid color-mix(in srgb, var(--color-white) 10%, transparent);
+    box-shadow: 0 10px 30px -10px color-mix(in srgb, var(--color-black) 50%, transparent);
+  }
+  
+  .glass-card-elevated {
+    background: color-mix(in srgb, var(--color-slate-800) 75%, transparent);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid color-mix(in srgb, var(--color-white) 15%, transparent);
+    border-top-color: color-mix(in srgb, var(--color-white) 25%, transparent);
+    box-shadow: 0 20px 40px -10px color-mix(in srgb, var(--color-black) 60%, transparent),
+                inset 0 1px 0 0 color-mix(in srgb, var(--color-white) 15%, transparent);
+  }
+
+  .glass-card-subtle {
+    background: color-mix(in srgb, var(--color-slate-900) 40%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid color-mix(in srgb, var(--color-white) 5%, transparent);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 15px currentColor;
+  }
 }
 
 /* --- shadcn-compatible theme tokens (dark mode aligned with slate-950 app) --- */
@@ -110,6 +140,41 @@ body {
 ::selection {
   background: color-mix(in srgb, var(--color-emerald-500), transparent 75%);
   color: var(--color-black);
+}
+
+/* Custom ambient slider */
+.ambient-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 5px;
+  border-radius: 9999px;
+  outline: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+.ambient-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+.ambient-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+.ambient-slider:disabled::-webkit-slider-thumb {
+  background: #475569;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.ambient-slider:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 /* --- Animated background aura --- */

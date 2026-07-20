@@ -138,16 +138,16 @@ const WelcomeScreen = ({ onComplete }) => {
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[var(--color-slate-950)] transition-colors duration-1000">
       {/* Animated gradient blobs */}
       <div
-        className={`absolute inset-0 bg-gradient-to-br ${step.gradient} transition-all duration-1000`}
+        className={`absolute inset-0 bg-gradient-to-br ${step.gradient} transition-all duration-1000 opacity-60`}
       />
-      <div className="absolute top-1/4 -left-20 w-72 h-72 bg-emerald-500/5 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute top-1/4 -left-20 w-96 h-96 bg-emerald-500/10 rounded-full blur-[100px] animate-pulse" />
       <div
-        className="absolute bottom-1/4 -right-20 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl animate-pulse"
+        className="absolute bottom-1/4 -right-20 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] animate-pulse"
         style={{ animationDelay: "1s" }}
       />
 
       {/* Main content */}
-      <div className="relative z-10 w-full max-w-lg mx-auto px-6 flex flex-col items-center min-h-[100dvh] sm:min-h-0 sm:h-auto py-12 sm:py-0">
+      <div className="relative z-10 w-full max-w-xl mx-auto px-6 flex flex-col items-center min-h-[100dvh] sm:min-h-0 sm:h-auto py-12 sm:py-16 glass-card-elevated rounded-[40px] shadow-2xl border border-white/10 m-4">
         {/* Progress dots */}
         <div className="flex items-center gap-2 mb-8 sm:mb-12">
           {steps.map((_, i) => (
@@ -224,7 +224,7 @@ const WelcomeScreen = ({ onComplete }) => {
                 initial={{ y: 15, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.25 }}
-                className="text-2xl sm:text-3xl md:text-4xl font-bold text-[var(--color-white)] mb-4 leading-tight transition-colors"
+                className="text-2xl sm:text-3xl md:text-[34px] font-bold text-[var(--color-white)] mb-4 leading-tight transition-colors tracking-tight"
               >
                 {step.title}
               </motion.h2>
@@ -234,7 +234,7 @@ const WelcomeScreen = ({ onComplete }) => {
                 initial={{ y: 15, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.3 }}
-                className="text-base sm:text-lg text-[var(--color-slate-400)] leading-relaxed max-w-md transition-colors font-medium"
+                className="text-[15px] sm:text-[17px] text-[var(--color-slate-300)] leading-relaxed max-w-md transition-colors font-medium"
               >
                 {step.subtitle}
               </motion.p>
