@@ -13,28 +13,33 @@ const SubTopicCard = ({
   const subTopicTime = subTopicTimers[subTopic.id]?.totalTime || 0;
 
   return (
-    <div className="bg-white/[0.02] p-3 pl-4 rounded-xl flex items-center justify-between gap-3 border border-white/[0.03] transition-all duration-300 hover:bg-white/[0.04] hover:border-[var(--color-emerald-500)]/10 motion-safe-gpu">
+    <div className="relative z-10 bg-white/[0.015] p-2.5 rounded-lg flex items-center justify-between gap-3 border border-white/[0.02] transition-all duration-300 hover:bg-white/[0.04] hover:border-emerald-500/15 group ml-3">
+      
+      {/* Horizontal connector line */}
+      <div className="absolute -left-[20px] top-1/2 w-[20px] h-px bg-white/10" />
+
       <div className="flex items-center gap-3 flex-1 min-w-0">
-        <div className="w-6 h-6 rounded-md bg-[var(--color-slate-800)] flex items-center justify-center flex-shrink-0">
-          <FaCheck className="text-[10px] text-[var(--color-slate-400)] transition-colors" />
+        <div className="w-7 h-7 rounded bg-slate-800/80 border border-white/5 flex items-center justify-center shrink-0 group-hover:bg-emerald-500/10 transition-colors">
+          <FaCheck className="text-[10px] text-slate-500 group-hover:text-emerald-400 transition-colors" />
         </div>
         <div className="flex-1 min-w-0">
-          <span className="text-white block truncate text-[13px] font-medium transition-colors">
+          <span className="text-slate-200 block truncate text-[13px] font-medium group-hover:text-white transition-colors">
             {subTopic.name}
           </span>
-          <p className="text-[11px] text-[var(--color-slate-400)] transition-colors mt-0.5">
+          <p className="text-[10px] text-slate-500 mt-0.5 group-hover:text-slate-400 transition-colors flex items-center gap-1.5">
+            <span className="w-1 h-1 rounded-full bg-slate-600"></span>
             {formatTime(subTopicTime)}
           </p>
         </div>
       </div>
+      
       <motion.button
         onClick={() => onSelect(project, topic, subTopic)}
-        className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-[var(--color-emerald-500)]/20 text-[var(--color-emerald-400)] rounded-lg text-[12px] font-bold transition-all shadow-sm shadow-[var(--color-emerald-500)]/5 focus:outline-none"
+        className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-emerald-500 text-slate-400 hover:text-slate-950 rounded-md text-[11px] font-bold transition-colors focus:outline-none shrink-0"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        transition={{ type: "spring", stiffness: 400, damping: 25 }}
       >
-        <FaPlay className="text-[9px]" /> Select
+        <FaPlay className="text-[8px]" /> Select
       </motion.button>
     </div>
   );
